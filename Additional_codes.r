@@ -982,4 +982,13 @@ setVisualStyle("SanjeeNetworkStyle")
 
 fitContent(selected.only = FALSE)
 
+########################################################################################################
 
+for(n in (1:maxn)){
+  print(n)
+  if (file.exists("D:/Matlab_Working_directory/PCA-PMI-master/lib/PMI_result.txt")) {
+    PMImat <- as.matrix(read.table(file = "PMI_result.txt", header = FALSE))
+  } else {
+    Sys.sleep(time)
+  }
+}
