@@ -7,5 +7,7 @@
 #' The foo functions ...
 #'
 #' @docType package
-#' @name foo
+#' @name netvis
+#'
+#' @importFrom magrittr %>%
 NULL
