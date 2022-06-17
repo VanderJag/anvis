@@ -1,9 +1,0 @@
-Package:
-Title:
-Description:
-Version:
-Author:
-Maintainer:
-Depends:
-License:
-LazyData:
