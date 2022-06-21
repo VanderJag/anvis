@@ -32,34 +32,66 @@
 #	Visual <- VisualiseNetwork(A, Group = TRUE, G, type = 3)
 #
 ##############################################################################################################################################################
-sigmoid_xB <- function(x, B){
-  T = (1/(1+((x/(1-x))^-B)))
-  return(T)
-}
-
-VisualiseNetwork <- function(A, Group = TRUE, G, type = 1) {
-
-  require(dplyr)
 
 
-  while(inherits(A, "data.frame") == TRUE || inherits(A, "matrix") == TRUE){A <- list(A)}
+#' Create formatted circular network
+#'
+#' This function creates a visualization for the input network
+#' information. The present implementation creates a network in which nodes are
+#' arranged in a circle. To highlight relevant interactions, there are different
+#' options available that determine the scaling of the weights in the network.
+#'
+#' @param df_adjacency A square matrix or data frame or a list of these. The data
+#'   should reprensed the strength of the relation between what will be the nodes in
+#'   the network. Rownames and column names are required.
+#' @return The section on the returned values
+#'
+#' @examples
+#' sum(1:10)
+#'
+#' @section Additional criteria for the use of this function
+#' * The Cytoscape software needs to be running.
+#' *
+#'
+#' @importFrom dplyr mutate
+VisualiseNetwork <- function(df_adjacency, Group = TRUE, group_vec, type = 1) {
 
+  # Since this function uses a for loop to iterate over the visualizations that
+  #   are created, the input needs to be converted into a list.
+  if(inherits(df_adjacency, "data.frame") == TRUE |
+     inherits(df_adjacency, "matrix") == TRUE) {
+    df_adjacency <- list(df_adjacency)
+  } else if (!inherits(df_adjacency, "list")) {
+    stop("Must provide data.frame, matrix, or list of these as input \n",
+         "You provided: ", class(df_adjacency), call. = FALSE)
+  }
+
+  # These variables will be used to store all prepared and rescaled networks
+  #   and return them in the end of this function
   AdjMatrix = NULL
   NodesNetwork = NULL
   EdgesNetwork = NULL
 
-  for (matrix in 1:length(A)) {
+  # Main loop to iterate over the multiple networks that can be provided as input
+  for (n_matrix in 1:length(df_adjacency)) {
 
-    Adjacency = NULL
+    # These variable store are used to create the current network in edgelist format
+    Adjacency = as.data.frame(df_adjacency[n_matrix])
     NodeTable = NULL
     EdgeTable = NULL
 
-    Adjacency = as.data.frame(A[matrix])
+    # If the number and column of the adjacency matrix is not equal there may be
+    #   missing info and an error with the data input
+    if (ncol(Adjacency) != nrow(Adjacency)) {
+      stop("Adjacency matrix should be a square matrix with equal number of rows ",
+           "and columns", call. = FALSE)
+    }
 
-    if(ncol(Adjacency) != nrow(Adjacency)) stop("Adjacency matrix should be a square matrix with equal number of rows and columns")
-    if(nrow(Adjacency) != length(G)) stop("The number of nodes/variables in the groups table should be the same as in the adjacency matrix")
-
-
+    # Incomplete group information can not be correctly assigned
+    if (nrow(Adjacency) != length(group_vec)) {
+      stop("The number of nodes/variables in the groups table should be the same ",
+           "as in the adjacency matrix", call. = FALSE)
+    }
 
     if(Group == FALSE){
       Adj <- Adjacency
@@ -68,7 +100,7 @@ VisualiseNetwork <- function(A, Group = TRUE, G, type = 1) {
       Groups <- as.vector(rep("A", nrow(Adj)))
       NodeTable <- as.data.frame(cbind(Node, Groups))
     } else {
-      Groups = as.vector(G)
+      Groups = as.vector(group_vec)
       Adj <- Adjacency
       Node <- as.vector(colnames(Adj))
       Node <- as.data.frame(Node)
@@ -165,8 +197,8 @@ VisualiseNetwork <- function(A, Group = TRUE, G, type = 1) {
 
     EdgeTable$sharedname <- paste(EdgeTable$Source, "(interacts)", EdgeTable$Target)
 
-    Network_name = sprintf("Visual_Network_%i", matrix)
-    Network_Collection = sprintf("Visual_Networks_%i", matrix)
+    Network_name = sprintf("Visual_Network_%i", n_matrix)
+    Network_Collection = sprintf("Visual_Networks_%i", n_matrix)
 
     nodes = NULL
     edges = NULL
@@ -196,7 +228,7 @@ VisualiseNetwork <- function(A, Group = TRUE, G, type = 1) {
     fitContent(selected.only = FALSE)
     fitContent(selected.only = FALSE)
 
-    Network_out = sprintf("Network_Image_%i", matrix)
+    Network_out = sprintf("Network_Image_%i", n_matrix)
 
     full.path = paste(getwd(), Network_out, sep="/")
     exportImage(full.path, "PNG", units="pixels", width=3600, height=1771)
@@ -206,7 +238,7 @@ VisualiseNetwork <- function(A, Group = TRUE, G, type = 1) {
     NodesNetwork <- list(NodesNetwork, NodeTable)
     EdgesNetwork <- list(EdgesNetwork, EdgeTable)
 
-    Network_save = sprintf("Cytoscape_Network_%i", matrix)
+    Network_save = sprintf("Cytoscape_Network_%i", n_matrix)
     full.path.cps = paste(getwd(), Network_save, sep="/")
     closeSession(save.before.closing = TRUE, filename = full.path.cps)
 
@@ -216,6 +248,11 @@ VisualiseNetwork <- function(A, Group = TRUE, G, type = 1) {
   Network = list(AdjMatrix, NodesNetwork, EdgesNetwork)
   return(Network)
 
+}
+
+sigmoid_xB <- function(x, B){
+  T = (1/(1+((x/(1-x))^-B)))
+  return(T)
 }
 
 # Run example
@@ -235,8 +272,8 @@ group_vec[names(Mat1) |> stringr::str_detect("IL")] <- "B"
 group_vec[names(Mat1) |> stringr::str_detect("CCL")] <- "C"
 group_vec[names(Mat1) |> stringr::str_detect("CXCL")] <- "D"
 
-Visual <- VisualiseNetwork(Mat1,
+Visual <- VisualiseNetwork(Mat1[1:3, 1:2],
                            Group = TRUE,
-                           G = group_vec,
+                           group_vec = group_vec,
                            type = 1)
 
