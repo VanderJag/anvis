@@ -32,14 +32,16 @@
 #	Visual <- VisualiseNetwork(A, Group = TRUE, G, type = 3)
 #
 ##############################################################################################################################################################
-sigmoid <- function(x, B){
-T = (1/(1+((x/(1-x))^-B)))
-return(T)
+sigmoid_xB <- function(x, B){
+  T = (1/(1+((x/(1-x))^-B)))
+  return(T)
 }
 
 VisualiseNetwork <- function(A, Group = TRUE, G, type = 1) {
 
   require(dplyr)
+
+
   while(inherits(A, "data.frame") == TRUE || inherits(A, "matrix") == TRUE){A <- list(A)}
 
   AdjMatrix = NULL
@@ -129,36 +131,36 @@ VisualiseNetwork <- function(A, Group = TRUE, G, type = 1) {
       value = wids[j]
       wid <- as.vector(append(wid, c(rep(value, times))))
     }
-	#1 is partcor, 2 is cor, 3 is MI, 4 is ranked, 5 is percentile.
-    ifelse(type == 1, EdgeTable <- mutate(EdgeTable, width=sigmoid(x=nthroot(abs(Weight), 3), B=3)),
-        ifelse(type == 2, EdgeTable <- mutate(EdgeTable, width=sigmoid(x=abs(Weight), B=3)),
-            ifelse(type == 3, EdgeTable <- mutate(EdgeTable, width=sigmoid(x=(abs(Weight)/max(abs(Adj))), B=3)),
-                ifelse(type == 4, EdgeTable <- mutate(EdgeTable, width = sigmoid(x=(Rank(-Weight)/E), B=3)),
-                    if(type == 5){
-                        wid <- as.data.frame(wid)
-                        EdgeTable <- EdgeTable[sort(abs(EdgeTable$Weight), decreasing=T, index.return=T)[[2]],]
-                        EdgeTable <- cbind(EdgeTable, wid)
-                        colnames(EdgeTable)[5] <- "width"
-                    }
-                        else{
-                            print("type not selected")
-                        }))))
+    #1 is partcor, 2 is cor, 3 is MI, 4 is ranked, 5 is percentile.
+    ifelse(type == 1, EdgeTable <- mutate(EdgeTable, width=sigmoid_xB(x=nthroot(abs(Weight), 3), B=3)),
+           ifelse(type == 2, EdgeTable <- mutate(EdgeTable, width=sigmoid_xB(x=abs(Weight), B=3)),
+                  ifelse(type == 3, EdgeTable <- mutate(EdgeTable, width=sigmoid_xB(x=(abs(Weight)/max(abs(Adj))), B=3)),
+                         ifelse(type == 4, EdgeTable <- mutate(EdgeTable, width = sigmoid_xB(x=(Rank(-Weight)/E), B=3)),
+                                if(type == 5){
+                                  wid <- as.data.frame(wid)
+                                  EdgeTable <- EdgeTable[sort(abs(EdgeTable$Weight), decreasing=T, index.return=T)[[2]],]
+                                  EdgeTable <- cbind(EdgeTable, wid)
+                                  colnames(EdgeTable)[5] <- "width"
+                                }
+                                else{
+                                  print("type not selected")
+                                }))))
 
 
     ct = NULL
-	ifelse(min(as.vector(Weight)) < 0, ct = 1, ct = 2)
+    if (min(as.vector(Weight)) < 0) ct = 1 else ct = 2
 
-	cp1 <- as.vector(diverging_hcl(n=nrow(EdgeTable), palette = "Blue-Red"))
-	cp2 <- as.vector(sequential_hcl(n=nrow(EdgeTable), palette = "Reds2"))
+    cp1 <- as.vector(diverging_hcl(n=nrow(EdgeTable), palette = "Blue-Red"))
+    cp2 <- as.vector(sequential_hcl(n=nrow(EdgeTable), palette = "Reds2"))
 
-	if(ct == 1){
-        EdgeTable <- EdgeTable[sort(EdgeTable$Weight, decreasing=T, index.return=T)[[2]],]
-        EdgeTable <- cbind(EdgeTable, cp1)
-        colnames(EdgeTable)[6] <- "Stroke"
+    if(ct == 1){
+      EdgeTable <- EdgeTable[sort(EdgeTable$Weight, decreasing=T, index.return=T)[[2]],]
+      EdgeTable <- cbind(EdgeTable, cp1)
+      colnames(EdgeTable)[6] <- "Stroke"
     }else{
-        EdgeTable <- EdgeTable[sort(abs(EdgeTable$Weight), decreasing=T, index.return=T)[[2]],]
-        EdgeTable <- cbind(EdgeTable, cp2)
-        colnames(EdgeTable)[6] <- "Stroke"
+      EdgeTable <- EdgeTable[sort(abs(EdgeTable$Weight), decreasing=T, index.return=T)[[2]],]
+      EdgeTable <- cbind(EdgeTable, cp2)
+      colnames(EdgeTable)[6] <- "Stroke"
     }
 
     EdgeTable$sharedname <- paste(EdgeTable$Source, "(interacts)", EdgeTable$Target)
@@ -216,4 +218,25 @@ VisualiseNetwork <- function(A, Group = TRUE, G, type = 1) {
 
 }
 
+# Run example
+library(dplyr)        # For data wrangling, e.g. using mutate
+library(RCy3)         # For communicating with cytoscape
+library(pracma)       # To use the nthroot function
+library(colorspace)   # To adjust color palettes
+
+Mat1 <- readRDS("tests/trail_adjacency_matrix.rds")
+
+# A <- list(Mat1, Mat2, Mat3)
+# G <- as.vector(c(label1, label2, label3...., labeln))
+
+group_vec <- rep("A", times = nrow(Mat1))
+
+group_vec[names(Mat1) |> stringr::str_detect("IL")] <- "B"
+group_vec[names(Mat1) |> stringr::str_detect("CCL")] <- "C"
+group_vec[names(Mat1) |> stringr::str_detect("CXCL")] <- "D"
+
+Visual <- VisualiseNetwork(Mat1,
+                           Group = TRUE,
+                           G = group_vec,
+                           type = 1)
 
