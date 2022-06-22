@@ -33,6 +33,223 @@
 #
 ##############################################################################################################################################################
 
+#' Adjacency matrix to edgelist
+#'
+#' Converts an adjacency matrix into an weighted edgelist. Interactions of nodes
+#' with themselves are removed
+#'
+#' @param df Data frame or matrix. Square adjacency matrix. Nodes must be specified
+#'   in rownames and column names.
+#' @return Returns data frame representing a network as weighted edgelist. Columns are
+#'   Source, Target, and Weight.
+#'
+#' @examples
+#' nodes <- c(paste0("IL", 1:5), paste0("CCL", 1:3), paste0("CXCL", 1:4))
+#' n_nodes <- length(nodes)
+#'
+#' interactions <- (runif(n_nodes**2)) |>
+#'   matrix(nrow = n_nodes, ncol = n_nodes)
+#'
+#' row.names(interactions) <- nodes
+#' colnames(interactions) <- nodes
+#'
+#' for(i in 1:n_nodes) {
+#'   interactions[i,i] <- 1
+#' }
+#'
+#' adj_matrix_to_edgelist(interactions)
+adj_matrix_to_edgelist <- function(df) {
+  # Prepare to convert to long format by making the rownames a column of their own
+  df <- df %>%
+    tibble::as_tibble(df, rownames = "Source")
+
+  # Convert into the edgelist format
+  edgelist <- tidyr::pivot_longer(df, cols = -Source, names_to = "Target", values_to = "Weight") %>%
+    dplyr::filter(Source != Target) %>%    # Remove self interactions
+    dplyr::filter(Weight != 0)            # No interaction means no edge
+
+  return(edgelist)
+
+  # Previous code
+  # diag(Adj) = 0
+  # Adj[lower.tri(Adj, diag=TRUE)] <- 0
+  #
+  # Source = NULL
+  # Target = NULL
+  # Weight = NULL
+  # for (row in 1:nrow(Adj)) {
+  #   for (col in 1:ncol(Adj)) {
+  #     if (Adj[row, col] != 0) {
+  #       Source <- as.vector(append(Source, rownames(Adj[row, ])))
+  #       Target <- as.vector(append(Target, colnames(Adj[col])))
+  #       Weight <- as.vector(append(Weight, as.numeric(Adj[row, col])))
+  #     } else {}
+  #   }
+  # }
+}
+
+
+adj_matrix_to_nodetable <- function(df) {
+
+  data.frame("Node" = colnames(df))
+}
+
+
+# adds a column with the grouping info to a node table, and sorts it
+group_nodes <- function(node_table, group_vec = NULL) {
+
+  # TODO Check if grouping vector has the correct length and ensure it's character type
+
+  # If a grouping vector has been provided
+  if (!is.null(group_vec)) {
+    node_table$Groups <- group_vec
+    node_table <- node_table[order(node_table$Groups),]
+  } else {
+    node_table$Groups <- "A"
+  }
+}
+
+add_node_xy <- function(node_table, layout = "circle") {
+  X = NULL
+  Y = NULL
+  R = round(nrow(node_table)/10, 0) * (100)
+
+  if (layout == "circle") {
+    # Calculate position in circle
+    for (i in 0:(nrow(node_table) - 1)) {
+      print(i)
+      x = R*cos((i*2*3.14159265359)/(nrow(node_table)))
+      X <- as.vector(append(X, x))
+      y = R*sin((i*2*3.14159265359)/(nrow(node_table)))
+      Y <- as.vector(append(Y, y))
+    }
+  } else {
+    # TODO complete error message
+    stop("Must select valid network layout. ",
+         "\nℹ you selected: ", layout,
+         "\n✖ parameter `layout` must be one of ...", call.=FALSE)
+  }
+
+  pos <- as.data.frame(cbind(X,Y))
+  node_table <- cbind(node_table, pos)
+
+  return(node_table)
+}
+
+
+
+# requires df with a column called Weight
+edge_weight_to_widths <- function(edge_table, type) {
+  frac = as.vector(c(2, 3, 4, 6, 10, 15, 24, 36))
+  n_edges = nrow(edge_table)
+  M = NULL
+  for (i in 1:length(frac)) {
+    f = frac[i]
+    mes = NULL
+    mes = round((f * n_edges)/100, 0)
+    M <- as.vector(append(M, mes))
+  }
+  diff = (sum(M)) - (nrow(edge_table))
+  ifelse(diff == 0, print("perfect!"), M[8] <- M[8] - diff)
+
+  wids <- as.vector(c(10, 8, 4, 2, 1, 0.5, 0.25, 0.25))
+  wid = NULL
+  for (j in 1:length(M)) {
+    times = M[j]
+    value = wids[j]
+    wid <- as.vector(append(wid, c(rep(value, times))))
+  }
+
+  #1 is partcor, 2 is cor, 3 is MI, 4 is ranked, 5 is percentile.
+  ifelse(type == 1, edge_table <- mutate(edge_table, width=sigmoid_xB(x=nthroot(abs(Weight), 3), B=3)),
+         ifelse(type == 2, edge_table <- mutate(edge_table, width=sigmoid_xB(x=abs(Weight), B=3)),
+                ifelse(type == 3, edge_table <- mutate(edge_table, width=sigmoid_xB(x=(abs(Weight)/max(abs(Adj))), B=3)),
+                       ifelse(type == 4, edge_table <- mutate(edge_table, width = sigmoid_xB(x=(Rank(-Weight)/n_edges), B=3)),
+                              if(type == 5){
+                                wid <- as.data.frame(wid)
+                                edge_table <- edge_table[sort(abs(edge_table$Weight), decreasing=T, index.return=T)[[2]],]
+                                edge_table <- cbind(edge_table, wid)
+                                colnames(edge_table)[5] <- "width"
+                              }
+                              else{
+                                print("type not selected")
+                              }))))
+
+  tmp_x <- seq(0, 1, length.out = 1000)
+  plot(tmp_x, sigmoid_xB(tmp_x, 3))
+  abline(0,1)
+  return(edge_table)
+}
+
+weights_to_color <- function(edge_table) {
+
+  # If negative numbers are found in the weights use a diverging color palette,
+  #   otherwise use a sequential color palette
+  if (min(edge_table$Weight) < 0) {
+    Stroke <- as.vector(diverging_hcl(n=nrow(edge_table), palette = "Blue-Red"))
+    edge_table <- edge_table[sort(edge_table$Weight, decreasing=T, index.return=T)[[2]],]
+    edge_table <- cbind(edge_table, Stroke)
+  } else {
+    Stroke <- as.vector(sequential_hcl(n=nrow(edge_table), palette = "Reds2"))
+    edge_table <- edge_table[sort(abs(edge_table$Weight), decreasing=T, index.return=T)[[2]],]
+    edge_table <- cbind(edge_table, Stroke)
+  }
+
+  return(edge_table)
+}
+
+vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1) {
+
+  Interaction <- rep("interacts", nrow(edge_table))
+  edge_table <- cbind(edge_table, Interaction)
+  edge_table$sharedname <- paste(edge_table$Source, "(interacts)", edge_table$Target)
+
+  Network_name = sprintf("Visual_Network_%i", netw_nr)
+  Network_Collection = sprintf("Visual_Networks_%i", netw_nr)
+
+  nodes = NULL
+  edges = NULL
+
+  nodes <- data.frame(id=as.vector(node_table$Node), group=as.vector(node_table$Groups), stringsAsFactors = FALSE)
+  edges <- data.frame(source=as.vector(edge_table$Source), target=as.vector(edge_table$Target), interaction=as.vector(edge_table$Interaction), weight=as.vector(edge_table$Weight), stringsAsFactors = FALSE)
+
+  createNetworkFromDataFrames(nodes, edges, title=Network_name, collection=Network_Collection, style.name = "SanjeeNetworkStyle")
+
+
+  Colour_palette <- as.vector(c("#0073C2", "#EFC000", "#868686", "#CD534C", "#7AA6DC", "#003C6799", "#8F7700", "#3B3B3B", "#A73030", "#4A6990"))
+
+  style.name = "SanjeeNetworkStyle"
+  defaults <- list(NODE_SHAPE="Ellipse", NODE_SIZE=25.0, EDGE_TRANSPARENCY=255 , NODE_LABEL_POSITION="W,E,c,0.00,0.00", NODE_BORDER_PAINT="#FFFFFF")
+  nodeLabels <- mapVisualProperty("Node Label", "id", "p")
+  nodecolour <- mapVisualProperty("Node Fill Color", "group", "d", as.vector(unique(node_table$Groups)), as.vector(Colour_palette[1:length(unique(node_table$Groups))]))
+  nodeXlocation <- mapVisualProperty("Node X Location", "id", "d", as.vector(node_table$Node), as.vector(node_table$X))
+  nodeYlocation <- mapVisualProperty("Node Y Location", "id", "d", as.vector(node_table$Node), as.vector(node_table$Y))
+  edgeline <- mapVisualProperty("Edge Line Type", "interaction", "d", as.vector(unique(edge_table$Interaction)), as.vector(c("Solid")))
+  edgewidth <- mapVisualProperty("Edge Width", "shared name", "d", as.vector(edge_table$sharedname), as.vector(edge_table$width))
+  edgestroke <- mapVisualProperty("Edge Stroke Unselected Paint", "shared name", "d", as.vector(edge_table$sharedname), as.vector(edge_table$Stroke))
+
+  createVisualStyle(style.name, defaults, list(nodeLabels, nodecolour, nodeXlocation, nodeYlocation, edgeline, edgewidth, edgestroke))
+  setVisualStyle("SanjeeNetworkStyle")
+
+  fitContent(selected.only = FALSE)
+  fitContent(selected.only = FALSE)
+  fitContent(selected.only = FALSE)
+
+  Network_out = sprintf("Network_Image_%i", netw_nr)
+
+  full.path = paste(getwd(), Network_out, sep="/")
+  exportImage(full.path, "PNG", units="pixels", width=3600, height=1771)
+
+
+  Network_save = sprintf("Cytoscape_Network_%i", netw_nr)
+  full.path.cps = paste(getwd(), Network_save, sep="/")
+  closeSession(save.before.closing = TRUE, filename = full.path.cps)
+}
+
+sigmoid_xB <- function(x, B){
+  T = (1/(1+((x/(1-x))^-B)))
+  return(T)
+}
 
 #' Create formatted circular network
 #'
@@ -54,7 +271,7 @@
 #' *
 #'
 #' @importFrom dplyr mutate
-VisualiseNetwork <- function(df_adjacency, Group = TRUE, group_vec, type = 1) {
+VisualiseNetwork <- function(df_adjacency, group_vec = NULL, type = 2) {
 
   # Since this function uses a for loop to iterate over the visualizations that
   #   are created, the input needs to be converted into a list.
@@ -73,11 +290,11 @@ VisualiseNetwork <- function(df_adjacency, Group = TRUE, group_vec, type = 1) {
   EdgesNetwork = NULL
 
   # Main loop to iterate over the multiple networks that can be provided as input
-  for (n_matrix in 1:length(df_adjacency)) {
+  for (i_matrix in 1:length(df_adjacency)) {
 
     # These variable store are used to create the current network in edgelist format
-    Adjacency = as.data.frame(df_adjacency[n_matrix])
-    NodeTable = NULL
+    Adjacency = as.data.frame(df_adjacency[i_matrix])
+    node_table = NULL
     EdgeTable = NULL
 
     # If the number and column of the adjacency matrix is not equal there may be
@@ -93,154 +310,47 @@ VisualiseNetwork <- function(df_adjacency, Group = TRUE, group_vec, type = 1) {
            "as in the adjacency matrix", call. = FALSE)
     }
 
-    if(Group == FALSE){
-      Adj <- Adjacency
-      Node <- as.vector(colnames(Adj))
-      Node <- as.data.frame(Node)
-      Groups <- as.vector(rep("A", nrow(Adj)))
-      NodeTable <- as.data.frame(cbind(Node, Groups))
-    } else {
-      Groups = as.vector(group_vec)
-      Adj <- Adjacency
-      Node <- as.vector(colnames(Adj))
-      Node <- as.data.frame(Node)
-      NodeTable <- as.data.frame(cbind(Node, Groups))
-    }
-    #NodeTable <- left_join(Node, Node_Group, by = NULL,  copy = FALSE, suffix=c(".n",".g"))
-    NodeTable <- with(NodeTable, NodeTable[order(NodeTable$Groups) , ])
 
-    diag(Adj) = 0
-    Adj[lower.tri(Adj, diag=TRUE)] <- 0
+    # Node table with group info ----------------------------------------------
 
-    Source = NULL
-    Target = NULL
-    Weight = NULL
-    for (row in 1:nrow(Adj)) {
-      for (col in 1:ncol(Adj)) {
-        if (Adj[row, col] != 0) {
-          Source <- as.vector(append(Source, rownames(Adj[row, ])))
-          Target <- as.vector(append(Target, colnames(Adj[col])))
-          Weight <- as.vector(append(Weight, as.numeric(Adj[row, col])))
-        } else {}
-      }
-    }
-    Interaction <- as.vector(rep("interacts", length(Weight)))
-    EdgeTable <- as.data.frame(cbind(Source, Target, Weight, Interaction))
-    EdgeTable$Weight <- as.numeric(as.character(EdgeTable$Weight))
+    node_table <- adj_matrix_to_nodetable(Adjacency)
+
+    # Adding grouping information ---------------------------------------------
+
+    node_table <- group_nodes(node_table, group_vec = group_vec)
+
+    # Cytoscape node positions ------------------------------------------------
+
+    node_table <- add_node_xy(node_table)
 
 
-    X = NULL
-    Y = NULL
-    R = round(nrow(Adj)/10, 0) * (100)
 
-    for (i in 0:(nrow(Adj) - 1)) {
-      print(i)
-      x = R*cos((i*2*3.14159265359)/(nrow(Adj)))
-      X <- as.vector(append(X, x))
-      y = R*sin((i*2*3.14159265359)/(nrow(Adj)))
-      Y <- as.vector(append(Y, y))
-    }
-    pos <- as.data.frame(cbind(X,Y))
+    # adjecency to edgelist ---------------------------------------------------
 
-    NodeTable <- cbind(NodeTable, pos)
+    edge_table <- adj_matrix_to_edgelist(Adjacency)
 
-    frac = as.vector(c(2, 3, 4, 6, 10, 15, 24, 36))
-    E = nrow(EdgeTable)
-    M = NULL
-    for (i in 1:length(frac)) {
-      f = frac[i]
-      mes = NULL
-      mes = round((f * E)/100, 0)
-      M <- as.vector(append(M, mes))
-    }
-    diff = (sum(M)) - (nrow(EdgeTable))
-    ifelse(diff == 0, print("perfect!"), M[8] <- M[8] - diff)
+    # Convert edge weight to edge width ---------------------------------------
 
-    wids <- as.vector(c(10, 8, 4, 2, 1, 0.5, 0.25, 0.25))
-    wid = NULL
-    for (j in 1:length(M)) {
-      times = M[j]
-      value = wids[j]
-      wid <- as.vector(append(wid, c(rep(value, times))))
-    }
-    #1 is partcor, 2 is cor, 3 is MI, 4 is ranked, 5 is percentile.
-    ifelse(type == 1, EdgeTable <- mutate(EdgeTable, width=sigmoid_xB(x=nthroot(abs(Weight), 3), B=3)),
-           ifelse(type == 2, EdgeTable <- mutate(EdgeTable, width=sigmoid_xB(x=abs(Weight), B=3)),
-                  ifelse(type == 3, EdgeTable <- mutate(EdgeTable, width=sigmoid_xB(x=(abs(Weight)/max(abs(Adj))), B=3)),
-                         ifelse(type == 4, EdgeTable <- mutate(EdgeTable, width = sigmoid_xB(x=(Rank(-Weight)/E), B=3)),
-                                if(type == 5){
-                                  wid <- as.data.frame(wid)
-                                  EdgeTable <- EdgeTable[sort(abs(EdgeTable$Weight), decreasing=T, index.return=T)[[2]],]
-                                  EdgeTable <- cbind(EdgeTable, wid)
-                                  colnames(EdgeTable)[5] <- "width"
-                                }
-                                else{
-                                  print("type not selected")
-                                }))))
+    edge_table <- edge_weight_to_widths(edge_table, type = type)
+
+    # Add colour column to edge table -----------------------------------------
+
+    edge_table <- weights_to_color(edge_table)
 
 
-    ct = NULL
-    if (min(as.vector(Weight)) < 0) ct = 1 else ct = 2
 
-    cp1 <- as.vector(diverging_hcl(n=nrow(EdgeTable), palette = "Blue-Red"))
-    cp2 <- as.vector(sequential_hcl(n=nrow(EdgeTable), palette = "Reds2"))
-
-    if(ct == 1){
-      EdgeTable <- EdgeTable[sort(EdgeTable$Weight, decreasing=T, index.return=T)[[2]],]
-      EdgeTable <- cbind(EdgeTable, cp1)
-      colnames(EdgeTable)[6] <- "Stroke"
-    }else{
-      EdgeTable <- EdgeTable[sort(abs(EdgeTable$Weight), decreasing=T, index.return=T)[[2]],]
-      EdgeTable <- cbind(EdgeTable, cp2)
-      colnames(EdgeTable)[6] <- "Stroke"
-    }
-
-    EdgeTable$sharedname <- paste(EdgeTable$Source, "(interacts)", EdgeTable$Target)
-
-    Network_name = sprintf("Visual_Network_%i", n_matrix)
-    Network_Collection = sprintf("Visual_Networks_%i", n_matrix)
-
-    nodes = NULL
-    edges = NULL
-
-    nodes <- data.frame(id=as.vector(NodeTable$Node), group=as.vector(NodeTable$Groups), stringsAsFactors = FALSE)
-    edges <- data.frame(source=as.vector(EdgeTable$Source), target=as.vector(EdgeTable$Target), interaction=as.vector(EdgeTable$Interaction), weight=as.vector(EdgeTable$Weight), stringsAsFactors = FALSE)
-
-    createNetworkFromDataFrames(nodes, edges, title=Network_name, collection=Network_Collection, style.name = "SanjeeNetworkStyle")
+    # Visualize in Cytoscape --------------------------------------------------
+    vis_in_cytoscape(edge_table = edge_table,
+                     node_table = node_table,
+                     netw_nr = i_matrix)
 
 
-    Colour_palette <- as.vector(c("#0073C2", "#EFC000", "#868686", "#CD534C", "#7AA6DC", "#003C6799", "#8F7700", "#3B3B3B", "#A73030", "#4A6990"))
 
-    style.name = "SanjeeNetworkStyle"
-    defaults <- list(NODE_SHAPE="Ellipse", NODE_SIZE=25.0, EDGE_TRANSPARENCY=255 , NODE_LABEL_POSITION="W,E,c,0.00,0.00", NODE_BORDER_PAINT="#FFFFFF")
-    nodeLabels <- mapVisualProperty("Node Label", "id", "p")
-    nodecolour <- mapVisualProperty("Node Fill Color", "group", "d", as.vector(unique(NodeTable$Groups)), as.vector(Colour_palette[1:length(unique(NodeTable$Groups))]))
-    nodeXlocation <- mapVisualProperty("Node X Location", "id", "d", as.vector(NodeTable$Node), as.vector(NodeTable$X))
-    nodeYlocation <- mapVisualProperty("Node Y Location", "id", "d", as.vector(NodeTable$Node), as.vector(NodeTable$Y))
-    edgeline <- mapVisualProperty("Edge Line Type", "interaction", "d", as.vector(unique(EdgeTable$Interaction)), as.vector(c("Solid")))
-    edgewidth <- mapVisualProperty("Edge Width", "shared name", "d", as.vector(EdgeTable$sharedname), as.vector(EdgeTable$width))
-    edgestroke <- mapVisualProperty("Edge Stroke Unselected Paint", "shared name", "d", as.vector(EdgeTable$sharedname), as.vector(EdgeTable$Stroke))
-
-    createVisualStyle(style.name, defaults, list(nodeLabels, nodecolour, nodeXlocation, nodeYlocation, edgeline, edgewidth, edgestroke))
-    setVisualStyle("SanjeeNetworkStyle")
-
-    fitContent(selected.only = FALSE)
-    fitContent(selected.only = FALSE)
-    fitContent(selected.only = FALSE)
-
-    Network_out = sprintf("Network_Image_%i", n_matrix)
-
-    full.path = paste(getwd(), Network_out, sep="/")
-    exportImage(full.path, "PNG", units="pixels", width=3600, height=1771)
-
-    #Network files for building network using some other software
+    # Network files for building network using some other software
     AdjMatrix <- list(AdjMatrix, Adjacency)
-    NodesNetwork <- list(NodesNetwork, NodeTable)
-    EdgesNetwork <- list(EdgesNetwork, EdgeTable)
+    NodesNetwork <- list(NodesNetwork, node_table)
+    EdgesNetwork <- list(EdgesNetwork, edge_table)
 
-    Network_save = sprintf("Cytoscape_Network_%i", n_matrix)
-    full.path.cps = paste(getwd(), Network_save, sep="/")
-    closeSession(save.before.closing = TRUE, filename = full.path.cps)
 
   }
 
@@ -248,11 +358,6 @@ VisualiseNetwork <- function(df_adjacency, Group = TRUE, group_vec, type = 1) {
   Network = list(AdjMatrix, NodesNetwork, EdgesNetwork)
   return(Network)
 
-}
-
-sigmoid_xB <- function(x, B){
-  T = (1/(1+((x/(1-x))^-B)))
-  return(T)
 }
 
 # Run example
@@ -271,6 +376,7 @@ group_vec <- rep("A", times = nrow(Mat1))
 group_vec[names(Mat1) |> stringr::str_detect("IL")] <- "B"
 group_vec[names(Mat1) |> stringr::str_detect("CCL")] <- "C"
 group_vec[names(Mat1) |> stringr::str_detect("CXCL")] <- "D"
+
 
 Visual <- VisualiseNetwork(Mat1[1:3, 1:2],
                            Group = TRUE,
