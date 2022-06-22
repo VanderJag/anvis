@@ -59,14 +59,17 @@
 #'
 #' adj_matrix_to_edgelist(interactions)
 adj_matrix_to_edgelist <- function(df) {
+  diag(df) = 0
+  df[lower.tri(df, diag=TRUE)] <- 0
+
   # Prepare to convert to long format by making the rownames a column of their own
   df <- df %>%
     tibble::as_tibble(df, rownames = "Source")
 
   # Convert into the edgelist format
   edgelist <- tidyr::pivot_longer(df, cols = -Source, names_to = "Target", values_to = "Weight") %>%
-    dplyr::filter(Source != Target) %>%    # Remove self interactions
-    dplyr::filter(Weight != 0)            # No interaction means no edge
+    # Self interaction and dulicate info from lower triangle have been set to 0
+    dplyr::filter(Weight != 0)
 
   return(edgelist)
 
@@ -109,7 +112,7 @@ group_nodes <- function(node_table, group_vec = NULL) {
   }
 }
 
-add_node_xy <- function(node_table, layout = "circle") {
+add_node_pos <- function(node_table, layout = "circle") {
   X = NULL
   Y = NULL
   R = round(nrow(node_table)/10, 0) * (100)
@@ -117,7 +120,6 @@ add_node_xy <- function(node_table, layout = "circle") {
   if (layout == "circle") {
     # Calculate position in circle
     for (i in 0:(nrow(node_table) - 1)) {
-      print(i)
       x = R*cos((i*2*3.14159265359)/(nrow(node_table)))
       X <- as.vector(append(X, x))
       y = R*sin((i*2*3.14159265359)/(nrow(node_table)))
@@ -163,7 +165,7 @@ edge_weight_to_widths <- function(edge_table, type) {
   #1 is partcor, 2 is cor, 3 is MI, 4 is ranked, 5 is percentile.
   ifelse(type == 1, edge_table <- mutate(edge_table, width=sigmoid_xB(x=nthroot(abs(Weight), 3), B=3)),
          ifelse(type == 2, edge_table <- mutate(edge_table, width=sigmoid_xB(x=abs(Weight), B=3)),
-                ifelse(type == 3, edge_table <- mutate(edge_table, width=sigmoid_xB(x=(abs(Weight)/max(abs(Adj))), B=3)),
+                ifelse(type == 3, edge_table <- mutate(edge_table, width=sigmoid_xB(x=(abs(Weight)/max(abs(df))), B=3)),
                        ifelse(type == 4, edge_table <- mutate(edge_table, width = sigmoid_xB(x=(Rank(-Weight)/n_edges), B=3)),
                               if(type == 5){
                                 wid <- as.data.frame(wid)
@@ -321,8 +323,7 @@ VisualiseNetwork <- function(df_adjacency, group_vec = NULL, type = 2) {
 
     # Cytoscape node positions ------------------------------------------------
 
-    node_table <- add_node_xy(node_table)
-
+    node_table <- add_node_pos(node_table)
 
 
     # adjecency to edgelist ---------------------------------------------------
@@ -366,20 +367,17 @@ library(RCy3)         # For communicating with cytoscape
 library(pracma)       # To use the nthroot function
 library(colorspace)   # To adjust color palettes
 
+# Load adjacency matrix
 Mat1 <- readRDS("tests/trail_adjacency_matrix.rds")
 
-# A <- list(Mat1, Mat2, Mat3)
-# G <- as.vector(c(label1, label2, label3...., labeln))
-
+# Some grouping based on column names
 group_vec <- rep("A", times = nrow(Mat1))
+group_vec[colnames(Mat1) |> stringr::str_detect("IL")] <- "B"
+group_vec[colnames(Mat1) |> stringr::str_detect("CCL")] <- "C"
+group_vec[colnames(Mat1) |> stringr::str_detect("CXCL")] <- "D"
 
-group_vec[names(Mat1) |> stringr::str_detect("IL")] <- "B"
-group_vec[names(Mat1) |> stringr::str_detect("CCL")] <- "C"
-group_vec[names(Mat1) |> stringr::str_detect("CXCL")] <- "D"
-
-
-Visual <- VisualiseNetwork(Mat1[1:3, 1:2],
-                           Group = TRUE,
+# Visualize the network
+Visual <- VisualiseNetwork(Mat1,
                            group_vec = group_vec,
                            type = 1)
 
