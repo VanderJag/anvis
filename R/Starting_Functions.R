@@ -36,11 +36,11 @@
 #' Adjacency matrix to edgelist
 #'
 #' Converts an adjacency matrix into an weighted edgelist. Interactions of nodes
-#' with themselves are removed
+#' with themselves are removed. Assumes the input in undirectional
 #'
 #' @param df Data frame or matrix. Square adjacency matrix. Nodes must be specified
 #'   in rownames and column names.
-#' @return Returns data frame representing a network as weighted edgelist. Columns are
+#' @return Returns data frame representing a network as weighted edge list. Columns are
 #'   Source, Target, and Weight.
 #'
 #' @examples
@@ -50,6 +50,9 @@
 #' interactions <- (runif(n_nodes**2)) |>
 #'   matrix(nrow = n_nodes, ncol = n_nodes)
 #'
+#' interactions[upper.tri(interactions, diag=FALSE)] <-
+#'     t(interactions)[upper.tri(t(interactions), diag=FALSE)]
+#'
 #' row.names(interactions) <- nodes
 #' colnames(interactions) <- nodes
 #'
@@ -58,7 +61,22 @@
 #' }
 #'
 #' adj_matrix_to_edgelist(interactions)
+#'
 adj_matrix_to_edgelist <- function(df) {
+
+  # If the upper and lower diagonal are not the same we would be discarding information
+  is_equal <- isTRUE(all.equal(df[upper.tri(df, diag=FALSE)],
+                           t(df)[upper.tri(t(df), diag=FALSE)]))
+  if(!is_equal) {
+    stop("Must provide adjacency matrix with identical upper and lower triangle.",
+         "\nℹ Check your adj. matrix with `all.equal(adj[upper.tri(adj, diag=FALSE)], ",
+         "t(adj)[upper.tri(t(adj), diag=FALSE)])`",
+         "\n✖ Lower triangle can't be discarded since it doesn't match upper triangle.",
+         call.=FALSE)
+  }
+
+  # It is assumed that there is no interest in self intaction, and that the
+  #   upper and lower triangles of the adjacency matrix are identical.
   diag(df) = 0
   df[lower.tri(df, diag=TRUE)] <- 0
 
@@ -72,23 +90,6 @@ adj_matrix_to_edgelist <- function(df) {
     dplyr::filter(Weight != 0)
 
   return(edgelist)
-
-  # Previous code
-  # diag(Adj) = 0
-  # Adj[lower.tri(Adj, diag=TRUE)] <- 0
-  #
-  # Source = NULL
-  # Target = NULL
-  # Weight = NULL
-  # for (row in 1:nrow(Adj)) {
-  #   for (col in 1:ncol(Adj)) {
-  #     if (Adj[row, col] != 0) {
-  #       Source <- as.vector(append(Source, rownames(Adj[row, ])))
-  #       Target <- as.vector(append(Target, colnames(Adj[col])))
-  #       Weight <- as.vector(append(Weight, as.numeric(Adj[row, col])))
-  #     } else {}
-  #   }
-  # }
 }
 
 
@@ -137,7 +138,6 @@ add_node_pos <- function(node_table, layout = "circle") {
 
   return(node_table)
 }
-
 
 
 # requires df with a column called Weight
