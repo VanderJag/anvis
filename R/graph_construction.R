@@ -47,7 +47,7 @@ adj_matrix_to_edgelist <- function(df) {
 
   # Prepare to convert to long format by making the rownames a column of their own
   df <- df %>%
-    tibble::as_tibble(df, rownames = "Source")
+    tibble::as_tibble(rownames = "Source")
 
   # Convert into the edgelist format
   edgelist <- tidyr::pivot_longer(df, cols = -Source, names_to = "Target", values_to = "Weight") %>%
