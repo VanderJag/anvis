@@ -202,7 +202,7 @@ weights_to_color <- function(edge_table) {
 }
 
 
-vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1) {
+vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session = TRUE) {
 
   # Cytoscape needs additional columns that indicate how nodes relate
   edge_table$Interaction <- "interacts"
@@ -210,11 +210,12 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1) {
                                  "(interacts)",
                                  edge_table$Target)
 
-  # Set names for
+  # Set names for labeling network aspects in cytoscape
   Network_name = sprintf("Visual_Network_%i", netw_nr)
   Network_Collection = sprintf("Visual_Networks_%i", netw_nr)
   style_name = "SanjeeNetworkStyle"
 
+  # Prepare data to visualize for Cytoscape
   nodes <- data.frame(id = as.vector(node_table$Node),
                       group = as.vector(node_table$Groups),
                       stringsAsFactors = FALSE)
@@ -223,23 +224,22 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1) {
                       interaction = as.vector(edge_table$Interaction),
                       weight = as.vector(edge_table$Weight),
                       stringsAsFactors = FALSE)
-
-  RCy3::createNetworkFromDataFrames(nodes,
-                                    edges,
-                                    title = Network_name,
-                                    collection = Network_Collection,
-                                    style.name  =  style_name)
-
   Colour_palette <- as.vector(c("#0073C2", "#EFC000", "#868686", "#CD534C",
                                 "#7AA6DC", "#003C6799", "#8F7700", "#3B3B3B",
                                 "#A73030", "#4A6990"))
-
-
   defaults <- list(NODE_SHAPE = "Ellipse",
                    NODE_SIZE = 25.0,
                    EDGE_TRANSPARENCY = 255,
                    NODE_LABEL_POSITION = "W,E,c,0.00,0.00",
                    NODE_BORDER_PAINT = "#FFFFFF")
+
+  # Create Cytoscape network
+  RCy3::createNetworkFromDataFrames(nodes,
+                                    edges,
+                                    title = Network_name,
+                                    collection = Network_Collection,
+                                    style.name  =  style_name)
+  # Create network properties
   nodeLabels <- RCy3::mapVisualProperty("Node Label", "id", "p")
   nodecolour <- RCy3::mapVisualProperty("Node Fill Color", "group", "d",
                                         as.vector(unique(node_table$Groups)),
@@ -258,14 +258,15 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1) {
                                        as.vector(edge_table$width))
   edgestroke <- RCy3::mapVisualProperty("Edge Stroke Unselected Paint", "shared name", "d",
                                         as.vector(edge_table$sharedname), as.vector(edge_table$Stroke))
-
+  # Set visual style
   RCy3::createVisualStyle(style_name,
                           defaults,
                           list(nodeLabels, nodecolour, nodeXlocation, nodeYlocation,
                                edgeline, edgewidth, edgestroke))
   RCy3::setVisualStyle(style_name)
 
-
+  # Fit content into window
+  # TODO check if doing this three times is required
   RCy3::fitContent(selected.only = FALSE)
   RCy3::fitContent(selected.only = FALSE)
   RCy3::fitContent(selected.only = FALSE)
@@ -278,7 +279,8 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1) {
 
   Network_save = sprintf("Cytoscape_Network_%i", netw_nr)
   full.path.cps = paste(getwd(), Network_save, sep = "/")
-  RCy3::closeSession(save.before.closing = TRUE, filename = full.path.cps)
+  RCy3::closeSession(save.before.closing = save_session,
+                     filename = full.path.cps)
 }
 
 sigmoid_xB <- function(x, B){
@@ -371,26 +373,20 @@ VisualiseNetwork <- function(df_adjacency, group_vec = NULL, type = 2) {
     edge_table <- weights_to_color(edge_table)
 
 
-
     # Visualize in Cytoscape --------------------------------------------------
     vis_in_cytoscape(edge_table = edge_table,
                      node_table = node_table,
                      netw_nr = i_matrix)
 
 
-
     # Network files for building network using some other software
     AdjMatrix <- list(AdjMatrix, Adjacency)
     NodesNetwork <- list(NodesNetwork, node_table)
     EdgesNetwork <- list(EdgesNetwork, edge_table)
-
-
   }
-
 
   Network = list(AdjMatrix, NodesNetwork, EdgesNetwork)
   return(Network)
-
 }
 
 # Run example
