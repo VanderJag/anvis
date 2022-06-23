@@ -17,4 +17,5 @@ Suggests:
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Imports: 
-    magrittr
+    magrittr,
+    RCy3

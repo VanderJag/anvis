@@ -1,15 +1,16 @@
-#Required packages:
+# Required packages:
 #   library(dplyr)
 #   library(RCy3)
-#Keep cytoscape open in the background
-#Inputs
+
+# Inputs
+# Keep cytoscape open in the background
 #   A is an adjacency matrix with the 1st column containing the column names and 1st row containing the row names and
 #       the matrix containing numerical values corresponding to the variable relationships in the columns and rows
 #   A can also be a list of matrices.
 #   Group is boolean asking if certain variables are to be clustered together as neighbours in the figure.
 #   Incase certain variables are to be clustered together in groups in the visualisation,
 #   G is a vector containing the label names of the "Groups to be clustered together" Nodes with the same labels will be visualised adjacent to each other.
-#For visualising the Edge Weights,
+# For visualising the Edge Weights,
 #   Choose "type = 1" for grading the edges based on partial correlation values
 #   Choose "type = 2" for grading the edges based on Pearson or Spearman correlation values
 #   Choose "type = 3" for grading the edges on a ranked percentile system (such that the edges are ranked and on an exponential scale
@@ -200,52 +201,84 @@ weights_to_color <- function(edge_table) {
   return(edge_table)
 }
 
+
 vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1) {
 
-  Interaction <- rep("interacts", nrow(edge_table))
-  edge_table <- cbind(edge_table, Interaction)
-  edge_table$sharedname <- paste(edge_table$Source, "(interacts)", edge_table$Target)
+  # Cytoscape needs additional columns that indicate how nodes relate
+  edge_table$Interaction <- "interacts"
+  edge_table$sharedname <- paste(edge_table$Source,
+                                 "(interacts)",
+                                 edge_table$Target)
 
+  # Set names for
   Network_name = sprintf("Visual_Network_%i", netw_nr)
   Network_Collection = sprintf("Visual_Networks_%i", netw_nr)
+  style_name = "SanjeeNetworkStyle"
 
-  nodes = NULL
-  edges = NULL
+  nodes <- data.frame(id = as.vector(node_table$Node),
+                      group = as.vector(node_table$Groups),
+                      stringsAsFactors = FALSE)
+  edges <- data.frame(source = as.vector(edge_table$Source),
+                      target = as.vector(edge_table$Target),
+                      interaction = as.vector(edge_table$Interaction),
+                      weight = as.vector(edge_table$Weight),
+                      stringsAsFactors = FALSE)
 
-  nodes <- data.frame(id=as.vector(node_table$Node), group=as.vector(node_table$Groups), stringsAsFactors = FALSE)
-  edges <- data.frame(source=as.vector(edge_table$Source), target=as.vector(edge_table$Target), interaction=as.vector(edge_table$Interaction), weight=as.vector(edge_table$Weight), stringsAsFactors = FALSE)
+  RCy3::createNetworkFromDataFrames(nodes,
+                                    edges,
+                                    title = Network_name,
+                                    collection = Network_Collection,
+                                    style.name  =  style_name)
 
-  createNetworkFromDataFrames(nodes, edges, title=Network_name, collection=Network_Collection, style.name = "SanjeeNetworkStyle")
+  Colour_palette <- as.vector(c("#0073C2", "#EFC000", "#868686", "#CD534C",
+                                "#7AA6DC", "#003C6799", "#8F7700", "#3B3B3B",
+                                "#A73030", "#4A6990"))
 
 
-  Colour_palette <- as.vector(c("#0073C2", "#EFC000", "#868686", "#CD534C", "#7AA6DC", "#003C6799", "#8F7700", "#3B3B3B", "#A73030", "#4A6990"))
+  defaults <- list(NODE_SHAPE = "Ellipse",
+                   NODE_SIZE = 25.0,
+                   EDGE_TRANSPARENCY = 255,
+                   NODE_LABEL_POSITION = "W,E,c,0.00,0.00",
+                   NODE_BORDER_PAINT = "#FFFFFF")
+  nodeLabels <- RCy3::mapVisualProperty("Node Label", "id", "p")
+  nodecolour <- RCy3::mapVisualProperty("Node Fill Color", "group", "d",
+                                        as.vector(unique(node_table$Groups)),
+                                        as.vector(Colour_palette[1:length(unique(node_table$Groups))]))
+  nodeXlocation <- RCy3::mapVisualProperty("Node X Location", "id", "d",
+                                           as.vector(node_table$Node),
+                                           as.vector(node_table$X))
+  nodeYlocation <- RCy3::mapVisualProperty("Node Y Location", "id", "d",
+                                           as.vector(node_table$Node),
+                                           as.vector(node_table$Y))
+  edgeline <- RCy3::mapVisualProperty("Edge Line Type", "interaction", "d",
+                                      as.vector(unique(edge_table$Interaction)),
+                                      as.vector(c("Solid")))
+  edgewidth <- RCy3::mapVisualProperty("Edge Width", "shared name", "d",
+                                       as.vector(edge_table$sharedname),
+                                       as.vector(edge_table$width))
+  edgestroke <- RCy3::mapVisualProperty("Edge Stroke Unselected Paint", "shared name", "d",
+                                        as.vector(edge_table$sharedname), as.vector(edge_table$Stroke))
 
-  style.name = "SanjeeNetworkStyle"
-  defaults <- list(NODE_SHAPE="Ellipse", NODE_SIZE=25.0, EDGE_TRANSPARENCY=255 , NODE_LABEL_POSITION="W,E,c,0.00,0.00", NODE_BORDER_PAINT="#FFFFFF")
-  nodeLabels <- mapVisualProperty("Node Label", "id", "p")
-  nodecolour <- mapVisualProperty("Node Fill Color", "group", "d", as.vector(unique(node_table$Groups)), as.vector(Colour_palette[1:length(unique(node_table$Groups))]))
-  nodeXlocation <- mapVisualProperty("Node X Location", "id", "d", as.vector(node_table$Node), as.vector(node_table$X))
-  nodeYlocation <- mapVisualProperty("Node Y Location", "id", "d", as.vector(node_table$Node), as.vector(node_table$Y))
-  edgeline <- mapVisualProperty("Edge Line Type", "interaction", "d", as.vector(unique(edge_table$Interaction)), as.vector(c("Solid")))
-  edgewidth <- mapVisualProperty("Edge Width", "shared name", "d", as.vector(edge_table$sharedname), as.vector(edge_table$width))
-  edgestroke <- mapVisualProperty("Edge Stroke Unselected Paint", "shared name", "d", as.vector(edge_table$sharedname), as.vector(edge_table$Stroke))
+  RCy3::createVisualStyle(style_name,
+                          defaults,
+                          list(nodeLabels, nodecolour, nodeXlocation, nodeYlocation,
+                               edgeline, edgewidth, edgestroke))
+  RCy3::setVisualStyle(style_name)
 
-  createVisualStyle(style.name, defaults, list(nodeLabels, nodecolour, nodeXlocation, nodeYlocation, edgeline, edgewidth, edgestroke))
-  setVisualStyle("SanjeeNetworkStyle")
 
-  fitContent(selected.only = FALSE)
-  fitContent(selected.only = FALSE)
-  fitContent(selected.only = FALSE)
+  RCy3::fitContent(selected.only = FALSE)
+  RCy3::fitContent(selected.only = FALSE)
+  RCy3::fitContent(selected.only = FALSE)
 
   Network_out = sprintf("Network_Image_%i", netw_nr)
 
-  full.path = paste(getwd(), Network_out, sep="/")
-  exportImage(full.path, "PNG", units="pixels", width=3600, height=1771)
+  full.path = paste(getwd(), Network_out, sep = "/")
+  RCy3::exportImage(full.path, "PNG", units = "pixels", width = 3600, height = 1771)
 
 
   Network_save = sprintf("Cytoscape_Network_%i", netw_nr)
-  full.path.cps = paste(getwd(), Network_save, sep="/")
-  closeSession(save.before.closing = TRUE, filename = full.path.cps)
+  full.path.cps = paste(getwd(), Network_save, sep = "/")
+  RCy3::closeSession(save.before.closing = TRUE, filename = full.path.cps)
 }
 
 sigmoid_xB <- function(x, B){
@@ -272,7 +305,6 @@ sigmoid_xB <- function(x, B){
 #' * The Cytoscape software needs to be running.
 #' *
 #'
-#' @importFrom dplyr mutate
 VisualiseNetwork <- function(df_adjacency, group_vec = NULL, type = 2) {
 
   # Since this function uses a for loop to iterate over the visualizations that
