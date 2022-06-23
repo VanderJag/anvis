@@ -9,8 +9,8 @@ test_that("when cytoscape is not availble RCy3 will give error", {
   group_vec[colnames(Mat1) %>% stringr::str_detect("CXCL")] <- "D"
 
   # Visualize the network
-  expect_error(VisualiseNetwork(Mat1, group_vec = group_vec, type = 1), "cyError")
+  expect_message(VisualiseNetwork(Mat1, group_vec = group_vec, type = 1),
+                 "Please check that Cytoscape is running") %>%
+  expect_error("object 'res' not found") %>%
+  expect_error("object 'res' not found")
 })
-
-
-
