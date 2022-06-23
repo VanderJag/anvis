@@ -34,224 +34,7 @@
 #
 ##############################################################################################################################################################
 
-#' Adjacency matrix to edgelist
-#'
-#' Converts an adjacency matrix into an weighted edgelist. Interactions of nodes
-#' with themselves are removed. Assumes the input in undirectional
-#'
-#' @param df Data frame or matrix. Square adjacency matrix. Nodes must be specified
-#'   in rownames and column names.
-#' @return Returns data frame representing a network as weighted edge list. Columns are
-#'   Source, Target, and Weight.
-#'
-#' @examples
-#' nodes <- c(paste0("IL", 1:5), paste0("CCL", 1:3), paste0("CXCL", 1:4))
-#' n_nodes <- length(nodes)
-#'
-#' interactions <- (runif(n_nodes**2)) |>
-#'   matrix(nrow = n_nodes, ncol = n_nodes)
-#'
-#' interactions[upper.tri(interactions, diag=FALSE)] <-
-#'     t(interactions)[upper.tri(t(interactions), diag=FALSE)]
-#'
-#' row.names(interactions) <- nodes
-#' colnames(interactions) <- nodes
-#'
-#' for(i in 1:n_nodes) {
-#'   interactions[i,i] <- 1
-#' }
-#'
-#' adj_matrix_to_edgelist(interactions)
-#'
-adj_matrix_to_edgelist <- function(df) {
 
-  # If the upper and lower diagonal are not the same we would be discarding information
-  is_equal <- isTRUE(all.equal(df[upper.tri(df, diag=FALSE)],
-                           t(df)[upper.tri(t(df), diag=FALSE)]))
-  if(!is_equal) {
-    stop("Must provide adjacency matrix with identical upper and lower triangle.",
-         "\nℹ Check your adj. matrix with `all.equal(adj[upper.tri(adj, diag=FALSE)], ",
-         "t(adj)[upper.tri(t(adj), diag=FALSE)])`",
-         "\n✖ Lower triangle can't be discarded since it doesn't match upper triangle.",
-         call.=FALSE)
-  }
-
-  # It is assumed that there is no interest in self intaction, and that the
-  #   upper and lower triangles of the adjacency matrix are identical.
-  diag(df) = 0
-  df[lower.tri(df, diag=TRUE)] <- 0
-
-  # Prepare to convert to long format by making the rownames a column of their own
-  df <- df %>%
-    tibble::as_tibble(df, rownames = "Source")
-
-  # Convert into the edgelist format
-  edgelist <- tidyr::pivot_longer(df, cols = -Source, names_to = "Target", values_to = "Weight") %>%
-    # Self interaction and dulicate info from lower triangle have been set to 0
-    dplyr::filter(Weight != 0)
-
-  return(edgelist)
-}
-
-
-adj_matrix_to_nodetable <- function(df, group_vec = NULL) {
-
-  data.frame("Node" = colnames(df))
-}
-
-
-adj_matrix_to_network <- function(adj_matrix, group_vec, width_type) {
-  # If the number and column of the adjacency matrix is not equal there may be
-  #   missing info and an error with the data input
-  if (ncol(adj_matrix) != nrow(adj_matrix)) {
-    stop("Adjacency matrix should be a square matrix with equal number of rows ",
-         "and columns", call. = FALSE)
-  }
-
-  # Incomplete group information can not be correctly assigned
-  if (nrow(adj_matrix) != length(group_vec)) {
-    stop("The number of nodes/variables in the groups table should be the same ",
-         "as in the adjacency matrix", call. = FALSE)
-  }
-
-
-  # Node table with group info ----------------------------------------------
-
-  node_table <- adj_matrix_to_nodetable(adj_matrix)
-
-  # Adding grouping information ---------------------------------------------
-
-  node_table <- group_nodes(node_table, group_vec = group_vec)
-
-  # Cytoscape node positions ------------------------------------------------
-
-  node_table <- add_node_pos(node_table)
-
-
-  # adjecency to edgelist ---------------------------------------------------
-
-  edge_table <- adj_matrix_to_edgelist(adj_matrix)
-
-  # Convert edge weight to edge width ---------------------------------------
-
-  edge_table <- edge_weight_to_widths(edge_table, type = width_type)
-
-  # Add colour column to edge table -----------------------------------------
-
-  edge_table <- weights_to_color(edge_table)
-
-  return(list("edge_table" = edge_table,
-              "node_table" = node_table))
-}
-
-
-# adds a column with the grouping info to a node table, and sorts it
-group_nodes <- function(node_table, group_vec = NULL) {
-
-  # TODO Check if grouping vector has the correct length and ensure it's character type
-
-  # If a grouping vector has been provided
-  if (!is.null(group_vec)) {
-    node_table$Groups <- group_vec
-    node_table <- node_table[order(node_table$Groups),]
-  } else {
-    node_table$Groups <- "A"
-  }
-}
-
-add_node_pos <- function(node_table, layout = "circle") {
-  X = NULL
-  Y = NULL
-  R = round(nrow(node_table)/10, 0) * (100)
-
-  if (layout == "circle") {
-    # Calculate position in circle
-    for (i in 0:(nrow(node_table) - 1)) {
-      x = R*cos((i*2*3.14159265359)/(nrow(node_table)))
-      X <- as.vector(append(X, x))
-      y = R*sin((i*2*3.14159265359)/(nrow(node_table)))
-      Y <- as.vector(append(Y, y))
-    }
-  } else {
-    # TODO complete error message
-    stop("Must select valid network layout. ",
-         "\nℹ you selected: ", layout,
-         "\n✖ parameter `layout` must be one of ...", call.=FALSE)
-  }
-
-  pos <- as.data.frame(cbind(X,Y))
-  node_table <- cbind(node_table, pos)
-
-  return(node_table)
-}
-
-
-# TODO create function that automatically infers the type of scaling for width,
-#   by checking the range of the weights
-pick_width_type <- function() {
-  NULL
-}
-
-
-# requires df with a column called Weight
-edge_weight_to_widths <- function(edge_table, type) {
-  frac = as.vector(c(2, 3, 4, 6, 10, 15, 24, 36))
-  n_edges = nrow(edge_table)
-  M = NULL
-  for (i in 1:length(frac)) {
-    f = frac[i]
-    mes = NULL
-    mes = round((f * n_edges)/100, 0)
-    M <- as.vector(append(M, mes))
-  }
-  diff = (sum(M)) - (nrow(edge_table))
-  ifelse(diff == 0, print("perfect!"), M[8] <- M[8] - diff)
-
-  wids <- as.vector(c(10, 8, 4, 2, 1, 0.5, 0.25, 0.25))
-  wid = NULL
-  for (j in 1:length(M)) {
-    times = M[j]
-    value = wids[j]
-    wid <- as.vector(append(wid, c(rep(value, times))))
-  }
-
-  #1 is partcor, 2 is cor, 3 is MI, 4 is ranked, 5 is percentile.
-  ifelse(type == 1, edge_table <- mutate(edge_table, width=sigmoid_xB(x=nthroot(abs(Weight), 3), B=3)),
-         ifelse(type == 2, edge_table <- mutate(edge_table, width=sigmoid_xB(x=abs(Weight), B=3)),
-                ifelse(type == 3, edge_table <- mutate(edge_table, width=sigmoid_xB(x=(abs(Weight)/max(abs(df))), B=3)),
-                       ifelse(type == 4, edge_table <- mutate(edge_table, width = sigmoid_xB(x=(Rank(-Weight)/n_edges), B=3)),
-                              if(type == 5){
-                                wid <- as.data.frame(wid)
-                                edge_table <- edge_table[sort(abs(edge_table$Weight), decreasing=T, index.return=T)[[2]],]
-                                edge_table <- cbind(edge_table, wid)
-                                colnames(edge_table)[5] <- "width"
-                              }
-                              else{
-                                print("type not selected")
-                              }))))
-
-  tmp_x <- seq(0, 1, length.out = 1000)
-  plot(tmp_x, sigmoid_xB(tmp_x, 3))
-  abline(0,1)
-  return(edge_table)
-}
-
-weights_to_color <- function(edge_table) {
-
-  # If negative numbers are found in the weights use a diverging color palette,
-  #   otherwise use a sequential color palette
-  if (min(edge_table$Weight) < 0) {
-    Stroke <- as.vector(diverging_hcl(n=nrow(edge_table), palette = "Blue-Red"))
-    edge_table <- edge_table[sort(edge_table$Weight, decreasing=T, index.return=T)[[2]],]
-    edge_table <- cbind(edge_table, Stroke)
-  } else {
-    Stroke <- as.vector(sequential_hcl(n=nrow(edge_table), palette = "Reds2"))
-    edge_table <- edge_table[sort(abs(edge_table$Weight), decreasing=T, index.return=T)[[2]],]
-    edge_table <- cbind(edge_table, Stroke)
-  }
-
-  return(edge_table)
-}
 
 
 vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session = TRUE) {
@@ -335,10 +118,6 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
                      filename = full.path.cps)
 }
 
-sigmoid_xB <- function(x, B){
-  T = (1/(1+((x/(1-x))^-B)))
-  return(T)
-}
 
 #' Create formatted circular network
 #'
@@ -408,14 +187,10 @@ VisualiseNetwork <- function(df_adjacency, group_vec = NULL, type = 2) {
   return(Network)
 }
 
-# Run example
-library(dplyr)        # For data wrangling, e.g. using mutate
-library(RCy3)         # For communicating with cytoscape
-library(pracma)       # To use the nthroot function
-library(colorspace)   # To adjust color palettes
 
 # Load adjacency matrix
 Mat1 <- readRDS("tests/trail_adjacency_matrix.rds")
+readRDS(test_path("fixtures", "useful_thing1.rds"))
 
 # Some grouping based on column names
 group_vec <- rep("A", times = nrow(Mat1))

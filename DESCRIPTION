@@ -17,5 +17,9 @@ Suggests:
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Imports: 
+    colorspace,
+    dplyr,
     magrittr,
-    RCy3
+    RCy3,
+    tibble,
+    tidyr
