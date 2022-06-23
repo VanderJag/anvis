@@ -94,9 +94,54 @@ adj_matrix_to_edgelist <- function(df) {
 }
 
 
-adj_matrix_to_nodetable <- function(df) {
+adj_matrix_to_nodetable <- function(df, group_vec = NULL) {
 
   data.frame("Node" = colnames(df))
+}
+
+
+adj_matrix_to_network <- function(adj_matrix, group_vec, width_type) {
+  # If the number and column of the adjacency matrix is not equal there may be
+  #   missing info and an error with the data input
+  if (ncol(adj_matrix) != nrow(adj_matrix)) {
+    stop("Adjacency matrix should be a square matrix with equal number of rows ",
+         "and columns", call. = FALSE)
+  }
+
+  # Incomplete group information can not be correctly assigned
+  if (nrow(adj_matrix) != length(group_vec)) {
+    stop("The number of nodes/variables in the groups table should be the same ",
+         "as in the adjacency matrix", call. = FALSE)
+  }
+
+
+  # Node table with group info ----------------------------------------------
+
+  node_table <- adj_matrix_to_nodetable(adj_matrix)
+
+  # Adding grouping information ---------------------------------------------
+
+  node_table <- group_nodes(node_table, group_vec = group_vec)
+
+  # Cytoscape node positions ------------------------------------------------
+
+  node_table <- add_node_pos(node_table)
+
+
+  # adjecency to edgelist ---------------------------------------------------
+
+  edge_table <- adj_matrix_to_edgelist(adj_matrix)
+
+  # Convert edge weight to edge width ---------------------------------------
+
+  edge_table <- edge_weight_to_widths(edge_table, type = width_type)
+
+  # Add colour column to edge table -----------------------------------------
+
+  edge_table <- weights_to_color(edge_table)
+
+  return(list("edge_table" = edge_table,
+              "node_table" = node_table))
 }
 
 
@@ -138,6 +183,13 @@ add_node_pos <- function(node_table, layout = "circle") {
   node_table <- cbind(node_table, pos)
 
   return(node_table)
+}
+
+
+# TODO create function that automatically infers the type of scaling for width,
+#   by checking the range of the weights
+pick_width_type <- function() {
+  NULL
 }
 
 
@@ -333,45 +385,12 @@ VisualiseNetwork <- function(df_adjacency, group_vec = NULL, type = 2) {
     node_table = NULL
     EdgeTable = NULL
 
-    # If the number and column of the adjacency matrix is not equal there may be
-    #   missing info and an error with the data input
-    if (ncol(Adjacency) != nrow(Adjacency)) {
-      stop("Adjacency matrix should be a square matrix with equal number of rows ",
-           "and columns", call. = FALSE)
-    }
-
-    # Incomplete group information can not be correctly assigned
-    if (nrow(Adjacency) != length(group_vec)) {
-      stop("The number of nodes/variables in the groups table should be the same ",
-           "as in the adjacency matrix", call. = FALSE)
-    }
-
-
-    # Node table with group info ----------------------------------------------
-
-    node_table <- adj_matrix_to_nodetable(Adjacency)
-
-    # Adding grouping information ---------------------------------------------
-
-    node_table <- group_nodes(node_table, group_vec = group_vec)
-
-    # Cytoscape node positions ------------------------------------------------
-
-    node_table <- add_node_pos(node_table)
-
-
-    # adjecency to edgelist ---------------------------------------------------
-
-    edge_table <- adj_matrix_to_edgelist(Adjacency)
-
-    # Convert edge weight to edge width ---------------------------------------
-
-    edge_table <- edge_weight_to_widths(edge_table, type = type)
-
-    # Add colour column to edge table -----------------------------------------
-
-    edge_table <- weights_to_color(edge_table)
-
+    # Create a network from adjacency info
+    network_list <- adj_matrix_to_network(Adjacency,
+                                          group_vec = group_vec,
+                                          width_type = type)
+    edge_table <- network_list[["edge_table"]]
+    node_table <- network_list[["node_table"]]
 
     # Visualize in Cytoscape --------------------------------------------------
     vis_in_cytoscape(edge_table = edge_table,
