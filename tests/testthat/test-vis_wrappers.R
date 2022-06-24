@@ -34,7 +34,7 @@ test_that("when cytoscape is available wrapper runs without error", {
   # Presence of cytoscape test
   cytosc <- RCy3::cytoscapePing() %>% capture_condition()
 
-  skip_if_not(cytosc$messages == "You are connected to Cytoscape!\n",
+  skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
               message = "this test runs only when cytoscape is active")
 
   # Visualize the network
