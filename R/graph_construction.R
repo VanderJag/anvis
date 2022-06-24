@@ -64,7 +64,7 @@ adj_matrix_to_nodetable <- function(df, group_vec = NULL) {
 }
 
 
-adj_matrix_to_network <- function(adj_matrix, group_vec, width_type) {
+adj_matrix_to_network <- function(adj_matrix, group_vec, width_type, add_color = T) {
   # If the number and column of the adjacency matrix is not equal there may be
   #   missing info and an error with the data input
   if (ncol(adj_matrix) != nrow(adj_matrix)) {
@@ -86,6 +86,10 @@ adj_matrix_to_network <- function(adj_matrix, group_vec, width_type) {
   # Adding grouping information ---------------------------------------------
 
   node_table <- group_nodes(node_table, group_vec = group_vec)
+
+  # Add colors for the groups -----------------------------------------------
+
+  node_table <- add_colors(node_table)
 
   # Cytoscape node positions ------------------------------------------------
 
