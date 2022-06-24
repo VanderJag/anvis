@@ -42,6 +42,29 @@ add_node_pos <- function(node_table, layout = "circle") {
 }
 
 
+add_colors <- function(node_table) {
+  # Group information is required to add group colouring
+  if (!"Groups" %in% names(node_table)) {
+    warning("No group column found while adding node group columns")
+    node_table$Groups <- "A"
+  }
+
+  # extract the unique groups
+  groups <- node_table$Groups %>% unique()
+
+  # same number of colors is required as group count
+  colors <- n_distinct_cols(length(groups))
+
+  # index which group is assigned to which row
+  idx <- match(node_table$Groups, groups)
+
+  # Use group index to select correct colors for each row
+  node_table$color <- colors[idx]
+
+  return(node_table)
+}
+
+
 # TODO create function that automatically infers the type of scaling for width,
 #   by checking the range of the weights
 pick_width_type <- function() {
