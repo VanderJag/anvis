@@ -90,9 +90,6 @@ edge_weight_to_widths <- function(edge_table, type) {
                                 print("type not selected")
                               }))))
 
-  tmp_x <- seq(0, 1, length.out = 1000)
-  plot(tmp_x, sigmoid_xB(tmp_x, 3))
-  abline(0,1)
   return(edge_table)
 }
 
