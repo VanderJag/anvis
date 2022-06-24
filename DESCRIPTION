@@ -21,6 +21,7 @@ Imports:
     dplyr,
     magrittr,
     RCy3,
+    scales,
     stringr,
     tibble,
     tidyr
