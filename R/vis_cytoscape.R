@@ -59,14 +59,12 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
                       interaction = as.vector(edge_table$Interaction),
                       weight = as.vector(edge_table$Weight),
                       stringsAsFactors = FALSE)
-  Colour_palette <- as.vector(c("#0073C2", "#EFC000", "#868686", "#CD534C",
-                                "#7AA6DC", "#003C6799", "#8F7700", "#3B3B3B",
-                                "#A73030", "#4A6990"))
   defaults <- list(NODE_SHAPE = "Ellipse",
                    NODE_SIZE = 25.0,
                    EDGE_TRANSPARENCY = 255,
                    NODE_LABEL_POSITION = "W,E,c,0.00,0.00",
                    NODE_BORDER_PAINT = "#FFFFFF")
+  n_groups <- length(unique(node_table$Groups))
 
   # Create Cytoscape network
   RCy3::createNetworkFromDataFrames(nodes,
@@ -77,8 +75,8 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
   # Create network properties
   nodeLabels <- RCy3::mapVisualProperty("Node Label", "id", "p")
   nodecolour <- RCy3::mapVisualProperty("Node Fill Color", "group", "d",
-                                        as.vector(unique(node_table$Groups)),
-                                        as.vector(Colour_palette[1:length(unique(node_table$Groups))]))
+                                        unique(node_table$Groups),
+                                        n_distinct_cols(n_groups))
   nodeXlocation <- RCy3::mapVisualProperty("Node X Location", "id", "d",
                                            as.vector(node_table$Node),
                                            as.vector(node_table$X))
