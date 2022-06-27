@@ -1,111 +1,237 @@
-# library(igraph)
-# library(testthat)
-#
-# Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
-#
-# # Some grouping based on column names
-# group_vec <- rep("A", times = nrow(Mat1))
-# group_vec[colnames(Mat1) |> stringr::str_detect("IL")] <- "B"
-# group_vec[colnames(Mat1) |> stringr::str_detect("CCL")] <- "C"
-# group_vec[colnames(Mat1) |> stringr::str_detect("CXCL")] <- "D"
-#
-#
-#
-#
-# vis_in_igraph <- function(edge_table, node_table) {
-#
-#
-#   g2 <- graph.data.frame(topology, vertices=answers, directed=FALSE)
-#   g <- simplify(g2)
-# }
-#
-#
-# network_list <- adj_matrix_to_network(Mat1,
-#                                       group_vec = group_vec,
-#                                       width_type = 1)
-# edge_table <- network_list[["edge_table"]]
-# node_table <- network_list[["node_table"]]
-#
-# # my_graph <- graph_from_adjacency_matrix(Mat1,
-# #                                         mode = "undirected",
-# #                                         weighted = TRUE,
-# #                                         diag = FALSE)
-# my_graph <- graph_from_data_frame(edge_table, vertices=node_table, directed=FALSE)
-#
-# group_layout <- layout_in_circle(my_graph, order = order(V(my_graph)$Groups))
-# plot(my_graph,
-#      layout = group_layout,
-#      vertex.color=V(my_graph)$color,
-#      edge.width=E(my_graph)$width,
-#      edge.color=E(my_graph)$Stroke,
-#      vertex.label.dist=1)
-#
-# ## The igraph docs say that vertex.label.degree controls the position
-# ## of the labels with respect to the vertices. It's interpreted as a
-# ## radian, like this:
-# ##
-# ## Value is : Label appears ... the node
-# ## -pi/2: above
-# ## 0: to the right of
-# ## pi/2: below
-# ## pi: to the left of
-# ##
-# ## We can generalize this. vertex.label.degree can take a vector as
-# ## well as a scalar for its argument. So we write a function to
-# ## calculate the right position for a label based on its vertex's location
-# ## on the circle.
-#
-# ## Get the labels aligned consistently around the edge of the circle
-# ## for any n of nodes.
-# ## This code borrows bits of ggplot2's polar_coord function
-# ## start = offset from 12 o'clock in radians
-# ## direction = 1 for clockwise; -1 for anti-clockwise.
-# radian.rescale <- function(x, start=0, direction=1) {
-#   # From https://gist.github.com/kjhealy/834774/a4e677401fd6e4c319135dabeaf9894393f9392c
-#   c.rotate <- function(x) (x + start) %% (2 * pi) * direction
-#   c.rotate(scales::rescale(x, c(0, 2 * pi), range(x)))
-# }
-#
-# lab.locs <- radian.rescale(x=1:vcount(my_graph), direction=-1, start=0)
-#
-# # Because the labels have no justification
-# V(my_graph)$name <- V(my_graph)$name %>%
-#   stringr::str_pad(width = max(nchar(.)), side = "left")
-# # Because the labels have no justification
-# # V(my_graph)$name <- "A"
-#
-#
-# plot(my_graph,
-#      layout = group_layout,
-#      edge.width=E(my_graph)$width,
-#      edge.color=E(my_graph)$Stroke,
-#      vertex.size=8,
-#      vertex.color=V(my_graph)$color,
-#      vertex.frame.color = V(my_graph)$color,
-#      vertex.label.degree=lab.locs,
-#      vertex.label.dist=rep(c(0,3), each=18),
-#      vertex.label.cex=0.9,
-#      vertex.label.family="Helvetica",
-#      vertex.label.color = "black")
-#
-#
-#
-# V(my_graph)$name
-#
-# radian.rescale <- function(x, start=0, direction=1) {
-#   c.rotate <- function(x) (x + start) %% (2 * pi) * direction
-#   c.rotate(scales::rescale(x, c(0, 2 * pi), range(x)))
-# }
-#
-# ### Example
-# ## Generate some fake data
-# n <- 15
-# g <- erdos.renyi.game(n, 0.5)
-# ## Obviously labeling in this way this only makes sense for graphs
-# ## laid out as a circle to begin with
-# la <- layout.circle(g)
-#
-# lab.locs <- radian.rescale(x=1:n, direction=-1, start=0)
-# plot(g, layout=la, vertex.size=2, vertex.label.dist=1,
-#      vertex.label.degree=lab.locs)
-#
+library(igraph)
+library(testthat)
+
+
+# Load data ---------------------------------------------------------------
+
+Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+
+# Some grouping based on column names
+group_vec <- rep("A", times = nrow(Mat1))
+group_vec[colnames(Mat1) |> stringr::str_detect("IL")] <- "B"
+group_vec[colnames(Mat1) |> stringr::str_detect("CCL")] <- "C"
+group_vec[colnames(Mat1) |> stringr::str_detect("CXCL")] <- "D"
+
+
+# Convert to edge and node table ------------------------------------------
+
+network_list <- adj_matrix_to_network(Mat1,
+                                      group_vec = group_vec,
+                                      width_type = 1)
+edge_table <- network_list[["edge_table"]]
+node_table <- network_list[["node_table"]]
+
+
+# Visualize in igraph -----------------------------------------------------
+
+my_graph <- igraph::graph_from_data_frame(edge_table, vertices=node_table, directed=FALSE)
+
+group_layout <- igraph::layout_in_circle(my_graph, order = order(igraph::V(my_graph)$Groups))
+igraph::plot.igraph(my_graph,
+     layout = group_layout,
+     vertex.color=igraph::V(my_graph)$color,
+     edge.width=igraph::E(my_graph)$width,
+     edge.color=igraph::E(my_graph)$Stroke,
+     vertex.label.dist=1)
+
+## The igraph docs say that vertex.label.degree controls the position
+## of the labels with respect to the vertices. It's interpreted as a
+## radian, like this:
+##
+## Value is : Label appears ... the node
+## -pi/2: above
+## 0: to the right of
+## pi/2: below
+## pi: to the left of
+##
+## We can generalize this. vertex.label.degree can take a vector as
+## well as a scalar for its argument. So we write a function to
+## calculate the right position for a label based on its vertex's location
+## on the circle.
+
+## Get the labels aligned consistently around the edge of the circle
+## for any n of nodes.
+## This code borrows bits of ggplot2's polar_coord function
+## start = offset from 12 o'clock in radians
+## direction = 1 for clockwise; -1 for anti-clockwise.
+radian.rescale <- function(x, start=0, direction=1) {
+  # From https://gist.github.com/kjhealy/834774/a4e677401fd6e4c319135dabeaf9894393f9392c
+  c.rotate <- function(x) (x + start) %% (2 * pi) * direction
+  c.rotate(scales::rescale(x, c(0, 2 * pi), range(x)))
+}
+
+lab.locs <- radian.rescale(x=1:igraph::vcount(my_graph), direction=-1, start=0)
+
+plot(my_graph,
+     layout = group_layout,
+     edge.width=E(my_graph)$width,
+     edge.color=E(my_graph)$Stroke,
+     vertex.size=10,
+     vertex.color=V(my_graph)$color,
+     vertex.frame.color = V(my_graph)$color,
+     vertex.label.degree=lab.locs,
+     vertex.label.dist=1,
+     vertex.label.cex=0.9,
+     vertex.label.family="Helvetica",
+     vertex.label.color = "black")
+
+# Change vertex label arrangement
+vertex.attributes(my_graph)
+tmp_circle <- tibble::tibble("x" = group_layout[,1],
+                             "y" = group_layout[,2],
+                             "name" = igraph::V(my_graph)$name,
+                             "nr" = 1:length(igraph::V(my_graph)))
+
+# TODO extend documentation
+#' Get vector for igraphs's `vertex.lable.degree` plotting parameter
+#'
+#' Move the vertex labels so they have less overlap with vertices and other
+#' labels when a circular layout is used for plotting.
+#' igraph plotting e.g. with `igraph::plot.igraph(...)` has a parameter
+#' `vertex.lable.degree` that determines on which side relative to the vertex
+#' the label will be placed. This function returns a vector of numbers relating
+#' to label sides, such that the labels on the right will be place to the right
+#' of the vertex, the label on the top of the circle will be place above the vertex,
+#' etc.
+#'
+#' @param xy_mat Matrix or data frame, like returned from `igraph::layout_in_circle()`.
+#'   The number of rows should match the number of labels that need to be placed.
+#'   The first column should be x-coordinates, the second y-coordinates. Both
+#'   x and y values are expected to range from -1 to 1.
+#' @return The section on the returned values ...
+#'
+#' @examples
+#'
+match_labels_ring <- function(xy_mat) {
+  if (!("x" %in% colnames(xy_mat) & "y" %in% colnames(xy_mat))) {
+    # igraph function may return matrix with coordinates without names
+    colnames(xy_mat) <- c("x", "y")
+  }
+
+  xy_mat <- xy_mat %>%
+    tibble::as_tibble() %>%
+    dplyr::mutate(label_loc = dplyr::case_when(
+      # right side
+      y > -0.8 & y < 0.8 & x > 0 ~ 0,
+      # left side
+      y > -0.8 & y < 0.8 & x < 0 ~ pi,
+      # top
+      y >= 0.8 ~ -pi/2,
+      # bottom
+      y <= -0.8 ~ pi/2,
+      # anything else (there shouldn't be anything)
+      TRUE ~ 0
+    ))
+
+  return(xy_mat %>% dplyr::pull(label_loc))
+}
+
+
+plot(my_graph,
+     layout = group_layout,
+     edge.width = E(my_graph)$width,
+     edge.color = E(my_graph)$Stroke,
+     vertex.size = 10,
+     vertex.color = V(my_graph)$color,
+     vertex.frame.color = V(my_graph)$color,
+     vertex.label.degree = match_labels_ring(group_layout),
+     vertex.label.dist = 1,
+     vertex.label.cex = 0.9,
+     vertex.label.family = "Helvetica",
+     vertex.label.color = "black")
+
+# TODO extend documentation
+#' Label vertex distance calculation for circular network layout
+#'
+#' Calculate distances that try to prevent overlap of vertex labels and vertices
+#' or other labels.
+#'
+#' @param labels Character vector of the names of the vertices
+#' @return The section on the returned values ...
+#'
+#' @examples
+#'
+#' @inheritParams match_labels_ring
+distance_ring_labels <- function(labels, xy_mat) {
+  # Check which sides of the circle the labels are on
+  side <- match_labels_ring(xy_mat = xy_mat)
+
+  # t1 <- sapply(as.vector(node_labels), FUN = strwidth, units='in')
+  # t2 <- (t1 - min(t1))/ (max(t1) - min(t1))*3+0.9
+
+  labs_df <- tibble::tibble("label" = labels,
+                            "side" = side,
+                            "x" = xy_mat[,1],
+                            "y" = xy_mat[,2]) %>%
+    dplyr::mutate(distance = dplyr::case_when(
+      # right side
+      side == 0 ~ strwidth(label, family = "sans", units = "in") %>%
+        {(. - min(.))/ (max(.) - min(.))*3+0.9} * 1.4 + 1,
+      # left side
+      side == pi ~ strwidth(label, family = "sans", units = "in") %>%
+        {(. - min(.))/ (max(.) - min(.))*3+0.9} * 1.4 + 1,
+      # anything else
+      TRUE ~ 0
+    ))
+
+  count_up_down <- function(numbers) {
+    l <- length(numbers)
+    if (l %% 2 == 0) {
+      v <- c(1:(l/2), (l/2):1)
+    } else if (l %% 2 == 1) {
+      v <- c(1:ceiling(l/2), floor(l/2):1)
+    }
+
+    v
+  }
+
+  labs_df_top <- labs_df %>%
+    dplyr::filter(side == -pi/2) %>%
+    dplyr::arrange(x) %>%
+    dplyr::mutate(distance = (count_up_down(label)**2.15 / nrow(.) + 1))
+
+  labs_df_bottom <- labs_df %>%
+    dplyr::filter(side == pi/2) %>%
+    dplyr::arrange(x) %>%
+    dplyr::mutate(distance = count_up_down(label)**2.15 / nrow(.) + 1)
+  tb_labs <- dplyr::bind_rows(labs_df_top, labs_df_bottom) %>%
+    tibble::column_to_rownames("label")
+
+  for (label_i in rownames(tb_labs)) {
+    labs_df <- dplyr::mutate(labs_df, distance =
+                        ifelse(label == label_i,
+                               tb_labs[label_i,]$distance,
+                               distance))
+  }
+
+  return(labs_df %>% dplyr::pull(distance))
+}
+
+plot(my_graph,
+     layout = group_layout,
+     edge.width = E(my_graph)$width,
+     edge.color = E(my_graph)$Stroke,
+     vertex.size = 10,
+     vertex.color = V(my_graph)$color,
+     vertex.frame.color = V(my_graph)$color,
+     vertex.label.degree = match_labels_ring(group_layout),
+     vertex.label.dist = distance_ring_labels(V(my_graph)$name, group_layout),
+     vertex.label.cex = 0.9,
+     vertex.label.family = "sans",
+     vertex.label.color = "black")
+
+strwidth(labels, units = "in", family = "mono")
+
+xy_mat %>%
+  tibble::as_tibble() %>%
+  dplyr::filter(y > 0.8 | y < -0.8)  %>%
+  dplyr::mutate(rank = dplyr::dense_rank(abs(y)))
+
+plot(1:5, (1:5)**2)
+
+
+count_up_down(1:4)
+
+dplyr::pull(x) %>%
+  length() / 2
+xy_mat <- group_layout
