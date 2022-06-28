@@ -40,10 +40,10 @@
 vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session = TRUE) {
 
   # Cytoscape needs additional columns that indicate how nodes relate
-  edge_table$Interaction <- "interacts"
-  edge_table$sharedname <- paste(edge_table$Source,
+  edge_table$interaction <- "interacts"
+  edge_table$sharedname <- paste(edge_table$source,
                                  "(interacts)",
-                                 edge_table$Target)
+                                 edge_table$target)
 
   # Set names for labeling network aspects in cytoscape
   Network_name = sprintf("Visual_Network_%i", netw_nr)
@@ -51,20 +51,20 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
   style_name = "SanjeeNetworkStyle"
 
   # Prepare data to visualize for Cytoscape
-  nodes <- data.frame(id = as.vector(node_table$Node),
-                      group = as.vector(node_table$Groups),
+  nodes <- data.frame(id = as.vector(node_table$node),
+                      group = as.vector(node_table$group),
                       stringsAsFactors = FALSE)
-  edges <- data.frame(source = as.vector(edge_table$Source),
-                      target = as.vector(edge_table$Target),
-                      interaction = as.vector(edge_table$Interaction),
-                      weight = as.vector(edge_table$Weight),
+  edges <- data.frame(source = as.vector(edge_table$source),
+                      target = as.vector(edge_table$target),
+                      interaction = as.vector(edge_table$interaction),
+                      weight = as.vector(edge_table$weight),
                       stringsAsFactors = FALSE)
   defaults <- list(NODE_SHAPE = "Ellipse",
                    NODE_SIZE = 25.0,
                    EDGE_TRANSPARENCY = 255,
                    NODE_LABEL_POSITION = "W,E,c,0.00,0.00",
                    NODE_BORDER_PAINT = "#FFFFFF")
-  n_groups <- length(unique(node_table$Groups))
+  n_groups <- length(unique(node_table$group))
 
   # Create Cytoscape network
   RCy3::createNetworkFromDataFrames(nodes,
@@ -75,16 +75,16 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
   # Create network properties
   nodeLabels <- RCy3::mapVisualProperty("Node Label", "id", "p")
   nodecolour <- RCy3::mapVisualProperty("Node Fill Color", "group", "d",
-                                        unique(node_table$Groups),
+                                        unique(node_table$group),
                                         n_distinct_cols(n_groups))
   nodeXlocation <- RCy3::mapVisualProperty("Node X Location", "id", "d",
-                                           as.vector(node_table$Node),
+                                           as.vector(node_table$node),
                                            as.vector(node_table$X))
   nodeYlocation <- RCy3::mapVisualProperty("Node Y Location", "id", "d",
-                                           as.vector(node_table$Node),
+                                           as.vector(node_table$node),
                                            as.vector(node_table$Y))
   edgeline <- RCy3::mapVisualProperty("Edge Line Type", "interaction", "d",
-                                      as.vector(unique(edge_table$Interaction)),
+                                      as.vector(unique(edge_table$interaction)),
                                       as.vector(c("Solid")))
   edgewidth <- RCy3::mapVisualProperty("Edge Width", "shared name", "d",
                                        as.vector(edge_table$sharedname),

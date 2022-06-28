@@ -1,37 +1,35 @@
-#' Adjacency matrix to edgelist
+#' Adjacency matrix to edge list
 #'
-#' Converts an adjacency matrix into an weighted edgelist. Interactions of nodes
-#' with themselves are removed. Assumes the input in undirectional
+#' Converts an adjacency matrix into an weighted edge list. Interactions of nodes
+#' with themselves are removed. Assumes the matrix to be symmetric over the
+#' diagonal, the resulting edges will be undirected.
 #'
-#' @param df Data frame or matrix. Square adjacency matrix. Nodes must be specified
-#'   in rownames and column names.
+#' @param adj_matrix Data frame or matrix. Square adjacency matrix. Nodes must be specified
+#'   in row names and column names.
 #' @return Returns data frame representing a network as weighted edge list. Columns are
-#'   Source, Target, and Weight.
-#'
-#' @examples
-#' nodes <- c(paste0("IL", 1:5), paste0("CCL", 1:3), paste0("CXCL", 1:4))
-#' n_nodes <- length(nodes)
-#'
-#' interactions <- (runif(n_nodes**2)) |>
-#'   matrix(nrow = n_nodes, ncol = n_nodes)
-#'
-#' interactions[upper.tri(interactions, diag=FALSE)] <-
-#'     t(interactions)[upper.tri(t(interactions), diag=FALSE)]
-#'
-#' row.names(interactions) <- nodes
-#' colnames(interactions) <- nodes
-#'
-#' for(i in 1:n_nodes) {
-#'   interactions[i,i] <- 1
-#' }
-#'
-#' adj_matrix_to_edgelist(interactions)
-#'
-adj_matrix_to_edgelist <- function(df) {
+#'   source, target, and weight.
+adj_matrix_to_edgelist <- function(adj_matrix) {
+  # Column names and row names are required to determine connected vertices
+  if (is.null(colnames(adj_matrix))) {
+    warning("No column names found for adjacency matrix.",
+            "\nNumbers have been set as column names: 1 2 3 ...",
+            "\nℹ to set column names use e.g.: colnames(adj_mat) <- names", call.=FALSE)
+
+    colnames(adj_matrix) <- 1:ncol(adj_matrix)
+  }
+
+  # Column names and row names are required to determine connected vertices
+  if (is.null(row.names(adj_matrix))) {
+    warning("No row names found found for adjacency matrix.",
+            "\nColumn names are now used as rownames.",
+            "\nℹ to set row names use e.g.: row.names(adj_mat) <- colnames(adj_mat)", call.=FALSE)
+
+    row.names(adj_matrix) <- colnames(adj_matrix)
+  }
 
   # If the upper and lower diagonal are not the same we would be discarding information
-  is_equal <- isTRUE(all.equal(df[upper.tri(df, diag=FALSE)],
-                               t(df)[upper.tri(t(df), diag=FALSE)]))
+  is_equal <- isTRUE(all.equal(adj_matrix[upper.tri(adj_matrix, diag=FALSE)],
+                               t(adj_matrix)[upper.tri(t(adj_matrix), diag=FALSE)]))
   if(!is_equal) {
     stop("Must provide adjacency matrix with identical upper and lower triangle.",
          "\nℹ Check your adj. matrix with `all.equal(adj[upper.tri(adj, diag=FALSE)], ",
@@ -42,25 +40,25 @@ adj_matrix_to_edgelist <- function(df) {
 
   # It is assumed that there is no interest in self intaction, and that the
   #   upper and lower triangles of the adjacency matrix are identical.
-  diag(df) = 0
-  df[lower.tri(df, diag=TRUE)] <- 0
+  diag(adj_matrix) = 0
+  adj_matrix[lower.tri(adj_matrix, diag=TRUE)] <- 0
 
   # Prepare to convert to long format by making the rownames a column of their own
-  df <- df %>%
-    tibble::as_tibble(rownames = "Source")
+  adj_matrix <- adj_matrix %>%
+    tibble::as_tibble(rownames = "source")
 
   # Convert into the edgelist format
-  edgelist <- tidyr::pivot_longer(df, cols = -Source, names_to = "Target", values_to = "Weight") %>%
+  edgelist <- tidyr::pivot_longer(adj_matrix, cols = -source, names_to = "target", values_to = "weight") %>%
     # Self interaction and dulicate info from lower triangle have been set to 0
-    dplyr::filter(Weight != 0)
+    dplyr::filter(weight != 0)
 
   return(edgelist)
 }
 
 
-adj_matrix_to_nodetable <- function(df, group_vec = NULL) {
+adj_matrix_to_nodetable <- function(adj_matrix, group_vec = NULL) {
 
-  data.frame("Node" = colnames(df))
+  data.frame("node" = colnames(adj_matrix))
 }
 
 

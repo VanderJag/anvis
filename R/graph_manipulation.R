@@ -7,10 +7,10 @@ group_nodes <- function(node_table, group_vec = NULL) {
 
   # If a grouping vector has been provided
   if (!is.null(group_vec)) {
-    node_table$Groups <- group_vec
-    node_table <- node_table[order(node_table$Groups),]
+    node_table$group <- group_vec
+    node_table <- node_table[order(node_table$group),]
   } else {
-    node_table$Groups <- "A"
+    node_table$group <- "A"
   }
 }
 
@@ -44,19 +44,19 @@ add_node_pos <- function(node_table, layout = "circle") {
 
 add_colors <- function(node_table) {
   # Group information is required to add group colouring
-  if (!"Groups" %in% names(node_table)) {
+  if (!"group" %in% names(node_table)) {
     warning("No group column found while adding node group columns")
-    node_table$Groups <- "A"
+    node_table$group <- "A"
   }
 
   # extract the unique groups
-  groups <- node_table$Groups %>% unique()
+  groups <- node_table$group %>% unique()
 
   # same number of colors is required as group count
   colors <- n_distinct_cols(length(groups))
 
   # index which group is assigned to which row
-  idx <- match(node_table$Groups, groups)
+  idx <- match(node_table$group, groups)
 
   # Use group index to select correct colors for each row
   node_table$color <- colors[idx]
@@ -72,7 +72,7 @@ pick_width_type <- function() {
 }
 
 
-# requires df with a column called Weight
+# requires df with a column called weight
 edge_weight_to_widths <- function(edge_table, type) {
   frac = as.vector(c(2, 3, 4, 6, 10, 15, 24, 36))
   n_edges = nrow(edge_table)
@@ -99,13 +99,13 @@ edge_weight_to_widths <- function(edge_table, type) {
   }
 
   #1 is partcor, 2 is cor, 3 is MI, 4 is ranked, 5 is percentile.
-  ifelse(type == 1, edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=nthroot(abs(Weight), 3), B=3)),
-         ifelse(type == 2, edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=abs(Weight), B=3)),
-                ifelse(type == 3, edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=(abs(Weight)/max(abs(df))), B=3)),
-                       ifelse(type == 4, edge_table <- dplyr::mutate(edge_table, width = sigmoid_xB(x=(Rank(-Weight)/n_edges), B=3)),
+  ifelse(type == 1, edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=nthroot(abs(weight), 3), B=3)),
+         ifelse(type == 2, edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=abs(weight), B=3)),
+                ifelse(type == 3, edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=(abs(weight)/max(abs(df))), B=3)),
+                       ifelse(type == 4, edge_table <- dplyr::mutate(edge_table, width = sigmoid_xB(x=(Rank(-weight)/n_edges), B=3)),
                               if(type == 5){
                                 wid <- as.data.frame(wid)
-                                edge_table <- edge_table[sort(abs(edge_table$Weight), decreasing=T, index.return=T)[[2]],]
+                                edge_table <- edge_table[sort(abs(edge_table$weight), decreasing=T, index.return=T)[[2]],]
                                 edge_table <- cbind(edge_table, wid)
                                 colnames(edge_table)[5] <- "width"
                               }
@@ -120,13 +120,13 @@ weights_to_color <- function(edge_table) {
 
   # If negative numbers are found in the weights use a diverging color palette,
   #   otherwise use a sequential color palette
-  if (min(edge_table$Weight) < 0) {
+  if (min(edge_table$weight) < 0) {
     Stroke <- as.vector(colorspace::diverging_hcl(n=nrow(edge_table), palette = "Blue-Red"))
-    edge_table <- edge_table[sort(edge_table$Weight, decreasing=T, index.return=T)[[2]],]
+    edge_table <- edge_table[sort(edge_table$weight, decreasing=T, index.return=T)[[2]],]
     edge_table <- cbind(edge_table, Stroke)
   } else {
     Stroke <- as.vector(colorspace::sequential_hcl(n=nrow(edge_table), palette = "Reds2"))
-    edge_table <- edge_table[sort(abs(edge_table$Weight), decreasing=T, index.return=T)[[2]],]
+    edge_table <- edge_table[sort(abs(edge_table$weight), decreasing=T, index.return=T)[[2]],]
     edge_table <- cbind(edge_table, Stroke)
   }
 
