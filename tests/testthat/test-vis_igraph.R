@@ -16,3 +16,13 @@ test_that("igraph visualization throws error when only node_table is provided", 
                           igraph_obj = NULL), "edge table parameter is NULL")
 })
 
+test_that("igraph_obj input must be of class igraph", {
+  graph_obj <- matrix(1:9, 3, 3)
+  class(graph_obj) <- "other_class"
+
+  expect_error(vis_igraph(edge_table = NULL,
+                          node_table = NULL,
+                          igraph_obj = graph_obj), "must be of class igraph")
+})
+
+
