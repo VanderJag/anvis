@@ -309,6 +309,22 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
     my_graph <- igraph_obj
   }
 
+  # Capture input -----------------------------------------------------------
+
+  plot_params <- list(...)
+
+  get_param <- function(list_item) {
+    if (list_item %in% names(plot_params)) {
+      plot_params[[list_item]]
+    } else {
+      igraph::vertex.attributes(my_graph)[[list_item]]
+    }
+  }
+
+  vertex_label <- if ("vertex.label" %in% names(plot_params)) plot_params$vertex.label else igraph::V(my_graph)[name]
+  igraph::V(my_graph)$name
+  # Prefer using user specified parameters over default function parameters
+
   # Visualize in igraph -----------------------------------------------------
 
 
