@@ -90,7 +90,7 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
                                        as.vector(edge_table$sharedname),
                                        as.vector(edge_table$width))
   edgestroke <- RCy3::mapVisualProperty("Edge Stroke Unselected Paint", "shared name", "d",
-                                        as.vector(edge_table$sharedname), as.vector(edge_table$Stroke))
+                                        as.vector(edge_table$sharedname), as.vector(edge_table$color))
   # Set visual style
   RCy3::createVisualStyle(style_name,
                           defaults,

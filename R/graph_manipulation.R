@@ -121,13 +121,13 @@ weights_to_color <- function(edge_table) {
   # If negative numbers are found in the weights use a diverging color palette,
   #   otherwise use a sequential color palette
   if (min(edge_table$weight) < 0) {
-    Stroke <- as.vector(colorspace::diverging_hcl(n=nrow(edge_table), palette = "Blue-Red"))
+    color <- as.vector(colorspace::diverging_hcl(n=nrow(edge_table), palette = "Blue-Red"))
     edge_table <- edge_table[sort(edge_table$weight, decreasing=T, index.return=T)[[2]],]
-    edge_table <- cbind(edge_table, Stroke)
+    edge_table <- cbind(edge_table, color)
   } else {
-    Stroke <- as.vector(colorspace::sequential_hcl(n=nrow(edge_table), palette = "Reds2"))
+    color <- as.vector(colorspace::sequential_hcl(n=nrow(edge_table), palette = "Reds2"))
     edge_table <- edge_table[sort(abs(edge_table$weight), decreasing=T, index.return=T)[[2]],]
-    edge_table <- cbind(edge_table, Stroke)
+    edge_table <- cbind(edge_table, color)
   }
 
   return(edge_table)
