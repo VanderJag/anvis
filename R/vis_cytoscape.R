@@ -37,7 +37,8 @@
 
 
 
-vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session = TRUE) {
+vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session = TRUE,
+                             cyto3.8_check = T) {
 
   # Cytoscape needs additional columns that indicate how nodes relate
   edge_table$interaction <- "interacts"
@@ -67,10 +68,19 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
   n_groups <- length(unique(node_table$group))
 
 
-  # TODO check cytoscape version, 3.8 does not work with RCy3, throw an error if this version is used
-  # throw error for version 3.8 because the first graph you visualize will not run
-  # argument: , cyto3.8_check = T
-  # RCy3::cytoscapeVersionInfo()
+  # Check if a valid version of cytoscape is used
+  if (cyto3.8_check) {
+    cytosc_v <- RCy3::cytoscapeVersionInfo()[["cytoscapeVersion"]] %>%
+      numeric_version()
+
+    if (!(cytosc_v < "3.8" | cytosc_v >= "3.9")) {
+      stop("Must use a cytoscape version different from 3.8.x:",
+           "\nℹ You're using: ", cytosc_v,
+           "\n✖ Cytoscape versions 3.8.x fail to make the first visualization.",
+           call.=FALSE)
+    }
+  }
+
 
   # Create Cytoscape network
   RCy3::createNetworkFromDataFrames(nodes,
