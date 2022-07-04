@@ -66,6 +66,12 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
                    NODE_BORDER_PAINT = "#FFFFFF")
   n_groups <- length(unique(node_table$group))
 
+
+  # TODO check cytoscape version, 3.8 does not work with RCy3, throw an error if this version is used
+  # throw error for version 3.8 because the first graph you visualize will not run
+  # argument: , cyto3.8_check = T
+  # RCy3::cytoscapeVersionInfo()
+
   # Create Cytoscape network
   RCy3::createNetworkFromDataFrames(nodes,
                                     edges,
