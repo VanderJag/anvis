@@ -10,12 +10,6 @@
 #   Group is boolean asking if certain variables are to be clustered together as neighbours in the figure.
 #   Incase certain variables are to be clustered together in groups in the visualisation,
 #   G is a vector containing the label names of the "Groups to be clustered together" Nodes with the same labels will be visualised adjacent to each other.
-# For visualising the Edge Weights,
-#   Choose "type = 1" for grading the edges based on partial correlation values
-#   Choose "type = 2" for grading the edges based on Pearson or Spearman correlation values
-#   Choose "type = 3" for grading the edges on a ranked percentile system (such that the edges are ranked and on an exponential scale
-#   the gradient of the width and colour of edges are assigned. for eg. 98th percentile with the highest width, 95th percentile with the next width etc.)
-#
 #
 #Example:
 #	source("VisualiseNetwork.R")

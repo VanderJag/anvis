@@ -71,50 +71,42 @@ pick_width_type <- function() {
   NULL
 }
 
-
+# For visualising the Edge Weights,
+#   Choose "type = 1" for grading the edges based on partial correlation values
+#   Choose "type = 2" for grading the edges based on Pearson or Spearman correlation values
+#   Choose "type = 3" for grading the edges on a ranked percentile system (such that the edges are ranked and on an exponential scale
+#   the gradient of the width and colour of edges are assigned. for eg. 98th percentile with the highest width, 95th percentile with the next width etc.)
+#
+#  1 is partcor, 2 is cor, 3 is MI, 4 is ranked, 5 is percentile.
+#
 # requires df with a column called weight
-edge_weight_to_widths <- function(edge_table, type) {
-  frac = as.vector(c(2, 3, 4, 6, 10, 15, 24, 36))
+edge_weight_to_widths <- function(edge_table, width_type) {
+
+  # TODO argument matching and selecting by numbers
+
   n_edges = nrow(edge_table)
-  M = NULL
-  for (i in 1:length(frac)) {
-    f = frac[i]
-    mes = NULL
-    mes = round((f * n_edges)/100, 0)
-    M <- as.vector(append(M, mes))
-  }
-  diff = (sum(M)) - (nrow(edge_table))
-  ifelse(diff == 0, print("perfect!"), M[8] <- M[8] - diff)
 
-  wids <- as.vector(c(10, 8, 4, 2, 1, 0.5, 0.25, 0.25))
-  wid = NULL
-  for (j in 1:length(M)) {
-    times = M[j]
-    value = wids[j]
-    wid <- as.vector(append(wid, c(rep(value, times))))
+  # Change the weights to widths according to type
+  if (width_type == 1) {
+    edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=nthroot(abs(weight), 3), B=3))
+  } else if (width_type == 2) {
+    edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=abs(weight), B=3))
+  } else if (width_type == 3) {
+    edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=(abs(weight)/max(abs(weight))), B=3))
+  } else if (width_type == 4) {
+    edge_table <- dplyr::mutate(edge_table, width = sigmoid_xB(x=(Rank(-weight)/n_edges), B=3))
+  } else if (width_type == 5) {
+    wid <- as.data.frame(percentile_widths(n_edges = n_edges))
+    edge_table <- edge_table[sort(abs(edge_table$weight), decreasing=T, index.return=T)[[2]],]
+    edge_table <- cbind(edge_table, wid)
+    colnames(edge_table)[5] <- "width"
+  } else {
+    print("type not selected")
   }
-
-  nthroot = function(x,n) {
-    (abs(x)^(1/n))*sign(x)
-  }
-
-  #1 is partcor, 2 is cor, 3 is MI, 4 is ranked, 5 is percentile.
-  ifelse(type == 1, edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=nthroot(abs(weight), 3), B=3)),
-         ifelse(type == 2, edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=abs(weight), B=3)),
-                ifelse(type == 3, edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=(abs(weight)/max(abs(df))), B=3)),
-                       ifelse(type == 4, edge_table <- dplyr::mutate(edge_table, width = sigmoid_xB(x=(Rank(-weight)/n_edges), B=3)),
-                              if(type == 5){
-                                wid <- as.data.frame(wid)
-                                edge_table <- edge_table[sort(abs(edge_table$weight), decreasing=T, index.return=T)[[2]],]
-                                edge_table <- cbind(edge_table, wid)
-                                colnames(edge_table)[5] <- "width"
-                              }
-                              else{
-                                print("type not selected")
-                              }))))
 
   return(edge_table)
 }
+
 
 weights_to_color <- function(edge_table) {
 
@@ -133,3 +125,37 @@ weights_to_color <- function(edge_table) {
   return(edge_table)
 }
 
+#' Edge width based on percentiles
+#'
+#' Creates a vector of edge widths that matched with the number of edges. Edges
+#' widths are determined on the percentiles of connection strengths. The highest
+#' 2 percentiles have width 10, the next 3 percentiles have width 8, etc.
+#'
+#' @param n_edges Integer to determine the number of edge widths that should be
+#'   returned
+#' @return A vector of edge widths which matches `n_edges` with its length. Widths
+#'   vary between 10 and 0.25
+percentile_widths <- function(n_edges) {
+  # The widths will be assigned based on the percentile a connection is in.
+  # Specify percentiles that will get distinct widths
+  percentile_groups = as.vector(c(2, 3, 4, 6, 10, 15, 24, 36) / 100)
+
+  # How often will each width be used
+  width_times = round((percentile_groups * n_edges), 0)
+  # Rounding can give the incorrect total number of edge widths
+  n_edge_diff = sum(width_times) - n_edges
+  if (!n_edge_diff == 0) width_times[8] <- width_times[8] - n_edge_diff
+
+  # Preset edge widths for the different percentiles
+  width_opts <- as.vector(c(10, 8, 4, 2, 1, 0.5, 0.25, 0.25))
+
+  # Edge width will be repeated so each edge can receive a width
+  edge_widths = NULL
+  for (i in 1:length(width_times)) {
+    times = width_times[i]
+    value = width_opts[i]
+    edge_widths <- as.vector(append(edge_widths, c(rep(value, times))))
+  }
+
+  return(edge_widths)
+}
