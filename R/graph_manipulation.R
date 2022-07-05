@@ -71,46 +71,83 @@ pick_width_type <- function() {
   NULL
 }
 
-# For visualising the Edge Weights,
-#   Choose "type = 1" for grading the edges based on partial correlation values
-#   Choose "type = 2" for grading the edges based on Pearson or Spearman correlation values
-#   Choose "type = 3" for grading the edges on a ranked percentile system (such that the edges are ranked and on an exponential scale
-#   the gradient of the width and colour of edges are assigned. for eg. 98th percentile with the highest width, 95th percentile with the next width etc.)
-#
-#  1 is partcor, 2 is cor, 3 is MI, 4 is ranked, 5 is percentile.
-#
-# requires df with a column called weight
-edge_weight_to_widths <- function(edge_table, width_type) {
+#' Calculate edge widths
+#'
+#' Adds a column called "width" to the input `edge_table`. The widths for the
+#' edges can be calculated using five different methods. Which method is most
+#' appropriate depend on the range of the input data. For more details on the
+#' choice of the method check `width_type` in the Arguments section.
+#'
+#' The methods have in common that they relate to the absolute values of the column
+#' "weight", which is a required argument. The most extreme values for "weight"
+#' get the highest value for edge width. The range of edge widths will be between
+#' 0 and 1, irrespective of the chosen method.
+#'
+#' @param edge_table A data frame with a column called "weight" containing
+#'   numeric values.
+#' @param width_type A character string that determines the method to be used for
+#'   converting edge weight to edge width. Options are: `"cor"`, which is
+#'   intended to be used with Pearson or Spearman correlation values (range -1
+#'   to 1). Widths will be the absolute value of the correlation, scaled with a
+#'   sigmoid. `"partcor"`, which is intended to be use for partial correlation
+#'   values (range -1 to 1). For this method, edge widths will be the cube root
+#'   of absolute weight values, scaled with a sigmoid. The option `"MI"` is meant
+#'   to be used with weights derived from mutual information (range 0 to +∞).
+#'   Widths will be the weights divided by to maximum weight, then scaled with
+#'   a sigmoid. `"ranked"` will calculate percentage ranks of the weight, and
+#'   scale them with a sigmoid. `"percentile"` will chose a set of fixed widths
+#'   determined by the percentile of a weight value. The highest percentiles will
+#'   be assigned the largest width, but they are the smallest group, vice versa
+#'   for the lowest percentiles.
+#' @return Return the input data frame with an added column "width", which can
+#'   be used to scale edges in a network visualization.
+edge_weight_to_widths <- function(edge_table,
+                                  width_type = c("cor", "partcor", "MI",
+                                                 "ranked", "percentile")) {
 
-  # TODO argument matching and selecting by numbers
+  # See if the width_type is one of the expected choices, this allows
+  #   partial matching and will throw an error for invalid arguments
+  width_type <- match.arg(width_type)
+
+  # A column named 'weight' is required to calculate the edge widths
+  if (!"weight" %in% colnames(edge_table)) {
+    stop("Must provide edge table with weights:",
+    "\nℹ Your edge table contains these columns: ",
+    colnames(edge_table) %>% paste(collapse = ", "),
+    ".\n✖ `colnames(edge_table)` must include 'weight'.",
+    call.=FALSE)
+  }
+
+  if ("width" %in% colnames(edge_table)) {
+    warning("A column with the name 'width' is already found in `edge_table`,",
+            "this column will be overwritten.")
+  }
 
   # number of edges is used in some calculations of edge width
   n_edges = nrow(edge_table)
 
   # Change the weights to widths according to type
-  if (width_type == 1) {
+  if (width_type == "partcor") {
     edge_table <- edge_table %>%
       dplyr::mutate(width = sigmoid_xB(x = nthroot(abs(weight), 3), B = 3))
-  } else if (width_type == 2) {
+  } else if (width_type == "cor") {
     edge_table <- edge_table %>%
       dplyr::mutate(width = sigmoid_xB(x = abs(weight), B = 3))
-  } else if (width_type == 3) {
+  } else if (width_type == "MI") {
     edge_table <- edge_table %>%
       dplyr::mutate(width = sigmoid_xB(x = (abs(weight) / max(abs(weight))), B = 3))
-  } else if (width_type == 4) {
+  } else if (width_type == "ranked") {
     edge_table <- edge_table %>%
-      dplyr::mutate(width = sigmoid_xB(x = (rank(-weight) / n_edges), B = 3))
-  } else if (width_type == 5) {
+      dplyr::mutate(width = sigmoid_xB(x = (rank(abs(weight)) / n_edges), B = 3))
+  } else if (width_type == "percentile") {
     # Get percentile widths (descending order)
     width_col <- data.frame("width" = percentile_widths(n_edges = n_edges))
-    # Sort edges descending
-    edge_table <- edge_table[sort(abs(edge_table$weight),
-                                  decreasing = T,
-                                  index.return = T)[[2]],]
+    # Get index for edges ordered by weight, this is done with ranks,
+    #   for ties 'min' is chosen to provide the tied edges with the lower of the
+    #   two options for their rank
+    widths_idx <- rank(-abs(edge_table$weight), ties.method = "min")
     # Combine edges and widths
-    edge_table <- cbind(edge_table, width_col)
-  } else {
-    print("type not selected")
+    edge_table <- dplyr::bind_cols(edge_table, "width" = width_col[widths_idx,])
   }
 
   return(edge_table)
@@ -126,7 +163,7 @@ edge_weight_to_widths <- function(edge_table, width_type) {
 #' @param n_edges Integer to determine the number of edge widths that should be
 #'   returned
 #' @return A vector of edge widths which matches `n_edges` with its length. Widths
-#'   vary between 10 and 0.25
+#'   vary between 1 and 0.025.
 percentile_widths <- function(n_edges) {
   # The widths will be assigned based on the percentile a connection is in.
   # Specify percentiles that will get distinct widths
@@ -139,7 +176,7 @@ percentile_widths <- function(n_edges) {
   if (!n_edge_diff == 0) width_times[8] <- width_times[8] - n_edge_diff
 
   # Preset edge widths for the different percentiles
-  width_opts <- as.vector(c(10, 8, 4, 2, 1, 0.5, 0.25, 0.25))
+  width_opts <- c(1, 0.8, 0.4, 0.2, 0.1, 0.05, 0.025, 0.025)
 
   # Edge width will be repeated so each edge can receive a width
   edge_widths = NULL
