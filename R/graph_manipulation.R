@@ -98,7 +98,7 @@ pick_width_type <- function() {
 #'   scale them with a sigmoid. `"percentile"` will chose a set of fixed widths
 #'   determined by the percentile of a weight value. The highest percentiles will
 #'   be assigned the largest width, but they are the smallest group, vice versa
-#'   for the lowest percentiles.
+#'   for the lowest percentiles. This argument can be abbreviated.
 #' @return Return the input data frame with an added column "width", which can
 #'   be used to scale edges in a network visualization.
 edge_weight_to_widths <- function(edge_table,
