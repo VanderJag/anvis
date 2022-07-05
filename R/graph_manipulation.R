@@ -84,22 +84,31 @@ edge_weight_to_widths <- function(edge_table, width_type) {
 
   # TODO argument matching and selecting by numbers
 
+  # number of edges is used in some calculations of edge width
   n_edges = nrow(edge_table)
 
   # Change the weights to widths according to type
   if (width_type == 1) {
-    edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=nthroot(abs(weight), 3), B=3))
+    edge_table <- edge_table %>%
+      dplyr::mutate(width = sigmoid_xB(x = nthroot(abs(weight), 3), B = 3))
   } else if (width_type == 2) {
-    edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=abs(weight), B=3))
+    edge_table <- edge_table %>%
+      dplyr::mutate(width = sigmoid_xB(x = abs(weight), B = 3))
   } else if (width_type == 3) {
-    edge_table <- dplyr::mutate(edge_table, width=sigmoid_xB(x=(abs(weight)/max(abs(weight))), B=3))
+    edge_table <- edge_table %>%
+      dplyr::mutate(width = sigmoid_xB(x = (abs(weight) / max(abs(weight))), B = 3))
   } else if (width_type == 4) {
-    edge_table <- dplyr::mutate(edge_table, width = sigmoid_xB(x=(Rank(-weight)/n_edges), B=3))
+    edge_table <- edge_table %>%
+      dplyr::mutate(width = sigmoid_xB(x = (rank(-weight) / n_edges), B = 3))
   } else if (width_type == 5) {
-    wid <- as.data.frame(percentile_widths(n_edges = n_edges))
-    edge_table <- edge_table[sort(abs(edge_table$weight), decreasing=T, index.return=T)[[2]],]
-    edge_table <- cbind(edge_table, wid)
-    colnames(edge_table)[5] <- "width"
+    # Get percentile widths (descending order)
+    width_col <- data.frame("width" = percentile_widths(n_edges = n_edges))
+    # Sort edges descending
+    edge_table <- edge_table[sort(abs(edge_table$weight),
+                                  decreasing = T,
+                                  index.return = T)[[2]],]
+    # Combine edges and widths
+    edge_table <- cbind(edge_table, width_col)
   } else {
     print("type not selected")
   }
@@ -107,23 +116,6 @@ edge_weight_to_widths <- function(edge_table, width_type) {
   return(edge_table)
 }
 
-
-weights_to_color <- function(edge_table) {
-
-  # If negative numbers are found in the weights use a diverging color palette,
-  #   otherwise use a sequential color palette
-  if (min(edge_table$weight) < 0) {
-    color <- as.vector(colorspace::diverging_hcl(n=nrow(edge_table), palette = "Blue-Red"))
-    edge_table <- edge_table[sort(edge_table$weight, decreasing=T, index.return=T)[[2]],]
-    edge_table <- cbind(edge_table, color)
-  } else {
-    color <- as.vector(colorspace::sequential_hcl(n=nrow(edge_table), palette = "Reds2"))
-    edge_table <- edge_table[sort(abs(edge_table$weight), decreasing=T, index.return=T)[[2]],]
-    edge_table <- cbind(edge_table, color)
-  }
-
-  return(edge_table)
-}
 
 #' Edge width based on percentiles
 #'
@@ -158,4 +150,22 @@ percentile_widths <- function(n_edges) {
   }
 
   return(edge_widths)
+}
+
+
+weights_to_color <- function(edge_table) {
+
+  # If negative numbers are found in the weights use a diverging color palette,
+  #   otherwise use a sequential color palette
+  if (min(edge_table$weight) < 0) {
+    color <- as.vector(colorspace::diverging_hcl(n=nrow(edge_table), palette = "Blue-Red"))
+    edge_table <- edge_table[sort(edge_table$weight, decreasing=T, index.return=T)[[2]],]
+    edge_table <- cbind(edge_table, color)
+  } else {
+    color <- as.vector(colorspace::sequential_hcl(n=nrow(edge_table), palette = "Reds2"))
+    edge_table <- edge_table[sort(abs(edge_table$weight), decreasing=T, index.return=T)[[2]],]
+    edge_table <- cbind(edge_table, color)
+  }
+
+  return(edge_table)
 }
