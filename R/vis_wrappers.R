@@ -17,7 +17,8 @@
 #' * The Cytoscape software needs to be running.
 #' *
 #'
-VisualiseNetwork <- function(df_adjacency, group_vec = NULL, type = 2) {
+VisualiseNetwork <- function(df_adjacency, group_vec = NULL, width_type = NULL,
+                             do_save = T, save_names) {
 
   # Since this function uses a for loop to iterate over the visualizations that
   #   are created, the input needs to be converted into a list.
@@ -40,13 +41,11 @@ VisualiseNetwork <- function(df_adjacency, group_vec = NULL, type = 2) {
 
     # These variable store are used to create the current network in edgelist format
     Adjacency = as.data.frame(df_adjacency[i_matrix])
-    node_table = NULL
-    EdgeTable = NULL
 
     # Create a network from adjacency info
     network_list <- adj_matrix_to_network(Adjacency,
                                           group_vec = group_vec,
-                                          width_type = type)
+                                          width_type = width_type)
     edge_table <- network_list[["edge_table"]]
     node_table <- network_list[["node_table"]]
 

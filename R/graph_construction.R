@@ -100,7 +100,7 @@ adj_matrix_to_network <- function(adj_matrix, group_vec, width_type, add_color =
 
   # Convert edge weight to edge width ---------------------------------------
 
-  edge_table <- edge_weight_to_widths(edge_table, type = width_type)
+  edge_table <- edge_weight_to_widths(edge_table, width_type = width_type)
 
   # Add colour column to edge table -----------------------------------------
 

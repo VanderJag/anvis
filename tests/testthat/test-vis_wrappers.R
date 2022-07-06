@@ -14,7 +14,7 @@ test_that("when cytoscape is not available RCy3 will give error", {
           message = "this test runs only when cytoscape is inactive")
 
   # Visualize the network
-  expect_message(VisualiseNetwork(Mat1, group_vec = group_vec, type = 1),
+  expect_message(VisualiseNetwork(Mat1, group_vec = group_vec),
                  "Please check that Cytoscape is running") %>%
   expect_error("object 'res' not found|Failed to connect to") %>%
   expect_error("object 'res' not found|argument is of length zero")
@@ -38,5 +38,5 @@ test_that("when cytoscape is available wrapper runs without error", {
               message = "this test runs only when cytoscape is active")
 
   # Visualize the network
-  expect_error(VisualiseNetwork(Mat1, group_vec = group_vec, type = 1), NA)
+  expect_error(VisualiseNetwork(Mat1, group_vec = group_vec), NA)
 })
