@@ -86,7 +86,7 @@ pick_width_type <- function() {
 #' @param edge_table A data frame with a column called "weight" containing
 #'   numeric values.
 #' @param width_type A character string that determines the method to be used for
-#'   converting edge weight to edge width. Options are: `"cor"`, which is
+#'   converting edge weight to edge width. Options are: `"cor"`, the default, which is
 #'   intended to be used with Pearson or Spearman correlation values (range -1
 #'   to 1). Widths will be the absolute value of the correlation, scaled with a
 #'   sigmoid. `"partcor"`, which is intended to be use for partial correlation
