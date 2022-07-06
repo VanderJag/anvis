@@ -61,7 +61,6 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
                    NODE_BORDER_PAINT = "#FFFFFF")
   n_groups <- length(unique(node_table$group))
 
-
   # Check if a valid version of cytoscape is used
   if (cyto3.8_check) {
     cytosc_v <- RCy3::cytoscapeVersionInfo()[["cytoscapeVersion"]] %>%
