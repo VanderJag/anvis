@@ -65,12 +65,6 @@ add_colors <- function(node_table) {
 }
 
 
-# TODO create function that automatically infers the type of scaling for width,
-#   by checking the range of the weights
-pick_width_type <- function() {
-  NULL
-}
-
 #' Calculate edge widths
 #'
 #' Adds a column called "width" to the input `edge_table`. The widths for the
@@ -102,7 +96,7 @@ pick_width_type <- function() {
 #' @return Return the input data frame with an added column "width", which can
 #'   be used to scale edges in a network visualization.
 edge_weight_to_widths <- function(edge_table,
-                                  width_type = c("cor", "partcor", "MI",
+                                  width_type = c("MI", "cor", "partcor",
                                                  "ranked", "percentile")) {
 
   # See if the width_type is one of the expected choices, this allows
