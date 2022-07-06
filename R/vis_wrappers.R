@@ -18,7 +18,7 @@
 #' *
 #'
 VisualiseNetwork <- function(df_adjacency, group_vec = NULL, width_type = NULL,
-                             do_save = T, save_names) {
+                             do_save = T, save_names = NULL) {
 
   # Since this function uses a for loop to iterate over the visualizations that
   #   are created, the input needs to be converted into a list.
