@@ -114,9 +114,28 @@ edge_weight_to_widths <- function(edge_table,
     call.=FALSE)
   }
 
+  # Unexpected results may be returned when the range of the data does not match
+  #   with the selected width type
+  if (width_type %in% c("partcor", "cor") &
+      (max(edge_table$weight) > 1 | min(edge_table$weight) < -1)) {
+    warning("'partcor' or 'cor' width ",
+            "types expect edge weight range -1 to 1, while your data has range: ",
+            range(edge_table$weight) %>% paste(collapse = " to "), ". ",
+            "Edge widths may not have the ideal range.")
+  }
+
+  if (width_type == "MI" &
+      (min(edge_table$weight) < 0)) {
+    warning("'MI' width ",
+            "type expect edge weight range 0 to +∞, while your data has range: ",
+            range(edge_table$weight) %>% paste(collapse = " to "), ". ",
+            "Edge widths may not have the ideal range.")
+  }
+
+  # Warning for overwriting data
   if ("width" %in% colnames(edge_table)) {
     warning("A column with the name 'width' is already found in `edge_table`,",
-            "this column will be overwritten.")
+            "this column will be overwritten.", call. = F)
   }
 
   # number of edges is used in some calculations of edge width

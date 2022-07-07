@@ -29,6 +29,28 @@ test_that("all edge width types return a column called width", {
 })
 
 
+test_that("Warning is shown when range doesn't match partcor or cor", {
+  # Create artificial edgelist with column 'weight'
+  df <- tibble::tibble("weight" = seq(0,3.6, length.out = 40))
+
+  expect_warning(edge_weight_to_widths(df, "partcor"), "ideal range")
+  expect_warning(edge_weight_to_widths(df, "cor"), "ideal range")
+
+  df <- tibble::tibble("weight" = seq(-5, 0, length.out = 40))
+
+  expect_warning(edge_weight_to_widths(df, "partcor"), "ideal range")
+  expect_warning(edge_weight_to_widths(df, "cor"), "ideal range")
+})
+
+
+test_that("Warning is shown when range doesn't match partcor or cor", {
+  # Create artificial edgelist with column 'weight'
+  df <- tibble::tibble("weight" = seq(-5,3000, length.out = 40))
+
+  expect_warning(edge_weight_to_widths(df, "MI"), "'MI' width type")
+})
+
+
 test_that("order of edge width is the same as edge weight", {
   # Load adjacency matrix
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
