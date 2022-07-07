@@ -80,7 +80,7 @@ add_colors <- function(node_table) {
 #' @param edge_table A data frame with a column called "weight" containing
 #'   numeric values.
 #' @param width_type A character string that determines the method to be used for
-#'   converting edge weight to edge width. Options are: `"cor"`, the default, which is
+#'   converting edge weight to edge width. Options are: `"cor"`, which is
 #'   intended to be used with Pearson or Spearman correlation values (range -1
 #'   to 1). Widths will be the absolute value of the correlation, scaled with a
 #'   sigmoid. `"partcor"`, which is intended to be use for partial correlation
@@ -88,7 +88,9 @@ add_colors <- function(node_table) {
 #'   of absolute weight values, scaled with a sigmoid. The option `"MI"` is meant
 #'   to be used with weights derived from mutual information (range 0 to +∞).
 #'   Widths will be the weights divided by to maximum weight, then scaled with
-#'   a sigmoid. `"ranked"` will calculate percentage ranks of the weight, and
+#'   a sigmoid. `"default_scaling"` applies the same transformation as `"MI"`,
+#'   as a result scaling the any weights to range 0 to 1.
+#'   `"ranked"` will calculate percentage ranks of the weight, and
 #'   scale them with a sigmoid. `"percentile"` will chose a set of fixed widths
 #'   determined by the percentile of a weight value. The highest percentiles will
 #'   be assigned the largest width, but they are the smallest group, vice versa
@@ -96,8 +98,8 @@ add_colors <- function(node_table) {
 #' @return Return the input data frame with an added column "width", which can
 #'   be used to scale edges in a network visualization.
 edge_weight_to_widths <- function(edge_table,
-                                  width_type = c("MI", "cor", "partcor",
-                                                 "ranked", "percentile")) {
+                                  width_type = c("default_scaling", "MI", "cor",
+                                                 "partcor", "ranked", "percentile")) {
 
   # See if the width_type is one of the expected choices, this allows
   #   partial matching and will throw an error for invalid arguments
@@ -127,7 +129,7 @@ edge_weight_to_widths <- function(edge_table,
   } else if (width_type == "cor") {
     edge_table <- edge_table %>%
       dplyr::mutate(width = sigmoid_xB(x = abs(weight), B = 3))
-  } else if (width_type == "MI") {
+  } else if (width_type == "MI" | width_type == "default_scaling") {
     edge_table <- edge_table %>%
       dplyr::mutate(width = sigmoid_xB(x = (abs(weight) / max(abs(weight))), B = 3))
   } else if (width_type == "ranked") {
