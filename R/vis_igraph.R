@@ -21,6 +21,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
                        igraph_obj = NULL,
                        radial_labs = T,
                        rad_lab_opts = list(),
+                       scale_width = 3.25,
                        ...) {
 
   # Validate network parameters ---------------------------------------------
@@ -78,7 +79,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
   do.call(igraph::plot.igraph,
           c(list(x = graph,
             layout = node_arrangement,
-            edge.width = edge_width * 4,
+            edge.width = edge_width * scale_width,
             edge.color = edge_color,
             vertex.color = vertex_color,
             vertex.label = vertex_label),
