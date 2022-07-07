@@ -10,7 +10,7 @@
 #'
 #' @param radial_labs A logical to indicate whether vertex labels should be
 #'   positioned radially around the circular arrangement of vertices.
-#' @param radial_lab_opts A names list, in which the names are valid arguments for
+#' @param rad_lab_opts A names list, in which the names are valid arguments for
 #'   `text()`.
 #' @param ... Additional options to be used with `igraph::plot.igraph` for
 #'   visualizing your network. Any options provided here will overwrite the
@@ -20,7 +20,7 @@
 vis_igraph <- function(edge_table = NULL, node_table = NULL,
                        igraph_obj = NULL,
                        radial_labs = T,
-                       radial_labs_opts = list(),
+                       rad_lab_opts = list(),
                        ...) {
 
   # Validate network parameters ---------------------------------------------
@@ -91,6 +91,15 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
     x = node_arrangement[,1]
     y = node_arrangement[,2]
 
+    # Check if user wants to overwrite one of the default arguments
+    txt_x <- if ("x" %in% names(rad_lab_opts)) rad_lab_opts[["x"]] else x * 1.1
+    txt_y <- if ("y" %in% names(rad_lab_opts)) rad_lab_opts[["y"]] else y * 1.1
+    txt_labels <- if ("labels" %in% names(rad_lab_opts)) rad_lab_opts[["labels"]] else vertex_label0
+    txt_adj <- if ("adj" %in% names(rad_lab_opts)) rad_lab_opts[["adj"]] else ifelse(x<=0, 1, 0)
+    txt_cex <- if ("cex" %in% names(rad_lab_opts)) rad_lab_opts[["cex"]] else 0.85
+    # Remove the used arguments from list as to pass them twice, prevents error
+    rad_lab_opts[c("x","y","labels","adj","cex")] <- NULL
+
     # create vector of angles for text based on number of nodes
     # (flipping the orientation of the words half way around so none appear upside down)
     angle = ifelse(atan(-(x/y))*(180/pi) < 0,
@@ -101,17 +110,15 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
     # Create a text function that vectorizes srt argument
     text <- function(...) Map(graphics::text, ...)
 
-    # TODO implement check to see whether radial_labs_opts is the correct list input
-    # TODO this will throw an error if the user supplies one of the arguments that
-    #   are already supplied
     do.call(text,
-            c(list(x = x * 1.1,
-                   y = y * 1.1,
-                   labels = vertex_label0,
-                   adj = ifelse(x<=0, 1, 0),
+            c(list(x = txt_x,
+                   y = txt_y,
+                   labels = txt_labels,
+                   adj = txt_adj,
+                   cex = txt_cex,
                    srt = angle,
                    xpd = T),
-              radial_labs_opts))
+              rad_lab_opts))
   }
 
   invisible(NULL)

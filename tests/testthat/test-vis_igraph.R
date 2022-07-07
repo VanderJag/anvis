@@ -96,7 +96,7 @@ test_that("igraph vis. leaves visual styling out when it is not an attribute",{
 })
 
 
-test_that("igraph vis. doesn't complain for duplicated arguments for text()",{
+test_that("igraph vis. doesn't complain when overwriting args. for text()",{
 
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
 
@@ -112,9 +112,11 @@ test_that("igraph vis. doesn't complain for duplicated arguments for text()",{
   node_table <- network_list[["node_table"]]
 
   expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
-                          radial_labs_opts = list(cex = 0.8, labels = "green")),
+                          rad_lab_opts = list(x = 0, y = 0)),
                NA)
-
+  expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
+                          rad_lab_opts = list(labels = "test", cex = 4, adj = 1, srt = 45)),
+               NA)
 })
 
 
