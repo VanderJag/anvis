@@ -64,6 +64,44 @@ add_colors <- function(node_table) {
   return(node_table)
 }
 
+# default node size for igraph is 15
+node_size_connectivity <- function(node_table, adj_matrix, vis_type = c("igraph")) {
+
+  # Check if the same nodes are present in node table and the adjacency matrix
+  only_nodes <- setdiff(node_table$node, colnames(adj_matrix))
+  only_adj <- setdiff(colnames(adj_matrix), node_table$node)
+  if (length(c(only_adj, only_nodes)) != 0) {
+    stop("Must provide node_table and adj_matrix with the same nodes.",
+    "\nℹ Unique elements in node_table$node: ", only_nodes %>% paste(collapse = ", "),
+    ", unique elements in names(adj_matrix): ", only_adj %>% paste(collapse = ", "),
+    ".\n✖ node_table$nodes and colnames(adj_matrix) should contain the same elements.",
+    call.=FALSE)
+  }
+
+  # Connections to self are omitted in this function
+  diag(adj_matrix) <- 0
+
+  connectivity <- rowSums(abs(adj_matrix))
+
+  # Scale to range 0 to 1, required for sigmoid
+  scale_conn <- connectivity / max(connectivity)
+
+  # Transform with sigmoid to emphasize the constrasts
+  scale_conn <- sigmoid_xB(scale_conn, 3)
+
+  # Match with default node size for the visualization
+  if (!is.null(vis_type)) {
+    if (vis_type == "igraph") scale_conn <- scale_conn * 15
+  }
+
+  # Make sure we can add the node size in correct order
+  match_idx <- match(node_table$node, names(scale_conn))
+
+  # Add to node table
+  node_table$size <- scale_conn[match_idx]
+
+  return(node_table)
+}
 
 #' Calculate edge widths
 #'
