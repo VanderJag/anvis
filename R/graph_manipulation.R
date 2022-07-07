@@ -121,7 +121,7 @@ edge_weight_to_widths <- function(edge_table,
     warning("'partcor' or 'cor' width ",
             "types expect edge weight range -1 to 1, while your data has range: ",
             range(edge_table$weight) %>% paste(collapse = " to "), ". ",
-            "Edge widths may not have the ideal range.")
+            "Unexpected results may be returned for edge widths.")
   }
 
   if (width_type == "MI" &
@@ -129,7 +129,7 @@ edge_weight_to_widths <- function(edge_table,
     warning("'MI' width ",
             "type expect edge weight range 0 to +∞, while your data has range: ",
             range(edge_table$weight) %>% paste(collapse = " to "), ". ",
-            "Edge widths may not have the ideal range.")
+            "Unexpected results may be returned for edge widths.")
   }
 
   # Warning for overwriting data
