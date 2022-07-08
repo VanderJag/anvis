@@ -125,6 +125,10 @@ test_that("order of edges gets maintained after adding widths column", {
 test_that("connectivity throws error when adj_matrix and node_table have different nodes", {
   # Load adjacency matrix
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- rep("A", times = nrow(Mat1))
+  group_vec[colnames(Mat1) %>% stringr::str_detect("IL")] <- "B"
+  group_vec[colnames(Mat1) %>% stringr::str_detect("CCL")] <- "C"
+  group_vec[colnames(Mat1) %>% stringr::str_detect("CXCL")] <- "D"
 
   network_list <- adj_matrix_to_network(Mat1,
                                         group_vec = group_vec,
@@ -143,6 +147,10 @@ test_that("connectivity throws error when adj_matrix and node_table have differe
 test_that("connectivity rowSums matches one determined based on edge weights", {
   # Load adjacency matrix
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- rep("A", times = nrow(Mat1))
+  group_vec[colnames(Mat1) %>% stringr::str_detect("IL")] <- "B"
+  group_vec[colnames(Mat1) %>% stringr::str_detect("CCL")] <- "C"
+  group_vec[colnames(Mat1) %>% stringr::str_detect("CXCL")] <- "D"
 
   network_list <- adj_matrix_to_network(Mat1,
                                         group_vec = group_vec,
