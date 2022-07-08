@@ -62,7 +62,20 @@ adj_matrix_to_nodetable <- function(adj_matrix, group_vec = NULL) {
 }
 
 
-adj_matrix_to_network <- function(adj_matrix, group_vec, width_type, add_color = T) {
+# all takes precedence over none
+# use color_group in combination with group
+# NULL for vis_type and for width_type will use the default arguments of the fucntions
+adj_matrix_to_network <- function(adj_matrix,
+                                  node_attrs = c("none", "all", "group", "color_group", "size"),
+                                  edge_attrs = c("none", "all", "width", "color"),
+                                  group_vec = NULL,
+                                  vis_type = NULL,
+                                  width_type = NULL) {
+
+  # Check which attributes should be added
+  node_attrs <- match.arg(node_attrs, several.ok = TRUE)
+  edge_attrs <- match.arg(edge_attrs, several.ok = TRUE)
+
   # If the number and column of the adjacency matrix is not equal there may be
   #   missing info and an error with the data input
   if (ncol(adj_matrix) != nrow(adj_matrix)) {
@@ -70,28 +83,37 @@ adj_matrix_to_network <- function(adj_matrix, group_vec, width_type, add_color =
          "and columns", call. = FALSE)
   }
 
-  # Incomplete group information can not be correctly assigned
-  if (nrow(adj_matrix) != length(group_vec)) {
-    stop("The number of nodes/variables in the groups table should be the same ",
-         "as in the adjacency matrix", call. = FALSE)
-  }
-
-
   # Node table with group info ----------------------------------------------
 
   node_table <- adj_matrix_to_nodetable(adj_matrix)
 
   # Adding grouping information ---------------------------------------------
 
-  node_table <- group_nodes(node_table, group_vec = group_vec)
+  if ("all" %in% node_attrs |
+      ( (!"none" %in% node_attrs) & "group" %in% node_attrs)) {
+    if (is.null(group_vec)) {
+      stop("Must provide grouping vector:",
+           "\n✖ `group_vec` should not be NULL when `node_attrs` is 'all' or 'group'.", call.=FALSE)
+    }
+    node_table <- group_nodes(node_table, group_vec = group_vec)
+  }
 
   # Add colors for the groups -----------------------------------------------
 
-  node_table <- add_colors(node_table)
+  if ("all" %in% node_attrs |
+      ( (!"none" %in% node_attrs) & "color_group" %in% node_attrs)) {
+    node_table <- add_colors(node_table)
+  }
 
-  # Cytoscape node positions ------------------------------------------------
 
-  node_table <- add_node_pos(node_table)
+  # Add node size -----------------------------------------------------------
+
+  if ("all" %in% node_attrs |
+      ( (!"none" %in% node_attrs) & "size" %in% node_attrs)) {
+    node_table <- node_size_connectivity(node_table = node_table,
+                                         adj_matrix = adj_matrix,
+                                         vis_type = vis_type)
+  }
 
 
   # adjecency to edgelist ---------------------------------------------------
@@ -100,11 +122,17 @@ adj_matrix_to_network <- function(adj_matrix, group_vec, width_type, add_color =
 
   # Convert edge weight to edge width ---------------------------------------
 
-  edge_table <- edge_weight_to_widths(edge_table, width_type = width_type)
+  if ("all" %in% edge_attrs |
+      ( (!"none" %in% edge_attrs) & "width" %in% edge_attrs)) {
+    edge_table <- edge_weight_to_widths(edge_table, width_type = width_type)
+  }
 
   # Add colour column to edge table -----------------------------------------
 
-  edge_table <- weights_to_color(edge_table)
+  if ("all" %in% edge_attrs |
+      ( (!"none" %in% edge_attrs) & "width" %in% edge_attrs)) {
+    edge_table <- weights_to_color(edge_table)
+  }
 
   return(list("edge_table" = edge_table,
               "node_table" = node_table))

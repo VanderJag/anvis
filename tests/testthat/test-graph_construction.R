@@ -50,3 +50,69 @@ test_that("creating edgelist does not fail when adj. matrix is symmetrical", {
   # Check if no error occurs
   expect_error(adj_matrix_to_edgelist(mat1), NA)
 })
+
+test_that("group vector must be provided to add node groups", {
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+
+  expect_error(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = "group",
+                                     edge_attrs = "none", group_vec = NULL),
+               "Must provide grouping vector")
+})
+
+test_that("group column is added to node table when 'group' is selected", {
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+
+  # Some grouping based on column names
+  group_vec <- rep("A", times = nrow(Mat1))
+  group_vec[colnames(Mat1) %>% stringr::str_detect("IL")] <- "B"
+  group_vec[colnames(Mat1) %>% stringr::str_detect("CCL")] <- "C"
+  group_vec[colnames(Mat1) %>% stringr::str_detect("CXCL")] <- "D"
+
+  expect_named(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = "group",
+                        edge_attrs = "none", group_vec = group_vec)[['node_table']],
+               c("node", "group"), ignore.order = TRUE)
+
+})
+
+test_that("group color column error when there is no group", {
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+
+  expect_error(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = "color",
+                        edge_attrs = "none")[['node_table']],
+               "Must provide node table with group info")
+
+})
+
+test_that("group color column is added to node table when 'group' and 'color' is selected", {
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+
+  # Some grouping based on column names
+  group_vec <- rep("A", times = nrow(Mat1))
+  group_vec[colnames(Mat1) %>% stringr::str_detect("IL")] <- "B"
+  group_vec[colnames(Mat1) %>% stringr::str_detect("CCL")] <- "C"
+  group_vec[colnames(Mat1) %>% stringr::str_detect("CXCL")] <- "D"
+
+  expect_named(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = c("group", "color"),
+                        edge_attrs = "none", group_vec = group_vec)[['node_table']],
+               c("node", "group", "color"), ignore.order = TRUE)
+
+})
+
+# TODO change this one to another attribute
+test_that("group column is added to node table when 'group' is selected", {
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+
+  # Some grouping based on column names
+  group_vec <- rep("A", times = nrow(Mat1))
+  group_vec[colnames(Mat1) %>% stringr::str_detect("IL")] <- "B"
+  group_vec[colnames(Mat1) %>% stringr::str_detect("CCL")] <- "C"
+  group_vec[colnames(Mat1) %>% stringr::str_detect("CXCL")] <- "D"
+
+  expect_named(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = "group",
+                        edge_attrs = "none", group_vec = group_vec)[['node_table']],
+               c("node", "group"), ignore.order = TRUE)
+
+})
+
+# one test to check if everyting is there when all is selected
+
