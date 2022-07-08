@@ -17,9 +17,17 @@
 #' * The Cytoscape software needs to be running.
 #' *
 #'
-VisualiseNetwork <- function(df_adjacency, group_vec = NULL, width_type = NULL,
+VisualiseNetwork <- function(df_adjacency,
+                             group_vec = NULL,
+                             vis_type = c("igraph", "cytoscape"),
+                             width_type = NULL,
                              do_save = T, save_names = NULL) {
   # TODO allow user to manually specify group colors
+  # TODO add option to scale igraph widths linearly
+
+  # Check which visualization should be used, allow abbreviations
+  vis_type <- match.arg(vis_type)
+
 
   # Since this function uses a for loop to iterate over the visualizations that
   #   are created, the input needs to be converted into a list.
@@ -50,10 +58,15 @@ VisualiseNetwork <- function(df_adjacency, group_vec = NULL, width_type = NULL,
     edge_table <- network_list[["edge_table"]]
     node_table <- network_list[["node_table"]]
 
-    # Visualize in Cytoscape --------------------------------------------------
-    vis_in_cytoscape(edge_table = edge_table,
-                     node_table = node_table,
-                     netw_nr = i_matrix)
+    # Choose visualization
+    if (vis_type == "igraph") {
+      vis_igraph(edge_table = edge_table,
+                 node_table = node_table)
+    } else if (vis_type == "cytoscape") {
+      vis_in_cytoscape(edge_table = edge_table,
+                       node_table = node_table,
+                       netw_nr = i_matrix)
+    }
 
 
     # Network files for building network using some other software
