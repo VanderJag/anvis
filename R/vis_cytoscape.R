@@ -34,6 +34,9 @@
 vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session = TRUE,
                              cyto3.8_check = T) {
 
+  # Calculate positions for the nodes
+  node_table <- add_node_pos(node_table)
+
   # Cytoscape needs additional columns that indicate how nodes relate
   edge_table$interaction <- "interacts"
   edge_table$sharedname <- paste(edge_table$source,
