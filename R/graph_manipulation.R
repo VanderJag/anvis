@@ -4,6 +4,13 @@
 group_nodes <- function(node_table, group_vec = NULL) {
 
   # TODO Check if grouping vector has the correct length and ensure it's character type
+  # TODO coerce to character
+
+  # Incomplete group information can not be correctly assigned
+  if (nrow(node_table) != length(group_vec)) {
+    stop("The number of nodes/variables in the groups table should be the same ",
+         "as in the adjacency matrix", call. = FALSE)
+  }
 
   # If a grouping vector has been provided
   if (!is.null(group_vec)) {
@@ -43,10 +50,13 @@ add_node_pos <- function(node_table, layout = "circle") {
 
 
 add_colors <- function(node_table) {
-  # Group information is required to add group colouring
-  if (!"group" %in% names(node_table)) {
-    warning("No group column found while adding node group columns")
-    node_table$group <- "A"
+  # Group information is required to add group coloring
+  if (!"group" %in% colnames(node_table)) {
+    stop("Must provide node table with group info:",
+         "\nℹ Your node table contains these columns: ",
+         colnames(node_table) %>% paste(collapse = ", "),
+         ".\n✖ `colnames(node_table)` must include 'group'.",
+         call.=FALSE)
   }
 
   # extract the unique groups
@@ -65,7 +75,12 @@ add_colors <- function(node_table) {
 }
 
 # default node size for igraph is 15
-node_size_connectivity <- function(node_table, adj_matrix, vis_type = c("igraph")) {
+node_size_connectivity <- function(node_table,
+                                   adj_matrix,
+                                   vis_type = c("igraph", "cytoscape", "scaled_only")) {
+
+  # Matching argument, allow abbreviation
+  vis_type <- match.arg(vis_type)
 
   # Check if the same nodes are present in node table and the adjacency matrix
   only_nodes <- setdiff(node_table$node, colnames(adj_matrix))
@@ -244,6 +259,14 @@ percentile_widths <- function(n_edges) {
 
 
 weights_to_color <- function(edge_table) {
+  # A column named 'weight' is required to determine edge colors
+  if (!"weight" %in% colnames(edge_table)) {
+    stop("Must provide edge table with weights:",
+         "\nℹ Your edge table contains these columns: ",
+         colnames(edge_table) %>% paste(collapse = ", "),
+         ".\n✖ `colnames(edge_table)` must include 'weight'.",
+         call.=FALSE)
+  }
 
   # If negative numbers are found in the weights use a diverging color palette,
   #   otherwise use a sequential color palette
