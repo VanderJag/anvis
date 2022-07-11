@@ -1,13 +1,13 @@
 #' Add group column and sort node table
 #'
-#' Adds a column to `node_table` that is called 'group'. The values of these
-#' columns are the values of `group_vec`. The rows of `node_table` will be
-#' reordered so the group column is sorted alphabetically.
+#' Adds 'group' column to `node_table` with values corresponding to  `group_vec`.
+#' The rows of `node_table` will be reordered so the group column is sorted
+#' alphabetically.
 #'
 #' @param node_table A data.frame in which rows correspond to the nodes of a
 #'   network.
 #' @param group_vec A vector contains group labels for each row in `node_table`.
-#' @return `node_table` with 'group' column added, sorted by group.
+#' @return Returns `node_table` with 'group' column added, sorted by group.
 group_nodes <- function(node_table, group_vec) {
 
   group_vec <- as.character(group_vec)
@@ -15,9 +15,10 @@ group_nodes <- function(node_table, group_vec) {
   # Incomplete group information can not be correctly assigned
   if (nrow(node_table) != length(group_vec)) {
     stop("`Must provide matching `node_table` and `group_vec`:",
-    "\nℹ Number of rows for `node_table`: ", nrow(node_table), ", length of `group_vec`: ", length(group_vec),
-    ".\n✖ number of rows of `node_table` and length of `group_vec` must match.", call.=FALSE)
-
+    "\nℹ Number of rows for `node_table`: ", nrow(node_table),
+    ", length of `group_vec`: ", length(group_vec),
+    ".\n✖ number of rows of `node_table` and length of `group_vec` must match.",
+    call.=FALSE)
   }
 
   # Add grouping vector as column and sort the rows
@@ -79,6 +80,23 @@ add_colors <- function(node_table) {
 }
 
 
+#' Add connectivity based 'size' column to node table
+#'
+#' Calculates the connectivity of nodes as the row sums from an adjacency matrix.
+#' For use as node size, the values are scaled to range 0 to 1, transformed
+#' with a sigmoid, and then multiplied with a constant factor that is determined
+#' by `size_type`
+#'
+#' @param node_table A data frame with a column named 'node'. The values in this
+#'   column (names of nodes), must be the same as the row names
+#'   of `adj_matrix`. Having nodes in the same order in `node_table` and the
+#'   matrix not required.
+#' @param size_type One of "igraph" (default), "cytoscape", or "scaled_only".
+#'   This argument determines a factor for linear scaling of node size. Factors
+#'   are 15, 25, and 1, respectively.
+#' @return Returns `node_table` with an added column 'size'.
+#'
+#' @inheritParams adj_matrix_to_edgelist
 node_size_connectivity <- function(node_table,
                                    adj_matrix,
                                    size_type = c("igraph", "cytoscape", "scaled_only")) {

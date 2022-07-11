@@ -13,10 +13,9 @@
 #' @examples
 #' sum(1:10)
 #'
-#' @section Additional criteria for the use of this function
+#' @section Additional criteria for the use of this function:
 #' * The Cytoscape software needs to be running.
-#' *
-#'
+#' * ...
 VisualiseNetwork <- function(df_adjacency,
                              group_vec = NULL,
                              vis_type = c("igraph", "cytoscape"),
