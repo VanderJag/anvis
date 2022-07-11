@@ -46,7 +46,7 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
   # Set names for labeling network aspects in cytoscape
   Network_name = sprintf("Visual_Network_%i", netw_nr)
   Network_Collection = sprintf("Visual_Networks_%i", netw_nr)
-  style_name = "SanjeeNetworkStyle"
+  style_name = "default_style"
 
   # Prepare data to visualize for Cytoscape
   nodes <- data.frame(id = as.vector(node_table$node),
@@ -95,6 +95,9 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
   nodeYlocation <- RCy3::mapVisualProperty("Node Y Location", "id", "d",
                                            as.vector(node_table$node),
                                            as.vector(node_table$Y))
+  nodesize <- RCy3::mapVisualProperty("Node Size", "shared name", "d",
+                                      as.vector(node_table$node),
+                                      as.vector(node_table$size))
   edgeline <- RCy3::mapVisualProperty("Edge Line Type", "interaction", "d",
                                       as.vector(unique(edge_table$interaction)),
                                       as.vector(c("Solid")))
@@ -106,7 +109,8 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
   # Set visual style
   RCy3::createVisualStyle(style_name,
                           defaults,
-                          list(nodeLabels, nodecolour, nodeXlocation, nodeYlocation,
+                          list(nodeLabels, nodecolour, nodesize,
+                               nodeXlocation, nodeYlocation,
                                edgeline, edgewidth, edgestroke))
   RCy3::setVisualStyle(style_name)
 

@@ -105,9 +105,9 @@ node_size_connectivity <- function(node_table,
   scale_conn <- sigmoid_xB(scale_conn, 3)
 
   # Match with default node size for the visualization
-  if (!is.null(size_type)) {
-    if (size_type == "igraph") scale_conn <- scale_conn * 15
-  }
+  if (size_type == "igraph") scale_conn <- scale_conn * 15
+  if (size_type == "cytoscape") scale_conn <- scale_conn * 25
+  # if (size_type == "scaled_only") scale_conn <- scale_conn
 
   # Make sure we can add the node size in correct order
   match_idx <- match(node_table$node, names(scale_conn))
