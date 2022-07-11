@@ -57,6 +57,10 @@ test_that("igraph scales widths", {
   edge_table <- network_list[["edge_table"]]
   node_table <- network_list[["node_table"]]
 
+  test_call <- deparse(sys.calls()[[1]][1])
+  skip_if_not(test_call == "test_that()",
+              message = "igraph visualizations need to be checked manually")
+
   expect_error(vis_igraph(edge_table, node_table, radial_labs = T, scale_width = 5,
                           radial_labs_opts = list()),
                NA)
@@ -74,6 +78,10 @@ test_that("igraph visualizates with additional parameters",{
                                         width_type = "partcor")
   edge_table <- network_list[["edge_table"]]
   node_table <- network_list[["node_table"]]
+
+  test_call <- deparse(sys.calls()[[1]][1])
+  skip_if_not(test_call == "test_that()",
+              message = "igraph visualizations need to be checked manually")
 
   expect_error(vis_igraph(edge_table, node_table, radial_labs = F,
                           vertex.color = c(rep("black", 18), rep("yellow", 18)),
@@ -98,6 +106,10 @@ test_that("igraph vis. leaves visual styling out when it is not an attribute",{
   edge_table <- edge_table %>% dplyr::select(!color)
   node_table <- network_list[["node_table"]]
 
+  test_call <- deparse(sys.calls()[[1]][1])
+  skip_if_not(test_call == "test_that()",
+              message = "igraph visualizations need to be checked manually")
+
   expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
                           radial_labs_opts = list(cex = 0.8)),
                NA)
@@ -119,6 +131,10 @@ test_that("igraph vis. doesn't complain when overwriting args. for text()",{
                                         width_type = "partcor")
   edge_table <- network_list[["edge_table"]]
   node_table <- network_list[["node_table"]]
+
+  test_call <- deparse(sys.calls()[[1]][1])
+  skip_if_not(test_call == "test_that()",
+              message = "igraph visualizations need to be checked manually")
 
   expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
                           rad_lab_opts = list(x = 0, y = 0)),
@@ -142,6 +158,10 @@ test_that("igraph vis. shows vertex sizes",{
   edge_table <- network_list[["edge_table"]]
   node_table <- network_list[["node_table"]]
 
+  test_call <- deparse(sys.calls()[[1]][1])
+  skip_if_not(test_call == "test_that()",
+              message = "igraph visualizations need to be checked manually")
+
   expect_error(vis_igraph(edge_table, node_table, radial_labs = T),
                NA)
 })
@@ -159,6 +179,10 @@ test_that("igraph vis. shows no vertex sizes when its not in node table",{
                                         width_type = "partcor")
   edge_table <- network_list[["edge_table"]]
   node_table <- network_list[["node_table"]]
+
+  test_call <- deparse(sys.calls()[[1]][1])
+  skip_if_not(test_call == "test_that()",
+              message = "igraph visualizations need to be checked manually")
 
   node_table <- node_table %>%
     dplyr::select(-size)
@@ -180,6 +204,10 @@ test_that("igraph vis. allows user to overwrite vertex sizes",{
                                         width_type = "partcor")
   edge_table <- network_list[["edge_table"]]
   node_table <- network_list[["node_table"]]
+
+  test_call <- deparse(sys.calls()[[1]][1])
+  skip_if_not(test_call == "test_that()",
+              message = "igraph visualizations need to be checked manually")
 
   expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
                           vertex.size = rep(c(5,15), each = 18)),
