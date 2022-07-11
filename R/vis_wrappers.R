@@ -53,6 +53,8 @@ VisualiseNetwork <- function(df_adjacency,
 
     # Create a network from adjacency info
     network_list <- adj_matrix_to_network(Adjacency,
+                                          node_attrs = "all",
+                                          edge_attrs = "all",
                                           group_vec = group_vec,
                                           width_type = width_type)
     edge_table <- network_list[["edge_table"]]

@@ -33,6 +33,8 @@ test_that("igraph basic visualization runs without error",{
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
                                         group_vec = group_vec,
                                         width_type = "partcor")
   edge_table <- network_list[["edge_table"]]
@@ -49,6 +51,8 @@ test_that("igraph scales widths", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
                                         group_vec = group_vec,
                                         width_type = "partcor")
   edge_table <- network_list[["edge_table"]]
@@ -65,6 +69,8 @@ test_that("igraph visualizates with additional parameters",{
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
                                         group_vec = group_vec,
                                         width_type = "partcor")
   edge_table <- network_list[["edge_table"]]
@@ -85,6 +91,8 @@ test_that("igraph vis. leaves visual styling out when it is not an attribute",{
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
                                         group_vec = group_vec,
                                         width_type = "partcor")
   edge_table <- network_list[["edge_table"]]
@@ -106,6 +114,8 @@ test_that("igraph vis. doesn't complain when overwriting args. for text()",{
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
                                         group_vec = group_vec,
                                         width_type = "partcor")
   edge_table <- network_list[["edge_table"]]

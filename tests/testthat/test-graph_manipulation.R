@@ -151,7 +151,7 @@ test_that("connectivity rowSums matches one determined based on edge weights", {
                                         width_type = "partcor")
   edge_table <- network_list[["edge_table"]]
   node_table <- network_list[["node_table"]]
-  node_table <- node_size_connectivity(node_table = node_table, Mat1, size_type = NULL)
+  node_table <- node_size_connectivity(node_table = node_table, Mat1, size_type = "scaled_only")
 
   # Calculate by alternative means
   conns2 <- sapply(node_table$node,
