@@ -40,8 +40,7 @@ test_that("igraph basic visualization runs without error",{
   edge_table <- network_list[["edge_table"]]
   node_table <- network_list[["node_table"]]
 
-  expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
-                          radial_labs_opts = list(cex = 0.8)),
+  expect_error(vis_igraph(edge_table, node_table, radial_labs = T),
                NA)
 })
 
@@ -126,5 +125,63 @@ test_that("igraph vis. doesn't complain when overwriting args. for text()",{
                NA)
   expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
                           rad_lab_opts = list(labels = "test", cex = 4, adj = 1, srt = 45)),
+               NA)
+})
+
+
+test_that("igraph vis. shows vertex sizes",{
+  Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
+                                        group_vec = group_vec,
+                                        size_type = "igraph",
+                                        width_type = "partcor")
+  edge_table <- network_list[["edge_table"]]
+  node_table <- network_list[["node_table"]]
+
+  expect_error(vis_igraph(edge_table, node_table, radial_labs = T),
+               NA)
+})
+
+
+test_that("igraph vis. shows no vertex sizes when its not in node table",{
+  Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
+                                        group_vec = group_vec,
+                                        size_type = "igraph",
+                                        width_type = "partcor")
+  edge_table <- network_list[["edge_table"]]
+  node_table <- network_list[["node_table"]]
+
+  node_table <- node_table %>%
+    dplyr::select(-size)
+
+  expect_error(vis_igraph(edge_table, node_table, radial_labs = T),
+               NA)
+})
+
+
+test_that("igraph vis. allows user to overwrite vertex sizes",{
+  Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
+                                        group_vec = group_vec,
+                                        size_type = "igraph",
+                                        width_type = "partcor")
+  edge_table <- network_list[["edge_table"]]
+  node_table <- network_list[["node_table"]]
+
+  expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
+                          vertex.size = rep(c(5,15), each = 18)),
                NA)
 })

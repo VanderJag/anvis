@@ -66,6 +66,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
   edge_width <- get_param(graph, plot_params, "edge.width", "width")
   edge_color <- get_param(graph, plot_params, "edge.color", "color")
   vertex_color <- get_param(graph, plot_params, "vertex.color", "color")
+  vertex_size <- get_param(graph, plot_params, "vertex.size", "size")
   vertex_label0 <- get_param(graph, plot_params, "vertex.label", "name")
 
   # If vertex labels are to be placed radially, there should be none placed
@@ -81,6 +82,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
             layout = node_arrangement,
             edge.width = edge_width * scale_width,
             edge.color = edge_color,
+            vertex.size = vertex_size,
             vertex.color = vertex_color,
             vertex.label = vertex_label),
             plot_params
