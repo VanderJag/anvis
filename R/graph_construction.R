@@ -62,14 +62,14 @@ adj_matrix_to_nodetable <- function(adj_matrix, group_vec = NULL) {
 }
 
 
-# all takes precedence over none
+# none takes precedence over all
 # use color_group in combination with group
-# NULL for vis_type and for width_type will use the default arguments of the fucntions
+# NULL for size_type and for width_type will use the default arguments of the fucntions
 adj_matrix_to_network <- function(adj_matrix,
                                   node_attrs = c("none", "all", "group", "color_group", "size"),
                                   edge_attrs = c("none", "all", "width", "color"),
                                   group_vec = NULL,
-                                  vis_type = NULL,
+                                  size_type = NULL,
                                   width_type = NULL) {
 
   # Check which attributes should be added
@@ -89,8 +89,8 @@ adj_matrix_to_network <- function(adj_matrix,
 
   # Adding grouping information ---------------------------------------------
 
-  if ("all" %in% node_attrs |
-      ( (!"none" %in% node_attrs) & "group" %in% node_attrs)) {
+  if ((!"none" %in% node_attrs) &
+      ("all" %in% node_attrs | "group" %in% node_attrs)) {
     if (is.null(group_vec)) {
       stop("Must provide grouping vector:",
            "\n✖ `group_vec` should not be NULL when `node_attrs` is 'all' or 'group'.", call.=FALSE)
@@ -100,19 +100,19 @@ adj_matrix_to_network <- function(adj_matrix,
 
   # Add colors for the groups -----------------------------------------------
 
-  if ("all" %in% node_attrs |
-      ( (!"none" %in% node_attrs) & "color_group" %in% node_attrs)) {
+  if ((!"none" %in% node_attrs) &
+      ("all" %in% node_attrs | "color_group" %in% node_attrs)) {
     node_table <- add_colors(node_table)
   }
 
 
   # Add node size -----------------------------------------------------------
 
-  if ("all" %in% node_attrs |
-      ( (!"none" %in% node_attrs) & "size" %in% node_attrs)) {
+  if ((!"none" %in% node_attrs) &
+      ("all" %in% node_attrs | "size" %in% node_attrs)) {
     node_table <- node_size_connectivity(node_table = node_table,
                                          adj_matrix = adj_matrix,
-                                         vis_type = vis_type)
+                                         size_type = size_type)
   }
 
 
@@ -122,15 +122,15 @@ adj_matrix_to_network <- function(adj_matrix,
 
   # Convert edge weight to edge width ---------------------------------------
 
-  if ("all" %in% edge_attrs |
-      ( (!"none" %in% edge_attrs) & "width" %in% edge_attrs)) {
+  if ((!"none" %in% edge_attrs) &
+      ("all" %in% edge_attrs | "width" %in% edge_attrs)) {
     edge_table <- edge_weight_to_widths(edge_table, width_type = width_type)
   }
 
   # Add colour column to edge table -----------------------------------------
 
-  if ("all" %in% edge_attrs |
-      ( (!"none" %in% edge_attrs) & "width" %in% edge_attrs)) {
+  if ((!"none" %in% edge_attrs) &
+      ("all" %in% edge_attrs | "color" %in% edge_attrs)) {
     edge_table <- weights_to_color(edge_table)
   }
 

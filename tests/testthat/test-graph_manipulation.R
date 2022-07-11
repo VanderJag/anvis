@@ -136,7 +136,7 @@ test_that("connectivity throws error when adj_matrix and node_table have differe
   Mat1 <- Mat1[,-2]
   node_table <- node_table %>% dplyr::filter(node != "ESelectin")
 
-  expect_error(node_size_connectivity(node_table = node_table, Mat1, vis_type = NULL),
+  expect_error(node_size_connectivity(node_table = node_table, Mat1, size_type = NULL),
                "Must provide node_table and adj_matrix with the same nodes")
 })
 
@@ -151,7 +151,7 @@ test_that("connectivity rowSums matches one determined based on edge weights", {
                                         width_type = "partcor")
   edge_table <- network_list[["edge_table"]]
   node_table <- network_list[["node_table"]]
-  node_table <- node_size_connectivity(node_table = node_table, Mat1, vis_type = NULL)
+  node_table <- node_size_connectivity(node_table = node_table, Mat1, size_type = NULL)
 
   # Calculate by alternative means
   conns2 <- sapply(node_table$node,

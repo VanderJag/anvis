@@ -77,10 +77,10 @@ add_colors <- function(node_table) {
 # default node size for igraph is 15
 node_size_connectivity <- function(node_table,
                                    adj_matrix,
-                                   vis_type = c("igraph", "cytoscape", "scaled_only")) {
+                                   size_type = c("igraph", "cytoscape", "scaled_only")) {
 
   # Matching argument, allow abbreviation
-  vis_type <- match.arg(vis_type)
+  size_type <- match.arg(size_type)
 
   # Check if the same nodes are present in node table and the adjacency matrix
   only_nodes <- setdiff(node_table$node, colnames(adj_matrix))
@@ -105,8 +105,8 @@ node_size_connectivity <- function(node_table,
   scale_conn <- sigmoid_xB(scale_conn, 3)
 
   # Match with default node size for the visualization
-  if (!is.null(vis_type)) {
-    if (vis_type == "igraph") scale_conn <- scale_conn * 15
+  if (!is.null(size_type)) {
+    if (size_type == "igraph") scale_conn <- scale_conn * 15
   }
 
   # Make sure we can add the node size in correct order

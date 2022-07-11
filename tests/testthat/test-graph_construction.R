@@ -51,6 +51,7 @@ test_that("creating edgelist does not fail when adj. matrix is symmetrical", {
   expect_error(adj_matrix_to_edgelist(mat1), NA)
 })
 
+
 test_that("group vector must be provided to add node groups", {
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
 
@@ -59,6 +60,7 @@ test_that("group vector must be provided to add node groups", {
                "Must provide grouping vector")
 })
 
+
 test_that("group column is added to node table when 'group' is selected", {
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
@@ -66,8 +68,8 @@ test_that("group column is added to node table when 'group' is selected", {
   expect_named(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = "group",
                         edge_attrs = "none", group_vec = group_vec)[['node_table']],
                c("node", "group"), ignore.order = TRUE)
-
 })
+
 
 test_that("group color column error when there is no group", {
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
@@ -75,8 +77,8 @@ test_that("group color column error when there is no group", {
   expect_error(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = "color",
                         edge_attrs = "none")[['node_table']],
                "Must provide node table with group info")
-
 })
+
 
 test_that("group color column is added to node table when 'group' and 'color' is selected", {
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
@@ -85,10 +87,9 @@ test_that("group color column is added to node table when 'group' and 'color' is
   expect_named(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = c("group", "color"),
                         edge_attrs = "none", group_vec = group_vec)[['node_table']],
                c("node", "group", "color"), ignore.order = TRUE)
-
 })
 
-# TODO change this one to another attribute
+
 test_that("group column is added to node table when 'group' is selected", {
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
@@ -96,8 +97,96 @@ test_that("group column is added to node table when 'group' is selected", {
   expect_named(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = "group",
                         edge_attrs = "none", group_vec = group_vec)[['node_table']],
                c("node", "group"), ignore.order = TRUE)
-
 })
 
-# one test to check if everyting is there when all is selected
+
+test_that("size column is added to node table when 'size' is selected", {
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  expect_named(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = "size",
+                        edge_attrs = "none", group_vec = group_vec)[['node_table']],
+               c("node", "size"), ignore.order = TRUE)
+})
+
+
+test_that("size, group, color is added to node table when 'all' is selected", {
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  expect_named(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = "all",
+                                     edge_attrs = "none", group_vec = group_vec)[['node_table']],
+               c("node", "group", "color", "size"), ignore.order = TRUE)
+})
+
+
+test_that("no additional column is added to node table when 'none' is selected", {
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  expect_named(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = "none",
+                                     edge_attrs = "none", group_vec = group_vec)[['node_table']],
+               c("node"), ignore.order = TRUE)
+})
+
+
+test_that("no additional column is added to node table when node_attrs is blank", {
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  expect_named(adj_matrix_to_network(adj_matrix = Mat1,
+                                     edge_attrs = "none")[['node_table']],
+               c("node"), ignore.order = TRUE)
+})
+
+
+test_that("width column is added to edge table when 'width' is selected", {
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  expect_named(adj_matrix_to_network(adj_matrix = Mat1,
+                                     edge_attrs = "width")[['edge_table']],
+               c("source", "target", "weight", "width"), ignore.order = TRUE)
+})
+
+
+test_that("color column is added to edge table when 'color' is selected", {
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  expect_named(adj_matrix_to_network(adj_matrix = Mat1,
+                                     edge_attrs = "color")[['edge_table']],
+               c("source", "target", "weight", "color"), ignore.order = TRUE)
+})
+
+
+test_that("color and width column is added to edge table when 'all' is selected", {
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  expect_named(adj_matrix_to_network(adj_matrix = Mat1,
+                                     edge_attrs = "all")[['edge_table']],
+               c("source", "target", "weight", "width", "color"), ignore.order = TRUE)
+})
+
+
+test_that("no additional column is added to edge table when 'none' is selected", {
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  expect_named(adj_matrix_to_network(adj_matrix = Mat1,
+                                     edge_attrs = "none")[['edge_table']],
+               c("source", "target", "weight"), ignore.order = TRUE)
+})
+
+
+test_that("no additional column is added to edge table when edge_attrs is left blank", {
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  expect_named(adj_matrix_to_network(adj_matrix = Mat1)[['edge_table']],
+               c("source", "target", "weight"), ignore.order = TRUE)
+})
+
+
 
