@@ -1,24 +1,28 @@
+#' Add group column and sort node table
+#'
+#' Adds a column to `node_table` that is called 'group'. The values of these
+#' columns are the values of `group_vec`. The rows of `node_table` will be
+#' reordered so the group column is sorted alphabetically.
+#'
+#' @param node_table A data.frame in which rows correspond to the nodes of a
+#'   network.
+#' @param group_vec A vector contains group labels for each row in `node_table`.
+#' @return `node_table` with 'group' column added, sorted by group.
+group_nodes <- function(node_table, group_vec) {
 
-
-# adds a column with the grouping info to a node table, and sorts it
-group_nodes <- function(node_table, group_vec = NULL) {
-
-  # TODO Check if grouping vector has the correct length and ensure it's character type
-  # TODO coerce to character
+  group_vec <- as.character(group_vec)
 
   # Incomplete group information can not be correctly assigned
   if (nrow(node_table) != length(group_vec)) {
-    stop("The number of nodes/variables in the groups table should be the same ",
-         "as in the adjacency matrix", call. = FALSE)
+    stop("`Must provide matching `node_table` and `group_vec`:",
+    "\nℹ Number of rows for `node_table`: ", nrow(node_table), ", length of `group_vec`: ", length(group_vec),
+    ".\n✖ number of rows of `node_table` and length of `group_vec` must match.", call.=FALSE)
+
   }
 
-  # If a grouping vector has been provided
-  if (!is.null(group_vec)) {
-    node_table$group <- group_vec
-    node_table <- node_table[order(node_table$group),]
-  } else {
-    node_table$group <- "A"
-  }
+  # Add grouping vector as column and sort the rows
+  node_table$group <- group_vec
+  node_table <- node_table[order(node_table$group),]
 }
 
 
@@ -74,7 +78,7 @@ add_colors <- function(node_table) {
   return(node_table)
 }
 
-# default node size for igraph is 15
+
 node_size_connectivity <- function(node_table,
                                    adj_matrix,
                                    size_type = c("igraph", "cytoscape", "scaled_only")) {

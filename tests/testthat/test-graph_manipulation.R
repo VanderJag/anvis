@@ -1,3 +1,30 @@
+test_that("grouping throws error when group vector doesn't have correct length", {
+  df <- tibble::as_tibble_col(c("abc", "bbc", "cbc"), column_name = "node")
+  groups <- c("A", "B")
+
+  expect_error(group_nodes(node_table = df, group_vec = groups),
+               "matching `node_table` and `group_vec`")
+})
+
+
+test_that("grouping add group column", {
+  df <- tibble::as_tibble_col(c("abc", "bbc", "cbc"), column_name = "node")
+  groups <- c("A", "B", "C")
+
+  expect_named(group_nodes(node_table = df, group_vec = groups),
+               c("node", "group"))
+})
+
+
+test_that("grouping returns sorted columns", {
+  df <- tibble::as_tibble_col(c("abc", "cbc", "bbc"), column_name = "node")
+  groups <- c("A", "C", "B")
+
+  expect_equal(group_nodes(node_table = df, group_vec = groups)$node, sort(df$node))
+  expect_equal(group_nodes(node_table = df, group_vec = groups)$group, sort(groups))
+})
+
+
 test_that("edge width works without error for all types", {
   # Load adjacency matrix
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
