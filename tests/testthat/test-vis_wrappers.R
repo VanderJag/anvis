@@ -3,10 +3,7 @@ test_that("when cytoscape is not available RCy3 will give error", {
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
 
   # Some grouping based on column names
-  group_vec <- rep("A", times = nrow(Mat1))
-  group_vec[colnames(Mat1) %>% stringr::str_detect("IL")] <- "B"
-  group_vec[colnames(Mat1) %>% stringr::str_detect("CCL")] <- "C"
-  group_vec[colnames(Mat1) %>% stringr::str_detect("CXCL")] <- "D"
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   # Presence of cytoscape test, not currently working because
   cytosc <- RCy3::cytoscapePing() %>% capture_condition()
@@ -26,10 +23,7 @@ test_that("when cytoscape is available wrapper runs without error", {
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
 
   # Some grouping based on column names
-  group_vec <- rep("A", times = nrow(Mat1))
-  group_vec[colnames(Mat1) %>% stringr::str_detect("IL")] <- "B"
-  group_vec[colnames(Mat1) %>% stringr::str_detect("CCL")] <- "C"
-  group_vec[colnames(Mat1) %>% stringr::str_detect("CXCL")] <- "D"
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   # Presence of cytoscape test
   cytosc <- RCy3::cytoscapePing() %>% capture_condition()

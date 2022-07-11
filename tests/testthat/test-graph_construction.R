@@ -61,12 +61,7 @@ test_that("group vector must be provided to add node groups", {
 
 test_that("group column is added to node table when 'group' is selected", {
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
-
-  # Some grouping based on column names
-  group_vec <- rep("A", times = nrow(Mat1))
-  group_vec[colnames(Mat1) %>% stringr::str_detect("IL")] <- "B"
-  group_vec[colnames(Mat1) %>% stringr::str_detect("CCL")] <- "C"
-  group_vec[colnames(Mat1) %>% stringr::str_detect("CXCL")] <- "D"
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = "group",
                         edge_attrs = "none", group_vec = group_vec)[['node_table']],
@@ -85,12 +80,7 @@ test_that("group color column error when there is no group", {
 
 test_that("group color column is added to node table when 'group' and 'color' is selected", {
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
-
-  # Some grouping based on column names
-  group_vec <- rep("A", times = nrow(Mat1))
-  group_vec[colnames(Mat1) %>% stringr::str_detect("IL")] <- "B"
-  group_vec[colnames(Mat1) %>% stringr::str_detect("CCL")] <- "C"
-  group_vec[colnames(Mat1) %>% stringr::str_detect("CXCL")] <- "D"
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = c("group", "color"),
                         edge_attrs = "none", group_vec = group_vec)[['node_table']],
@@ -101,12 +91,7 @@ test_that("group color column is added to node table when 'group' and 'color' is
 # TODO change this one to another attribute
 test_that("group column is added to node table when 'group' is selected", {
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
-
-  # Some grouping based on column names
-  group_vec <- rep("A", times = nrow(Mat1))
-  group_vec[colnames(Mat1) %>% stringr::str_detect("IL")] <- "B"
-  group_vec[colnames(Mat1) %>% stringr::str_detect("CCL")] <- "C"
-  group_vec[colnames(Mat1) %>% stringr::str_detect("CXCL")] <- "D"
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adj_matrix_to_network(adj_matrix = Mat1, node_attrs = "group",
                         edge_attrs = "none", group_vec = group_vec)[['node_table']],
