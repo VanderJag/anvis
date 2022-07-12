@@ -30,9 +30,27 @@
 
 
 
-
+# optional columns for nodes: group,
 vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session = TRUE,
                              cyto3.8_check = T) {
+
+  # TODO check for the minimal require columns like node names and edge targets
+
+  # Check that the input contains the required information on the nodes and edges
+  if (!"node" %in% colnames(node_table)) {
+    stop("`node_table` must contain column named 'node':",
+    "\nℹ Column names of your `node_table`: ", paste0(colnames(node_table),
+                                                      collapse = ", "), ".",
+    call.=FALSE)
+  }
+
+  if (!all(c("source", "target") %in% colnames(edge_table))) {
+    stop("`edge_table` must contain columns 'source' and 'target':",
+         "\nℹ Column names of your `edge_table`: ", paste0(colnames(edge_table),
+                                                           collapse = ", "), ".",
+         call.=FALSE)
+
+  }
 
   # Calculate positions for the nodes
   node_table <- add_node_pos(node_table)
@@ -49,19 +67,21 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
   style_name = "default_style"
 
   # Prepare data to visualize for Cytoscape
-  nodes <- data.frame(id = as.vector(node_table$node),
-                      group = as.vector(node_table$group),
-                      stringsAsFactors = FALSE)
+  # Minimal required data
+  nodes <- data.frame(id = as.vector(node_table$node))
   edges <- data.frame(source = as.vector(edge_table$source),
                       target = as.vector(edge_table$target),
                       interaction = as.vector(edge_table$interaction),
-                      weight = as.vector(edge_table$weight),
-                      stringsAsFactors = FALSE)
+                      weight = as.vector(edge_table$weight))
   defaults <- list(NODE_SHAPE = "Ellipse",
                    NODE_SIZE = 25.0,
                    EDGE_TRANSPARENCY = 255,
                    NODE_LABEL_POSITION = "W,E,c,0.00,0.00",
                    NODE_BORDER_PAINT = "#FFFFFF")
+  # Optional additional data
+  if ("group" %in% colnames(nodes)) {
+    nodes[["group"]] <- node_table$group
+  }
   n_groups <- length(unique(node_table$group))
 
   # Check if a valid version of cytoscape is used
