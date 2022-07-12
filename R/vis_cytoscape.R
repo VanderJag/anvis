@@ -31,10 +31,17 @@
 
 
 # optional columns for nodes: group,
-vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session = TRUE,
+vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1,
+                             save_session = TRUE,
+                             close_session = TRUE,
+                             image_opts = list(filename = "network", type = "PNG",
+                                               units = "inches", resolution = 600,
+                                               height = 5, width = 5),
                              cyto3.8_check = T) {
 
-  # TODO check for the minimal require columns like node names and edge targets
+  # TODO add option to give save names
+  # TODO remove manual specification of network number, let the system automatically
+  #   detect which new number to add when there is no saving name specified
 
   # Check that the input contains the required information on the nodes and edges
   if (!"node" %in% colnames(node_table)) {
@@ -79,10 +86,10 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
                    NODE_LABEL_POSITION = "W,E,c,0.00,0.00",
                    NODE_BORDER_PAINT = "#FFFFFF")
   # Optional additional data
-  if ("group" %in% colnames(nodes)) {
+  if ("group" %in% colnames(node_table)) {
     nodes[["group"]] <- node_table$group
+    n_groups <- length(unique(node_table$group))
   }
-  n_groups <- length(unique(node_table$group))
 
   # Check if a valid version of cytoscape is used
   if (cyto3.8_check) {
@@ -99,8 +106,8 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
 
 
   # Create Cytoscape network
-  RCy3::createNetworkFromDataFrames(nodes,
-                                    edges,
+  RCy3::createNetworkFromDataFrames(nodes = nodes,
+                                    edges = edges,
                                     title = Network_name,
                                     collection = Network_Collection,
                                     style.name  =  style_name)
@@ -140,14 +147,15 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1, save_session =
   RCy3::fitContent(selected.only = FALSE)
   RCy3::fitContent(selected.only = FALSE)
 
-  Network_out = sprintf("Network_Image_%i", netw_nr)
+  # Network_out = sprintf("Network_Image_%i", netw_nr)
+  # full.path = paste(getwd(), Network_out, sep = "/")
+  #
+  # img_path <- if
 
-  full.path = paste(getwd(), Network_out, sep = "/")
-  RCy3::exportImage(full.path, "PNG", units = "pixels", width = 3600, height = 1771)
+  do.call(RCy3::exportImage, image_opts)
 
 
   Network_save = sprintf("Cytoscape_Network_%i", netw_nr)
   full.path.cps = paste(getwd(), Network_save, sep = "/")
-  RCy3::closeSession(save.before.closing = save_session,
-                     filename = full.path.cps)
+  RCy3::closeSession(save.before.closing = save_session, filename = full.path.cps)
 }
