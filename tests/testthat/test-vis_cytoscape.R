@@ -67,8 +67,6 @@ test_that("error when edge source or target cannot be found", {
 })
 
 
-
-
 test_that("Cytoscape saves session", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
@@ -89,13 +87,53 @@ test_that("Cytoscape saves session", {
 
   # tf <- with_tempfile("tf", {write.csv(iris, tf); file.size(tf)})
 
+  withr::with_tempfile("temp_network", {
+    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                     save_session = TRUE, save_name = "temp_network")})
 
-  expect_error(vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
-                                save_session = TRUE), NA)
 })
 
 
-test_that("saving without name works a previous save is present")
+test_that("Cytoscape exports image", {
+  Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
+                                        group_vec = group_vec,
+                                        width_type = "partcor",
+                                        size_type = "cytoscape")
+  edge_table <- network_list[["edge_table"]]
+  node_table <- network_list[["node_table"]]
+
+  # Test for presence of cytoscape
+  cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+  skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+              message = "this test runs only when cytoscape is active")
+
+
+  withr::with_file("temp_network.png", {
+    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                     save_session = FALSE, export_image = TRUE,
+                     save_name = "temp_network");
+
+    expect_equal(list.files(pattern = "temp_network"), "temp_network.png")
+  })
+
+  withr::with_file("temp_network.png", {
+    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                     save_session = FALSE, export_image = FALSE,
+                     save_name = "temp_network");
+    expect_equal(list.files(pattern = "temp_network"), character(0))
+  })
+
+})
+
+test_that("cytoscape saves image when no name is provided")
+
+
+test_that("saving without name works while a previous save is present")
 
 
 # test_that("no error when node or edge attributes are missing", {

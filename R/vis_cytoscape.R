@@ -31,12 +31,13 @@
 
 
 # optional columns for nodes: group,
+# save name is used both for session and for image
 vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1,
                              save_session = TRUE,
                              close_session = TRUE,
-                             image_opts = list(filename = "network", type = "PNG",
-                                               units = "inches", resolution = 600,
-                                               height = 5, width = 5),
+                             save_name = NULL,
+                             export_image = TRUE,
+                             image_opts = list(filename = "network", type = "PNG"),
                              cyto3.8_check = T) {
 
   # TODO add option to give save names
@@ -151,11 +152,21 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1,
   # full.path = paste(getwd(), Network_out, sep = "/")
   #
   # img_path <- if
+  # TODO check save name with serial next system
 
-  do.call(RCy3::exportImage, image_opts)
+  if (export_image) {
+    if (!is.null(save_name)) image_opts[["filename"]] <- save_name
+    do.call(RCy3::exportImage, image_opts)
+  }
 
 
-  Network_save = sprintf("Cytoscape_Network_%i", netw_nr)
-  full.path.cps = paste(getwd(), Network_save, sep = "/")
-  RCy3::closeSession(save.before.closing = save_session, filename = full.path.cps)
+  if (save_session) {
+    Network_save = sprintf("Cytoscape_Network_%i", netw_nr)
+    full.path.cps = paste(getwd(), Network_save, sep = "/")
+    RCy3::saveSession(full.path.cps)
+  }
+
+  if (close_session) {
+    RCy3::closeSession(save.before.closing = FALSE)
+  }
 }
