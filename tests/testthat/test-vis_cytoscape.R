@@ -11,6 +11,10 @@ test_that("basic visualization works",{
   edge_table <- network_list[["edge_table"]]
   node_table <- network_list[["node_table"]]
 
+  test_call <- deparse(sys.calls()[[1]][1])
+  skip_if_not(test_call == "test_that()",
+              message = "cytoscape visualizations need to be checked manually")
+
   # Test for presence of cytoscape
   cytosc <- RCy3::cytoscapePing() %>% capture_condition()
   skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
@@ -85,16 +89,18 @@ test_that("Cytoscape saves session", {
   skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
               message = "this test runs only when cytoscape is active")
 
-  # tf <- with_tempfile("tf", {write.csv(iris, tf); file.size(tf)})
-
-  withr::with_tempfile("temp_network", {
+  withr::with_file("temp_network.cys", {
     vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
-                     save_session = TRUE, save_name = "temp_network")})
+                     export_image = FALSE,
+                     save_session = TRUE, save_name = "temp_network")
+
+    expect_equal(list.files(pattern = "temp_network"), "temp_network.cys")
+    })
 
 })
 
 
-test_that("Cytoscape exports imagewith name", {
+test_that("Cytoscape exports image with name", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
