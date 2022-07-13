@@ -155,7 +155,11 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1,
   # TODO check save name with serial next system
 
   if (export_image) {
+    # Overwrite default with users choice
     if (!is.null(save_name)) image_opts[["filename"]] <- save_name
+    # Check if name is already used
+    image_opts[["filename"]] <- image_opts[["filename"]] %>%
+      file_sequence(paste0(".", image_opts[["type"]]))
     do.call(RCy3::exportImage, image_opts)
   }
 

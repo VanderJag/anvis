@@ -94,7 +94,7 @@ test_that("Cytoscape saves session", {
 })
 
 
-test_that("Cytoscape exports image", {
+test_that("Cytoscape exports imagewith name", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
@@ -112,28 +112,118 @@ test_that("Cytoscape exports image", {
   skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
               message = "this test runs only when cytoscape is active")
 
-
+  # perform save and check
   withr::with_file("temp_network.png", {
     vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = FALSE, export_image = TRUE,
-                     save_name = "temp_network");
+                     save_name = "temp_network")
 
     expect_equal(list.files(pattern = "temp_network"), "temp_network.png")
   })
-
+  # don't save and check
   withr::with_file("temp_network.png", {
     vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = FALSE, export_image = FALSE,
                      save_name = "temp_network");
     expect_equal(list.files(pattern = "temp_network"), character(0))
   })
-
 })
 
-test_that("cytoscape saves image when no name is provided")
+
+test_that("cytoscape saves image when no name is provided", {
+  Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
+                                        group_vec = group_vec,
+                                        width_type = "partcor",
+                                        size_type = "cytoscape")
+  edge_table <- network_list[["edge_table"]]
+  node_table <- network_list[["node_table"]]
+
+  # Test for presence of cytoscape
+  cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+  skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+              message = "this test runs only when cytoscape is active")
+
+  # perform save and check
+  withr::with_file("network.png", {
+    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                     save_session = FALSE, export_image = TRUE)
+
+    expect_equal(list.files(pattern = "network"), "network.png")
+  })
+})
 
 
-test_that("saving without name works while a previous save is present")
+test_that("image saving without name works while a previous save is present", {
+  Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
+                                        group_vec = group_vec,
+                                        width_type = "partcor",
+                                        size_type = "cytoscape")
+  edge_table <- network_list[["edge_table"]]
+  node_table <- network_list[["node_table"]]
+
+  # Test for presence of cytoscape
+  cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+  skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+              message = "this test runs only when cytoscape is active")
+
+  # perform save and check
+  withr::with_file(list("network.png", "network_2.png", "network_3.png"), {
+    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                     save_session = FALSE, export_image = TRUE)
+    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                     save_session = FALSE, export_image = TRUE)
+    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                     save_session = FALSE, export_image = TRUE)
+
+    expect_equal(list.files(pattern = "network"), c("network.png",
+                                                    "network_2.png",
+                                                    "network_3.png"))
+  })
+})
+
+
+test_that("image saving file name sequence works with non default names", {
+  Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
+                                        group_vec = group_vec,
+                                        width_type = "partcor",
+                                        size_type = "cytoscape")
+  edge_table <- network_list[["edge_table"]]
+  node_table <- network_list[["node_table"]]
+
+  # Test for presence of cytoscape
+  cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+  skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+              message = "this test runs only when cytoscape is active")
+
+  # perform save and check
+  withr::with_file(list("temp_network.png", "temp_network_2.png", "temp_network_3.png"), {
+    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                     save_session = FALSE, export_image = TRUE, save_name = "temp_network")
+    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                     save_session = FALSE, export_image = TRUE, save_name = "temp_network")
+    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                     save_session = FALSE, export_image = TRUE, save_name = "temp_network")
+
+    expect_equal(list.files(pattern = "temp_network"), c("temp_network.png",
+                                                    "temp_network_2.png",
+                                                    "temp_network_3.png"))
+  })
+})
 
 
 # test_that("no error when node or edge attributes are missing", {
