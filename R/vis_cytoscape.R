@@ -62,8 +62,9 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1,
 
   }
 
-  # Calculate positions for the nodes
+  # Calculate positions for the nodes, also cytoscape need node column called id
   node_table <- add_node_pos(node_table)
+  node_table <- node_table %>% dplyr::rename("id" = "node")
 
   # Cytoscape needs additional columns that indicate how nodes relate
   edge_table$interaction <- "interacts"
@@ -76,23 +77,13 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1,
   Network_Collection = sprintf("Visual_Networks_%i", netw_nr)
   style_name = "default_style"
 
-  # Prepare data to visualize for Cytoscape
-  # Minimal required data
-  nodes <- data.frame(id = as.vector(node_table$node))
-  edges <- data.frame(source = as.vector(edge_table$source),
-                      target = as.vector(edge_table$target),
-                      interaction = as.vector(edge_table$interaction),
-                      weight = as.vector(edge_table$weight))
+  # Prepare defaults
   defaults <- list(NODE_SHAPE = "Ellipse",
                    NODE_SIZE = 25.0,
                    EDGE_TRANSPARENCY = 255,
                    NODE_LABEL_POSITION = "W,E,c,0.00,0.00",
                    NODE_BORDER_PAINT = "#FFFFFF")
-  # Optional additional data
-  if ("group" %in% colnames(node_table)) {
-    nodes[["group"]] <- node_table$group
-    n_groups <- length(unique(node_table$group))
-  }
+
 
   # Check if a valid version of cytoscape is used
   if (cyto3.8_check) {
@@ -109,8 +100,8 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1,
 
 
   # Create Cytoscape network
-  RCy3::createNetworkFromDataFrames(nodes = nodes,
-                                    edges = edges,
+  RCy3::createNetworkFromDataFrames(nodes = node_table,
+                                    edges = edge_table,
                                     title = Network_name,
                                     collection = Network_Collection,
                                     style.name  =  style_name)
@@ -118,15 +109,15 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1,
   nodeLabels <- RCy3::mapVisualProperty("Node Label", "id", "p")
   nodecolour <- RCy3::mapVisualProperty("Node Fill Color", "group", "d",
                                         unique(node_table$group),
-                                        n_distinct_cols(n_groups))
+                                        n_distinct_cols(length(unique(node_table$group))))
   nodeXlocation <- RCy3::mapVisualProperty("Node X Location", "id", "d",
-                                           as.vector(node_table$node),
+                                           as.vector(node_table$id),
                                            as.vector(node_table$X))
   nodeYlocation <- RCy3::mapVisualProperty("Node Y Location", "id", "d",
-                                           as.vector(node_table$node),
+                                           as.vector(node_table$id),
                                            as.vector(node_table$Y))
   nodesize <- RCy3::mapVisualProperty("Node Size", "shared name", "d",
-                                      as.vector(node_table$node),
+                                      as.vector(node_table$id),
                                       as.vector(node_table$size))
   edgeline <- RCy3::mapVisualProperty("Edge Line Type", "interaction", "d",
                                       as.vector(unique(edge_table$interaction)),
