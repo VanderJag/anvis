@@ -313,17 +313,17 @@ test_that("image and session save number will be matching (default names)", {
               message = "this test runs only when cytoscape is active")
 
   # Check if image adjusts to session names
-  # withr::with_file(list("network.cys", "network_2.cys",
-  #                       "network_3.cys", "network_3.png"), {
-  #                         vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
-  #                                          save_session = TRUE, export_image = FALSE)
-  #                         vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
-  #                                          save_session = TRUE, export_image = FALSE)
-  #                         vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
-  #                                          save_session = TRUE, export_image = TRUE)
-  #
-  #                         expect_true(all(c("network_3.png", "network_3.cys") %in% list.files()))
-  #                       })
+  withr::with_file(list("network.cys", "network_2.cys",
+                        "network_3.cys", "network_3.png"), {
+                          vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                                           save_session = TRUE, export_image = FALSE)
+                          vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                                           save_session = TRUE, export_image = FALSE)
+                          vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                                           save_session = TRUE, export_image = TRUE)
+
+                          expect_true(all(c("network_3.png", "network_3.cys") %in% list.files()))
+                        })
 
   # Check if session adjusts to image names
   withr::with_file(list("network.png", "network_2.png",
