@@ -31,7 +31,9 @@
 
 
 # optional columns for nodes: group,
-# save name is used both for session and for image
+# save name is used both for session and for image, so don't add extension, if
+#   the name already exists a number will be add, when both session and image
+#   are save the numbers are chosen to match
 vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1,
                              save_session = TRUE,
                              close_session = TRUE,
@@ -148,28 +150,34 @@ vis_in_cytoscape <- function(edge_table, node_table, netw_nr = 1,
   RCy3::fitContent(selected.only = FALSE)
   RCy3::fitContent(selected.only = FALSE)
 
-  # Network_out = sprintf("Network_Image_%i", netw_nr)
-  # full.path = paste(getwd(), Network_out, sep = "/")
-  #
-  # img_path <- if
-  # TODO check save name with serial next system
 
+  # Saving and closing ------------------------------------------------------
+  # Save image
   if (export_image) {
     # Overwrite default with users choice
     if (!is.null(save_name)) image_opts[["filename"]] <- save_name
     # Check if name is already used
     image_opts[["filename"]] <- image_opts[["filename"]] %>%
       file_sequence(paste0(".", image_opts[["type"]]))
+    # We want the file name numbers to match with potential cytoscape session numbers
+    if (save_session) {
+      image_opts[["filename"]] <- file_sequence(image_opts[["filename"]], ".cys")
+    }
+    save_name <- image_opts[["filename"]]
     do.call(RCy3::exportImage, image_opts)
   }
 
-
+  # Save session
   if (save_session) {
-    Network_save = sprintf("Cytoscape_Network_%i", netw_nr)
-    full.path.cps = paste(getwd(), Network_save, sep = "/")
-    RCy3::saveSession(full.path.cps)
+    save_name <- if (!is.null(save_name)) {save_name}
+         else if (!is.null(image_opts[["filename"]])) {image_opts[["filename"]]}
+         else {"network"}
+    # when export image is FALSE still have to determine the file number
+    save_name <- file_sequence(save_name, ext = ".cys")
+    RCy3::saveSession(filename = save_name)
   }
 
+  # Close session
   if (close_session) {
     RCy3::closeSession(save.before.closing = FALSE)
   }
