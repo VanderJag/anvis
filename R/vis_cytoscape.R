@@ -1,13 +1,41 @@
-# optional columns for nodes: (group), color, size
-# optional columns for edge table: width (otherwise defaults to weight), color
-# save name is used both for session and for image, so don't add extension, if
-#   the name already exists a number will be add, when both session and image
-#   are save the numbers are chosen to match
-vis_in_cytoscape <- function(edge_table, node_table,
+#' Visualize in Cytoscape
+#'
+#' Uses RCy3 to communicate to your running cytoscape software. Visualizes your
+#' network with a circular layout. Depending on the attributes of your
+#' `edge_table` and `node_table`, additional visual properties will be added to
+#' the visualization. Image and session object can be saved.
+#'
+#' @param node_table Data frame with required column 'node'. Optional are columns
+#'   'color' and 'size': when present they will be used to determine the respective
+#'   visual properties of the visualization. Other columns with node attributes
+#'   will not be used in the visualization, but they will be added to the node
+#'   table in cytoscape.
+#' @param edge_table Data frame with required columns 'source' and 'target'.
+#'   Optional are columns: 'width' or 'weight' to determine edge widths in the
+#'   visualization (only when 'width' is not present weight will be used), and
+#'   'color' to determine the color of the edges.
+#' @param export_image Logical (default TRUE), should the visualization be saved?
+#' @param save_session Logical (default TRUE), specifying whether the cytoscape
+#'   session should be saved.
+#' @param close_session Logical (default TRUE), should the cytoscape session be
+#'   closed after optional saving?
+#' @param save_name Character string that will be used to name image and session
+#'   save files, excluding file extensions, as these will be added automatically.
+#'   If this argument is `NULL`, `image_opt[["filename"]]` will be used for naming.
+#'   If both are `NULL`, "network" will be used as default name. If the name
+#'   chosen for `save_name` already exists in the current working directory
+#'   numbers will be appended to it.
+#' @param image_opts List with named values that will be used to customize
+#'   image export. Any argument accepted by [RCy3::exportImage] is valid.
+#' @param cyto3.8_check Logical (default TRUE). Should execution stop if
+#'   Cytoscape version 3.8.x is detected? `FALSE` to skip this test.
+#'   Cytoscape version 3.8.x has problems interacting with `RCy3`, first
+#'   visualization may not show.
+vis_in_cytoscape <- function(node_table, edge_table,
+                             export_image = TRUE,
                              save_session = TRUE,
                              close_session = TRUE,
                              save_name = NULL,
-                             export_image = TRUE,
                              image_opts = list(filename = "network", type = "PNG"),
                              cyto3.8_check = T) {
 

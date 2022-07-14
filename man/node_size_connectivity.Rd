@@ -28,7 +28,7 @@ Returns \code{node_table} with an added column 'size'.
 }
 \description{
 Calculates the connectivity of nodes as the row sums from an adjacency matrix.
-For use as node sized, the values are scaled to range 0 to 1, transformed
+For use as node size, the values are scaled to range 0 to 1, transformed
 with a sigmoid, and then multiplied with a constant factor that is determined
 by \code{size_type}
 }
