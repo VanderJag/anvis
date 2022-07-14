@@ -1,36 +1,5 @@
-# Required packages:
-#   library(dplyr)
-#   library(RCy3)
-
-# Inputs
-# Keep cytoscape open in the background
-#   A is an adjacency matrix with the 1st column containing the column names and 1st row containing the row names and
-#       the matrix containing numerical values corresponding to the variable relationships in the columns and rows
-#   A can also be a list of matrices.
-#   Group is boolean asking if certain variables are to be clustered together as neighbours in the figure.
-#   Incase certain variables are to be clustered together in groups in the visualisation,
-#   G is a vector containing the label names of the "Groups to be clustered together" Nodes with the same labels will be visualised adjacent to each other.
-#
-#Example:
-#	source("VisualiseNetwork.R")
-#	library(dplyr)
-#	library(RCy3)
-#
-#	setwd("full path to working directory")
-#	Mat1 <- read.table("Adjacency_Matrix1.txt", header = TRUE, row.names = 1)
-#       Mat2 <- read.table("Adjacency_Matrix2.txt", header = TRUE, row.names = 1)
-#       mat3 <- read.table("Adjacency_Matrix3.txt", header = TRUE, row.names = 1)
-#
-#	A <- list(Mat1, Mat2, Mat3)
-#	G <- as.vector(c(label1, label2, label3...., labeln))
-#
-#	Visual <- VisualiseNetwork(A, Group = TRUE, G, type = 3)
-#
-##############################################################################################################################################################
-
-
-
-# optional columns for nodes: group,
+# optional columns for nodes: (group), color, size
+# optional columns for edge table: width (otherwise defaults to weight), color
 # save name is used both for session and for image, so don't add extension, if
 #   the name already exists a number will be add, when both session and image
 #   are save the numbers are chosen to match
@@ -41,11 +10,6 @@ vis_in_cytoscape <- function(edge_table, node_table,
                              export_image = TRUE,
                              image_opts = list(filename = "network", type = "PNG"),
                              cyto3.8_check = T) {
-
-  # TODO add option to give save names
-  # TODO if I change the default save type also change it in name section
-  # TODO remove manual specification of network number, let the system automatically
-  #   detect which new number to add when there is no saving name specified
 
   # Check that the input contains the required information on the nodes and edges
   if (!"node" %in% colnames(node_table)) {
@@ -78,7 +42,7 @@ vis_in_cytoscape <- function(edge_table, node_table,
   save_name <- save_name %||% image_opts[["filename"]] %||% "network"
   # store original name for series
   save_name0 <- save_name
-  # Check numbers to avoid duplicate names, always checks for both image and cys file
+  # Check suffix numbers to avoid duplicate names, always checks for both image and cys file
   save_name <- file_pair_seq(save_name,
                              ext1 = paste0(".", (image_opts[["type"]] %||% "PNG")),
                              ext2 = ".cys")
@@ -86,7 +50,7 @@ vis_in_cytoscape <- function(edge_table, node_table,
   # Set names for labeling network aspects in cytoscape
   Network_name = save_name
   Network_Collection = save_name0
-  style_name = "default_style"
+  style_name = "netvis_style"
 
   # Prepare defaults
   defaults <- list(NODE_SHAPE = "Ellipse",
@@ -117,39 +81,35 @@ vis_in_cytoscape <- function(edge_table, node_table,
                                     collection = Network_Collection,
                                     style.name  =  style_name)
   # Create network properties
-  nodeLabels <- RCy3::mapVisualProperty("Node Label", "id", "p")
-  nodecolour <- RCy3::mapVisualProperty("Node Fill Color", "group", "d",
-                                        unique(node_table$group),
-                                        n_distinct_cols(length(unique(node_table$group))))
-  nodeXlocation <- RCy3::mapVisualProperty("Node X Location", "id", "d",
-                                           as.vector(node_table$id),
-                                           as.vector(node_table$X))
-  nodeYlocation <- RCy3::mapVisualProperty("Node Y Location", "id", "d",
-                                           as.vector(node_table$id),
-                                           as.vector(node_table$Y))
-  nodesize <- RCy3::mapVisualProperty("Node Size", "shared name", "d",
-                                      as.vector(node_table$id),
-                                      as.vector(node_table$size))
-  edgeline <- RCy3::mapVisualProperty("Edge Line Type", "interaction", "d",
+  vis_props <- list()
+  vis_props[["nodeLabels"]] <- RCy3::mapVisualProperty("Node Label", "id", "p")
+  vis_props[["nodeXlocation"]] <- RCy3::mapVisualProperty("Node X Location", "X", "p")
+  vis_props[["nodeYlocation"]] <- RCy3::mapVisualProperty("Node Y Location", "Y", "p")
+  vis_props[["edgeline"]] <- RCy3::mapVisualProperty("Edge Line Type", "interaction", "d",
                                       as.vector(unique(edge_table$interaction)),
                                       as.vector(c("Solid")))
-  edgewidth <- RCy3::mapVisualProperty("Edge Width", "shared name", "d",
-                                       as.vector(edge_table$sharedname),
-                                       as.vector(edge_table$width))
-  edgestroke <- RCy3::mapVisualProperty("Edge Stroke Unselected Paint", "shared name", "d",
-                                        as.vector(edge_table$sharedname), as.vector(edge_table$color))
+  # Optional properties
+  if ("color" %in% colnames(node_table)) {
+    vis_props[["nodecolor"]] <- RCy3::mapVisualProperty("Node Fill Color", "color", "p")
+  }
+  if ("size" %in% colnames(node_table)) {
+    vis_props[["nodesize"]] <- RCy3::mapVisualProperty("Node Size", "size", "p")
+  }
+  if (any(c("width", "weight") %in% colnames(edge_table))) {
+    vis_props[["edgewidth"]] <- RCy3::mapVisualProperty(
+      "Edge Width", "shared name", "d",
+      as.vector(edge_table$sharedname),
+      edge_table$width %||% edge_table$weight)
+  }
+  if ("color" %in% colnames(edge_table)) {
+    vis_props[["edgestroke"]] <- RCy3::mapVisualProperty(
+      "Edge Stroke Unselected Paint", "shared name", "d",
+      as.vector(edge_table$sharedname), as.vector(edge_table$color))
+  }
   # Set visual style
-  RCy3::createVisualStyle(style_name,
-                          defaults,
-                          list(nodeLabels, nodecolour, nodesize,
-                               nodeXlocation, nodeYlocation,
-                               edgeline, edgewidth, edgestroke))
+  RCy3::createVisualStyle(style_name, defaults, vis_props)
   RCy3::setVisualStyle(style_name)
-
   # Fit content into window
-  # TODO check if doing this three times is required
-  RCy3::fitContent(selected.only = FALSE)
-  RCy3::fitContent(selected.only = FALSE)
   RCy3::fitContent(selected.only = FALSE)
 
 
