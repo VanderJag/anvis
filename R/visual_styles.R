@@ -31,17 +31,25 @@ n_distinct_cols <- function(n, colors = NULL) {
 
   # Define colors palettes with distinct colors
   sanjee_cols4 <- as.vector(c("#0073C2", "#EFC000", "#868686", "#CD534C"))
-  c16 <- c("dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00", "black", "gold1",
-           "skyblue2", "palegreen2", "#FDBF6F", "gray70", "maroon", "orchid1",
-           "darkturquoise", "darkorange4", "brown")
-  c25 <- c("dodgerblue2", "#E31A1C", # red
-           "green4", "#6A3D9A", # purple
-           "#FF7F00", # orange
-           "black", "gold1", "skyblue2", "#FB9A99", # lt pink
-           "palegreen2", "#CAB2D6", # lt purple
-           "#FDBF6F", # lt orange
-           "gray70", "khaki2", "maroon", "orchid1", "deeppink1", "blue1", "steelblue4",
-           "darkturquoise", "green1", "yellow4", "yellow3", "darkorange4", "brown")
+  c16 <- c("#1C86EE", "#E31A1C", "#008B00", "#6A3D9A", "#FF7F00", "#000000",
+           "#FFD700", "#7EC0EE", "#90EE90", "#FDBF6F", "#B3B3B3", "#B03060",
+           "#FF83FA", "#00CED1", "#8B4500", "#A52A2A")
+    # c("dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00", "black", "gold1",
+    #        "skyblue2", "palegreen2", "#FDBF6F", "gray70", "maroon", "orchid1",
+    #        "darkturquoise", "darkorange4", "brown")
+  c25 <- c("#1C86EE", "#E31A1C", "#008B00", "#6A3D9A", "#FF7F00", "#000000",
+           "#FFD700", "#7EC0EE", "#FB9A99", "#90EE90", "#CAB2D6", "#FDBF6F",
+           "#B3B3B3", "#EEE685", "#B03060", "#FF83FA", "#FF1493", "#0000FF",
+           "#36648B", "#00CED1", "#00FF00", "#8B8B00", "#CDCD00", "#8B4500",
+           "#A52A2A")
+    # c("dodgerblue2", "#E31A1C", # red
+    #        "green4", "#6A3D9A", # purple
+    #        "#FF7F00", # orange
+    #        "black", "gold1", "skyblue2", "#FB9A99", # lt pink
+    #        "palegreen2", "#CAB2D6", # lt purple
+    #        "#FDBF6F", # lt orange
+    #        "gray70", "khaki2", "maroon", "orchid1", "deeppink1", "blue1", "steelblue4",
+    #        "darkturquoise", "green1", "yellow4", "yellow3", "darkorange4", "brown")
 
   # Are manual colors supplied?
   if(is.null(colors)) {
