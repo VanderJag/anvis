@@ -34,3 +34,9 @@ test_that("when cytoscape is available wrapper runs without error", {
   # Visualize the network
   expect_error(VisualiseNetwork(Mat1, group_vec = group_vec, vis_type = "cyto"), NA)
 })
+
+
+# test_that("Visualizations are made for each network in the list", {
+#   readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+#
+# })
