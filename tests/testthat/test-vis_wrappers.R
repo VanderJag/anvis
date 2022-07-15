@@ -37,6 +37,6 @@ test_that("when cytoscape is available wrapper runs without error", {
 
 
 # test_that("Visualizations are made for each network in the list", {
-#   readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+#   adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
 #
 # })
