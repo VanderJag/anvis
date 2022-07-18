@@ -14,6 +14,10 @@
 #'   adjacency matrices. If `adj_mats` is a list, a single group vector can be
 #'   used if it matches all adjacency matrices. Alternatively, provide a list of
 #'   group vectors with one vector for each adj. matrix in the list.
+#' @param arrange_co Logical (default TRUE), should nodes be reordered based on
+#'   their average connectivity in multiple networks? Value of this argument will
+#'   only be used when `adj_mats`is a list of multiple matrices. Requires
+#'   the same names nodes to be present in all networks.
 #' @return The section on the returned values
 #'
 #' @section Additional criteria for the use of this function:
@@ -21,8 +25,9 @@
 #' * ...
 VisualiseNetwork <- function(adj_mats,
                              group_vec = NULL,
-                             vis_type = c("igraph", "cytoscape"),
+                             vis_type = c("igraph", "cytoscape", "xgmml"),
                              width_type = NULL,
+                             arrange_co = FALSE,
                              do_save = T, save_names = NULL) {
   # TODO allow user to manually specify group colors
   # TODO add option to scale igraph widths linearly
@@ -42,59 +47,51 @@ VisualiseNetwork <- function(adj_mats,
          "You provided: ", class(adj_mats), call. = FALSE)
   }
 
-  # TODO make sure group vector is of length 1 or same as the list of adj_mats
-  #   then adjust below so it uses the correct group vec, maybe if len(vec) is 1 turn into list and then i can do group_vec[[x]] %||% group_vec[[1]]
+  # Check if grouping vector is list, if not, turn into list
+  if (!is.null(group_vec)) {
+    if (!is.list(group_vec)) {
+      group_vec <- list(group_vec)
+    } else {
+      if (!length(group_vec) == length(adj_mats) && !length(group_vec) == 1) {
+        stop("Grouping vector list must be of equal length as adj_mats, or length 1",
+             "\nℹ Length of `group_vec` = ", length(group_vec),
+             ", length of `adj_mats` = ", length(adj_mats), ".", call.=FALSE)
+
+      }
+    }
+  }
+
   # Convert all adjacency matrices into edge and node tables
   networks <- lapply(seq_along(adj_mats),
-                     function(x, ...) adj_matrix_to_network(adj_mats[[x]], ...),
-                                                               node_attrs = "all",
-                                                               edge_attrs = "all",
-                                                               group_vec = group_vec,
-                                                               width_type = width_type)
+     function(x, ...) {
+       adj_matrix_to_network(adj_mats[[x]],
+                             node_attrs = "all",
+                             edge_attrs = "all",
+                             group_vec = group_vec[[
+                               if (length(group_vec) == length(adj_mats)) x else 1]],
+                             width_type = width_type)})
   nodes <- lapply(seq_along(adj_mats),
                   function(x) networks[[x]]$node_table)
   edges <- lapply(seq_along(adj_mats),
-                  function(x) networks[[x]]$node_table)
+                  function(x) networks[[x]]$edge_table)
 
+  # TODO add arrangement by connectivity, integreate the below code
+  # if (length(adj_mats) > 1)
+  #   WARNING(unequal nodes)
 
-  # These variables will be used to store all prepared and rescaled networks
-  #   and return them in the end of this function
-  AdjMatrix = NULL
-  NodesNetwork = NULL
-  EdgesNetwork = NULL
-
-  # Main loop to iterate over the multiple networks that can be provided as input
-  for (i_matrix in 1:length(adj_mats)) {
-
-    # These variable store are used to create the current network in edgelist format
-    Adjacency = as.data.frame(adj_mats[i_matrix])
-
-    # Create a network from adjacency info
-    network_list <- adj_matrix_to_network(Adjacency,
-                                          node_attrs = "all",
-                                          edge_attrs = "all",
-                                          group_vec = group_vec,
-                                          width_type = width_type)
-    edge_table <- network_list[["edge_table"]]
-    node_table <- network_list[["node_table"]]
-
-    # Choose visualization
-    if (vis_type == "igraph") {
-      vis_igraph(edge_table = edge_table,
-                 node_table = node_table)
-    } else if (vis_type == "cytoscape") {
-      vis_in_cytoscape(edge_table = edge_table,
-                       node_table = node_table,
-                       netw_nr = i_matrix)
+  # Choose visualization
+  if (vis_type == "igraph") {
+    for (i in seq_along(edges)) {
+      vis_igraph(edge_table = edges[[i]],
+                 node_table = nodes[[i]])
     }
-
-
-    # Network files for building network using some other software
-    AdjMatrix <- list(AdjMatrix, Adjacency)
-    NodesNetwork <- list(NodesNetwork, node_table)
-    EdgesNetwork <- list(EdgesNetwork, edge_table)
+  } else if (vis_type == "cytoscape") {
+    for (i in seq_along(edges)) {
+      vis_in_cytoscape(edge_table = edges[[i]],
+                       node_table = nodes[[i]])
+    }
   }
 
-  Network = list(AdjMatrix, NodesNetwork, EdgesNetwork)
+  Network = list(adjacencies = adj_mats, nodes = nodes, edges = edges)
   return(Network)
 }
