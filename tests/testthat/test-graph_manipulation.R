@@ -188,3 +188,38 @@ test_that("connectivity rowSums matches one determined based on edge weights", {
 
   expect_equal(node_table$size, conns2)
 })
+
+
+test_that("avg conn. shows warning when not all node tables have size column", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+  group_vec <- list(group_vec)
+
+  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, vis_type = "xgmml")
+  networks <- lapply(seq_along(adj_mats),
+                     function(x, ...) {
+                       adj_matrix_to_network(adj_mats[[x]],
+                                             node_attrs = "all",
+                                             edge_attrs = "all",
+                                             group_vec = group_vec[[
+                                               if (length(group_vec) == length(adj_mats)) x else 1]],
+                                             width_type = "partcor")})
+  nodes <- lapply(seq_along(adj_mats),
+                  function(x) networks[[x]]$node_table)
+  Network = list(adjacencies = adj_mats, nodes = nodes)
+
+  expect_error(sort_avg_connectivity(Network$nodes), NA)
+
+  Network$nodes[[12]] <- Network$nodes[[12]] %>% dplyr::select(-size)
+  expect_warning(sort_avg_connectivity(Network$nodes),
+                 "Not all networks have node size attribute")
+
+  for (i in 1:11) {
+    Network$nodes[[i]] <- Network$nodes[[i]] %>% dplyr::select(-size)
+  }
+  expect_error(sort_avg_connectivity(Network$nodes),
+               "Must provide data frames with 'size' connectivity column")
+
+})
+

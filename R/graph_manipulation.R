@@ -140,6 +140,37 @@ node_size_connectivity <- function(node_table,
   return(node_table)
 }
 
+sort_avg_connectivity <- function(nodes_list) {
+  size_in_colnames <- function(list_item) {
+    col_names <- colnames(list_item)
+    any(stringr::str_detect(col_names, "size"))
+  }
+
+  has_connectivity <- sapply(nodes_list, size_in_colnames)
+
+  if (!any(has_connectivity)) {
+    stop("Must provide data frames with 'size' connectivity column: ",
+         "\n✖ Node tables require size column to calculate average connectivity.",
+         call.=FALSE)
+  } else   if (!all(has_connectivity)) {
+    warning("Not all networks have node size attribute: ",
+            "\nAverage connectivity will be calculated without the missing info.",
+            call. = FALSE)
+  }
+
+  # TODO require node column in each node table: error
+  # TODO check if nodes are in the list same or not: error
+  # TODO check if they are in the same order, else reorder, ideally keep groups in
+  #   mind
+  # sapply(list, function)
+
+  nodes_list[[12]]$si
+
+}
+
+tmp_vec <- lapply(nodes_list, colnames)
+as.vector(tmp_vec)
+
 #' Calculate edge widths
 #'
 #' Adds a column called "width" to the input `edge_table`. The widths for the
