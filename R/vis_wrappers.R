@@ -27,7 +27,7 @@ VisualiseNetwork <- function(adj_mats,
                              group_vec = NULL,
                              vis_type = c("igraph", "cytoscape", "xgmml"),
                              width_type = NULL,
-                             arrange_co = FALSE,
+                             arrange_co = TRUE,
                              do_save = T, save_names = NULL) {
   # TODO allow user to manually specify group colors
   # TODO add option to scale igraph widths linearly
@@ -78,6 +78,9 @@ VisualiseNetwork <- function(adj_mats,
   # TODO add arrangement by connectivity, integreate the below code
   # if (length(adj_mats) > 1)
   #   WARNING(unequal nodes)
+  if (arrange_co) {
+    nodes <- sort_avg_connectivity(nodes_list = nodes)
+  }
 
   # Choose visualization
   if (vis_type == "igraph") {
