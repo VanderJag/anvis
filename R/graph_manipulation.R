@@ -158,18 +158,52 @@ sort_avg_connectivity <- function(nodes_list) {
             call. = FALSE)
   }
 
+  # if a group column is found maintain the group order
+
+
   # TODO require node column in each node table: error
   # TODO check if nodes are in the list same or not: error
-  # TODO check if they are in the same order, else reorder, ideally keep groups in
-  #   mind
-  # sapply(list, function)
+  # there might be a different order of the nodes, use the first as reference
+  #   to prevent averaging different nodes
+  # TODO Check if groups are the same
 
-  nodes_list[[12]]$si
+  ref_nodes <- nodes_list[[1]]$node
+  # It's possible that not all node_tables have the size attribute
+  conn_tables <- nodes_list[has_connectivity]
 
+  # Extract the connectivity scores from the tables that hold them
+  connectivities <- sapply(seq_along(conn_tables),
+         function(x) {
+           nodes_i <- conn_tables[[x]]
+           nodes_i[match(ref_nodes, nodes_i$node),]$size
+         }
+  )
+
+  # Calculate average connectivities
+  avg_conns <- rowMeans(connectivities) %>%
+    tibble::as_tibble_col(column_name = "conns")
+
+  # Add the node names to the averages
+  avg_conns$node <- ref_nodes
+
+  # Sort and keep groups together if they are present
+  if ("group" %in% colnames(nodes_list[[1]])) {
+    avg_ordered <- avg_conns %>%
+      dplyr::mutate(group = nodes_list[[1]]$group) %>%
+      dplyr::arrange(group, conns)
+  } else {
+    avg_ordered <- dplyr::arrange(avg_conns, conns)
+  }
+
+  node_order <- avg_ordered$node
+
+  nodes_list <- lapply(nodes_list, function(nodes_i) {
+    nodes_i[match(node_order, nodes_i$node),]
+  })
+
+  return(nodes_list)
 }
 
-tmp_vec <- lapply(nodes_list, colnames)
-as.vector(tmp_vec)
 
 #' Calculate edge widths
 #'

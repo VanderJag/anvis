@@ -223,3 +223,52 @@ test_that("avg conn. shows warning when not all node tables have size column", {
 
 })
 
+
+test_that("avg conn. gives the same result for reordered node tables", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+  group_vec <- list(group_vec)
+
+  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, vis_type = "xgmml")
+  networks <- lapply(seq_along(adj_mats),
+                     function(x, ...) {
+                       adj_matrix_to_network(adj_mats[[x]],
+                                             node_attrs = "all",
+                                             edge_attrs = "all",
+                                             group_vec = group_vec[[
+                                               if (length(group_vec) == length(adj_mats)) x else 1]],
+                                             width_type = "partcor")})
+  nodes <- lapply(seq_along(adj_mats),
+                  function(x) networks[[x]]$node_table)
+  nodes_reorder <- lapply(seq_along(adj_mats),
+                          function(x) networks[[x]]$node_table %>% {.[sample(1:nrow(.)),]})
+
+  expect_equal(sort_avg_connectivity(nodes), sort_avg_connectivity(nodes_reorder))
+})
+
+
+test_that("avg. conn. is calculated when some some node tables miss size attribute", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+  group_vec <- list(group_vec)
+
+  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, vis_type = "xgmml")
+  networks <- lapply(seq_along(adj_mats),
+                     function(x, ...) {
+                       adj_matrix_to_network(adj_mats[[x]],
+                                             node_attrs = "all",
+                                             edge_attrs = "all",
+                                             group_vec = group_vec[[
+                                               if (length(group_vec) == length(adj_mats)) x else 1]],
+                                             width_type = "partcor")})
+  nodes <- lapply(seq_along(adj_mats),
+                  function(x) networks[[x]]$node_table)
+  nodes_minus <- nodes
+  nodes_minus[[12]]$size <- NULL
+
+  # Fasligand has the second highest average for its group, check if that still
+  #   holds
+  expect_true(all(stringr::str_detect(#TODO complete test to see if this second node is properly sorted)) sort_avg_connectivity(nodes_minus))
+})
