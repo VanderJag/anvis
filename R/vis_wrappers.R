@@ -89,9 +89,12 @@ VisualiseNetwork <- function(adj_mats,
   edges <- lapply(seq_along(adj_mats),
                   function(x) networks[[x]]$edge_table)
 
-  # Node ordering by average connectivity
-  if (arrange_co) {
-    nodes <- sort_avg_connectivity(nodes_list = nodes)
+  # Avoid errors by checking whether node size (connectivity) has been determined
+  if (node_attrs %in% c("all", "size")) {
+    # Node ordering by average connectivity
+    if (arrange_co) {
+      nodes <- sort_avg_connectivity(nodes_list = nodes)
+    }
   }
 
   # Choose visualization
