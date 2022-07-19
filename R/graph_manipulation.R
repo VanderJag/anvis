@@ -140,6 +140,17 @@ node_size_connectivity <- function(node_table,
   return(node_table)
 }
 
+
+#' Reorder node tables by their average connectivity
+#'
+#' Calculates the average connectivity and reorders the rows of the input node
+#' tables. If a 'group' column is present in the first node table, the groups
+#' will only be ordered internally by average connectivity.
+#'
+#' @param nodes_list A list of node tables. Each must have a 'node' column holding
+#'   node names. A least some of the tables should have a 'size' column, containing
+#'   the connectivity information.
+#' @return Returns the same `nodes_list` as was used as input, with rows reordered.
 sort_avg_connectivity <- function(nodes_list) {
   col_in_colnames <- function(list_item, col) {
     col_names <- colnames(list_item)
