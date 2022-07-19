@@ -19,7 +19,10 @@
 #'   the same names nodes to be present in all networks. Also requires 'size'
 #'   column to be present in node tables, so `node_attrs` should be 'all' or
 #'   include 'size'.
-#' @param
+#' @param output_type Choose "igraph" (default), "cytoscape", or "xgmml" to get
+#'   a visualization with the respective software for the first two options, or
+#'   the appropriate download for the third option. Node widths columns will be
+#'   adjusted to match your chosen output.
 #' @inheritParams adj_matrix_to_network
 #' @return The section on the returned values
 #'
@@ -36,14 +39,16 @@ VisualiseNetwork <- function(adj_mats,
                              do_save = T, save_names = NULL) {
   # TODO allow user to manually specify group colors
   # TODO add option to scale igraph widths linearly
-  # TODO add additional arguments of the adj_matrix_to_network
-
-  # TODO get size type from output type
-  c("igraph", "cytoscape", "scaled_only")
 
   # Check which visualization should be used, allow abbreviations
   output_type <- match.arg(output_type)
 
+  # Get size type from output type
+  if (output_type %in% c("igraph", "cytoscape")) {
+    size_type <- output_type
+  } else {
+    size_type <- "scaled_only"
+  }
 
   # Since this function uses a for loop to iterate over the visualizations that
   #   are created, the input needs to be converted into a list.
@@ -77,7 +82,8 @@ VisualiseNetwork <- function(adj_mats,
                              edge_attrs = edge_attrs,
                              group_vec = group_vec[[
                                if (length(group_vec) == length(adj_mats)) x else 1]],
-                             width_type = width_type)})
+                             width_type = width_type,
+                             size_type = size_type)})
   nodes <- lapply(seq_along(adj_mats),
                   function(x) networks[[x]]$node_table)
   edges <- lapply(seq_along(adj_mats),
