@@ -275,3 +275,54 @@ test_that("avg. conn. is calculated when some some node tables miss size attribu
   #   if without the connectivity of the last node table the nodes are still sorted
   expect_true(all(stringr::str_detect(sec_node, "FasLigand")))
 })
+
+
+test_that("avg. conn. give error for missing node column", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+  group_vec <- list(group_vec)
+
+  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, vis_type = "xgmml")
+  networks <- lapply(seq_along(adj_mats),
+                     function(x, ...) {
+                       adj_matrix_to_network(adj_mats[[x]],
+                                             node_attrs = "all",
+                                             edge_attrs = "all",
+                                             group_vec = group_vec[[
+                                               if (length(group_vec) == length(adj_mats)) x else 1]],
+                                             width_type = "partcor")})
+  nodes <- lapply(seq_along(adj_mats),
+                  function(x) networks[[x]]$node_table)
+  nodes_minus <- nodes
+  nodes_minus[[12]]$node <- NULL
+
+  expect_error(sort_avg_connectivity(nodes_minus),
+               "Must provide node names")
+})
+
+
+test_that("avg. conn. give error for unequal node sets", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+  group_vec <- list(group_vec)
+
+  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, vis_type = "xgmml")
+  networks <- lapply(seq_along(adj_mats),
+                     function(x, ...) {
+                       adj_matrix_to_network(adj_mats[[x]],
+                                             node_attrs = "all",
+                                             edge_attrs = "all",
+                                             group_vec = group_vec[[
+                                               if (length(group_vec) == length(adj_mats)) x else 1]],
+                                             width_type = "partcor")})
+  nodes <- lapply(seq_along(adj_mats),
+                  function(x) networks[[x]]$node_table)
+  nodes_minus <- nodes
+  nodes_minus[[12]]$node <- stringr::str_replace_all(nodes_minus[[12]]$node, "MMP8", "MMP80000")
+  nodes_minus[[3]]$node <- stringr::str_replace_all(nodes_minus[[3]]$node, "MMP8", "BAD_NODE")
+
+  expect_error(sort_avg_connectivity(nodes_minus),
+               "have the same nodes in node tables")
+})

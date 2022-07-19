@@ -141,28 +141,45 @@ node_size_connectivity <- function(node_table,
 }
 
 sort_avg_connectivity <- function(nodes_list) {
-  size_in_colnames <- function(list_item) {
+  col_in_colnames <- function(list_item, col) {
     col_names <- colnames(list_item)
-    any(stringr::str_detect(col_names, "size"))
+    any(stringr::str_detect(col_names, col))
   }
 
-  has_connectivity <- sapply(nodes_list, size_in_colnames)
+  has_connectivity <- sapply(nodes_list, col_in_colnames, "size")
 
   if (!any(has_connectivity)) {
     stop("Must provide data frames with 'size' connectivity column: ",
          "\n✖ Node tables require size column to calculate average connectivity.",
          call.=FALSE)
-  } else   if (!all(has_connectivity)) {
+  } else if (!all(has_connectivity)) {
     warning("Not all networks have node size attribute: ",
             "\nAverage connectivity will be calculated without the missing info.",
             call. = FALSE)
   }
 
-  # if a group column is found maintain the group order
+  # Check if all node tables have a column called 'node', needed to match rows
+  has_nodenames <- sapply(nodes_list, col_in_colnames, "node")
 
+  if (!all(has_nodenames)) {
+    stop("Must provide node names to calculate average connectivity:",
+    "\nℹ Indices of your node tables not containing 'node' column: ",
+    which(!has_nodenames) %>% paste(collapse = " "),
+    "\n✖ All node tables must contain 'node' column.", call.=FALSE)
+  }
 
-  # TODO require node column in each node table: error
-  # TODO check if nodes are in the list same or not: error
+  # To avoid unexpected results, test if the same nodes are found in all tables
+  same_nodes <- sapply(nodes_list,
+                       function (df_nodes) setequal(nodes_list[[1]]$node,
+                                                    df_nodes$node))
+
+  if (!all(same_nodes)) {
+    stop("Must have the same nodes in node tables:",
+    "\nℹ Indices of node tables not matching with the first node table: ",
+    which(!same_nodes) %>% paste(collapse = " "),
+    "\n✖ All node tables must have the same values in their 'node' column.", call.=FALSE)
+  }
+    # TODO check if nodes are in the list same or not: error
   # there might be a different order of the nodes, use the first as reference
   #   to prevent averaging different nodes
   # TODO Check if groups are the same
@@ -197,9 +214,9 @@ sort_avg_connectivity <- function(nodes_list) {
 
   node_order <- avg_ordered$node
 
-  nodes_list <- lapply(nodes_list, function(nodes_i) {
-    nodes_i[match(node_order, nodes_i$node),]
-  })
+  nodes_list <- lapply(nodes_list,
+                       function(nodes_i) nodes_i[match(node_order, nodes_i$node),]
+  )
 
   return(nodes_list)
 }
