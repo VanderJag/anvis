@@ -179,11 +179,9 @@ sort_avg_connectivity <- function(nodes_list) {
     which(!same_nodes) %>% paste(collapse = " "),
     "\n✖ All node tables must have the same values in their 'node' column.", call.=FALSE)
   }
-    # TODO check if nodes are in the list same or not: error
+
   # there might be a different order of the nodes, use the first as reference
   #   to prevent averaging different nodes
-  # TODO Check if groups are the same
-
   ref_nodes <- nodes_list[[1]]$node
   # It's possible that not all node_tables have the size attribute
   conn_tables <- nodes_list[has_connectivity]
