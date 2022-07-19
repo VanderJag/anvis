@@ -14,7 +14,7 @@
 #'   adjacency matrices. If `adj_mats` is a list, a single group vector can be
 #'   used if it matches all adjacency matrices. Alternatively, provide a list of
 #'   group vectors with one vector for each adj. matrix in the list.
-#' @param arrange_co Logical (default TRUE), should nodes be reordered based on
+#' @param arrange_co Logical (default FALSE), should nodes be reordered based on
 #'   their average connectivity in multiple networks? Requires
 #'   the same names nodes to be present in all networks. Also requires 'size'
 #'   column to be present in node tables, so `node_attrs` should be 'all' or
@@ -35,7 +35,7 @@ VisualiseNetwork <- function(adj_mats,
                              group_vec = NULL,
                              width_type = NULL,
                              output_type = c("igraph", "cytoscape", "xgmml"),
-                             arrange_co = TRUE,
+                             arrange_co = FALSE,
                              do_save = T, save_names = NULL) {
   # TODO allow user to manually specify group colors
   # TODO add option to scale igraph widths linearly
@@ -89,12 +89,9 @@ VisualiseNetwork <- function(adj_mats,
   edges <- lapply(seq_along(adj_mats),
                   function(x) networks[[x]]$edge_table)
 
-  # Avoid errors by checking whether node size (connectivity) has been determined
-  if (node_attrs %in% c("all", "size")) {
-    # Node ordering by average connectivity
-    if (arrange_co) {
-      nodes <- sort_avg_connectivity(nodes_list = nodes)
-    }
+  # Node ordering by average connectivity
+  if (arrange_co) {
+    nodes <- sort_avg_connectivity(nodes_list = nodes)
   }
 
   # Choose visualization
