@@ -71,9 +71,28 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 }
 
 
-# none takes precedence over all
+# TODO finish this documentation
 # use color_group in combination with group
 # NULL for size_type and for width_type will use the default arguments of the fucntions
+
+#' Create edge and node table from adjacency matrix
+#'
+#' Creates edge and node tables with various optional attributes.
+#'
+#' When `node_attrs` or `edge_attrs` is a vector containing 'none' and any other
+#' option, no additional attributes will be added.
+#' # TODO write about the options for attributes, for node and edge individually
+#' # TODO integrate choice of your own color
+#'
+#' @inheritParams adj_matrix_to_edgelist
+#' @param node_attrs Character strings, one or multiple of 'none', 'all', 'group',
+#'   'color_group', and 'size'.
+#' @param edge_attrs Character strings, one or multiple of 'none, 'all', 'width',
+#'   'color'.
+#' @inheritParams group_nodes
+#' @inheritParams node_size_connectivity
+#' @inheritParams edge_weight_to_widths
+#' @return The section on the returned values
 adj_matrix_to_network <- function(adj_matrix,
                                   node_attrs = c("none", "all", "group", "color_group", "size"),
                                   edge_attrs = c("none", "all", "width", "color"),
