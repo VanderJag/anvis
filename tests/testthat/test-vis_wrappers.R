@@ -80,7 +80,8 @@ test_that("Igraph visualizations are made for each network in the list", {
   skip_if_not(test_call == "test_that()",
               message = "cytoscape visualizations need to be checked manually")
 
-  expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, vis_type = "igraph"),
+  expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, vis_type = "igraph",
+                                edge_attrs = "all", node_attrs = "all"),
                NA)
 })
 
@@ -91,7 +92,8 @@ test_that("grouping vector of lenght 1 or same as data works", {
 
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, vis_type = "xgmml")
+  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, vis_type = "xgmml",
+                               edge_attrs = "all", node_attrs = "all")
 
   all_equal <- all(vapply(seq_along(networks$nodes),
          function (x) all(networks$nodes[[1]]$group == networks$nodes[[x]]$group),
@@ -101,7 +103,8 @@ test_that("grouping vector of lenght 1 or same as data works", {
 
   grouping_list <- replicate(length(adj_mats), sample(group_vec), simplify = FALSE)
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = grouping_list, vis_type = "xgmml")
+  networks <- VisualiseNetwork(adj_mats, group_vec = grouping_list, vis_type = "xgmml",
+                               edge_attrs = "all", node_attrs = "all")
 
   expect_equal(lapply(seq_along(networks$nodes),
                       function (x) {

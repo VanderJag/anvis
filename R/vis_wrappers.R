@@ -15,9 +15,11 @@
 #'   used if it matches all adjacency matrices. Alternatively, provide a list of
 #'   group vectors with one vector for each adj. matrix in the list.
 #' @param arrange_co Logical (default TRUE), should nodes be reordered based on
-#'   their average connectivity in multiple networks? Value of this argument will
-#'   only be used when `adj_mats`is a list of multiple matrices. Requires
-#'   the same names nodes to be present in all networks.
+#'   their average connectivity in multiple networks? Requires
+#'   the same names nodes to be present in all networks. Also requires 'size'
+#'   column to be present in node tables, so `node_attrs` should be 'all' or
+#'   include 'size'.
+#' @inheritParams adj_matrix_to_network
 #' @return The section on the returned values
 #'
 #' @section Additional criteria for the use of this function:
@@ -25,6 +27,8 @@
 #' * ...
 VisualiseNetwork <- function(adj_mats,
                              group_vec = NULL,
+                             node_attrs = c("none", "all", "group", "color_group", "size"),
+                             edge_attrs = c("none", "all", "width", "color"),
                              vis_type = c("igraph", "cytoscape", "xgmml"),
                              width_type = NULL,
                              arrange_co = TRUE,
@@ -63,10 +67,10 @@ VisualiseNetwork <- function(adj_mats,
 
   # Convert all adjacency matrices into edge and node tables
   networks <- lapply(seq_along(adj_mats),
-     function(x, ...) {
+     function(x) {
        adj_matrix_to_network(adj_mats[[x]],
-                             node_attrs = "all",
-                             edge_attrs = "all",
+                             node_attrs = node_attrs,
+                             edge_attrs = edge_attrs,
                              group_vec = group_vec[[
                                if (length(group_vec) == length(adj_mats)) x else 1]],
                              width_type = width_type)})
@@ -75,9 +79,7 @@ VisualiseNetwork <- function(adj_mats,
   edges <- lapply(seq_along(adj_mats),
                   function(x) networks[[x]]$edge_table)
 
-  # TODO add arrangement by connectivity, integreate the below code
-  # if (length(adj_mats) > 1)
-  #   WARNING(unequal nodes)
+  # Node ordering by average connectivity
   if (arrange_co) {
     nodes <- sort_avg_connectivity(nodes_list = nodes)
   }
