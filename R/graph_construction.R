@@ -56,7 +56,16 @@ adj_matrix_to_edgelist <- function(adj_matrix) {
 }
 
 
-adj_matrix_to_nodetable <- function(adj_matrix, group_vec = NULL) {
+#' Create node table from adjacency matrix
+#'
+#' Extracts column names from the adjacency matrix and creates a basic node table
+#' with the column 'node'.
+#'
+#' @param adj_matrix An adjacency matrix (data frame or matrix), with column
+#'   names.
+#' @return Returns a data frame with a single column: 'node', which holds the
+#'   names of the network's nodes.
+adj_matrix_to_nodetable <- function(adj_matrix) {
 
   data.frame("node" = colnames(adj_matrix))
 }
@@ -93,7 +102,8 @@ adj_matrix_to_network <- function(adj_matrix,
       ("all" %in% node_attrs | "group" %in% node_attrs)) {
     if (is.null(group_vec)) {
       stop("Must provide grouping vector:",
-           "\n✖ `group_vec` should not be NULL when `node_attrs` is 'all' or 'group'.", call.=FALSE)
+           "\n✖ `group_vec` should not be NULL when `node_attrs` is 'all' or 'group'.",
+           call.=FALSE)
     }
     node_table <- group_nodes(node_table, group_vec = group_vec)
   }
