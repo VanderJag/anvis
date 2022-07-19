@@ -43,21 +43,10 @@ test_that("group vec list and adj mat list are checked for equal size", {
   group_vec <- list(group1 = groupings, group2 = groupings, group3 = groupings)
 
   group_vec <- group_vec[-2]
-  expect_error(VisualiseNetwork(mat_list, group_vec),
-               "must be equal length")
+  expect_error(VisualiseNetwork(adj_mats = mat_list, group_vec = group_vec),
+               "must be of equal length")
 })
 
-test_that("Igraph visualizations are made for each network in the list", {
-  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
-
-  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-
-  # Presence of cytoscape test, not currently working because
-  cytosc <- RCy3::cytoscapePing() %>% capture_condition()
-  skip_if(cytosc$message == "You are connected to Cytoscape!\n",
-          message = "this test runs only when cytoscape is inactive")
-
-})
 
 # test_that("Cytoscape visualizations are made for each network in the list", {
 #   adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
