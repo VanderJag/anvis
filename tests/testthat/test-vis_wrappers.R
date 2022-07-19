@@ -11,7 +11,7 @@ test_that("when cytoscape is not available RCy3 will give error", {
           message = "this test runs only when cytoscape is inactive")
 
   # Visualize the network
-  expect_message(VisualiseNetwork(Mat1, group_vec = group_vec, vis_type = "cyto"),
+  expect_message(VisualiseNetwork(Mat1, group_vec = group_vec, output_type = "cyto"),
                  "Please check that Cytoscape is running") %>%
   expect_error("object 'res' not found|Failed to connect to") %>%
   expect_error("object 'res' not found|argument is of length zero")
@@ -32,7 +32,7 @@ test_that("when cytoscape is available wrapper runs without error", {
               message = "this test runs only when cytoscape is active")
 
   # Visualize the network
-  expect_error(VisualiseNetwork(Mat1, group_vec = group_vec, vis_type = "cyto"), NA)
+  expect_error(VisualiseNetwork(Mat1, group_vec = group_vec, output_type = "cyto"), NA)
 })
 
 
@@ -80,7 +80,7 @@ test_that("Igraph visualizations are made for each network in the list", {
   skip_if_not(test_call == "test_that()",
               message = "cytoscape visualizations need to be checked manually")
 
-  expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, vis_type = "igraph",
+  expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                                 edge_attrs = "all", node_attrs = "all"),
                NA)
 })
@@ -92,7 +92,7 @@ test_that("grouping vector of lenght 1 or same as data works", {
 
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, vis_type = "xgmml",
+  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "xgmml",
                                edge_attrs = "all", node_attrs = "all")
 
   all_equal <- all(vapply(seq_along(networks$nodes),
@@ -103,7 +103,7 @@ test_that("grouping vector of lenght 1 or same as data works", {
 
   grouping_list <- replicate(length(adj_mats), sample(group_vec), simplify = FALSE)
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = grouping_list, vis_type = "xgmml",
+  networks <- VisualiseNetwork(adj_mats, group_vec = grouping_list, output_type = "xgmml",
                                edge_attrs = "all", node_attrs = "all")
 
   expect_equal(lapply(seq_along(networks$nodes),

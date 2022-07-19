@@ -19,6 +19,7 @@
 #'   the same names nodes to be present in all networks. Also requires 'size'
 #'   column to be present in node tables, so `node_attrs` should be 'all' or
 #'   include 'size'.
+#' @param
 #' @inheritParams adj_matrix_to_network
 #' @return The section on the returned values
 #'
@@ -26,19 +27,22 @@
 #' * The Cytoscape software needs to be running.
 #' * ...
 VisualiseNetwork <- function(adj_mats,
-                             group_vec = NULL,
                              node_attrs = c("none", "all", "group", "color_group", "size"),
                              edge_attrs = c("none", "all", "width", "color"),
-                             vis_type = c("igraph", "cytoscape", "xgmml"),
+                             group_vec = NULL,
                              width_type = NULL,
+                             output_type = c("igraph", "cytoscape", "xgmml"),
                              arrange_co = TRUE,
                              do_save = T, save_names = NULL) {
   # TODO allow user to manually specify group colors
   # TODO add option to scale igraph widths linearly
   # TODO add additional arguments of the adj_matrix_to_network
 
+  # TODO get size type from output type
+  c("igraph", "cytoscape", "scaled_only")
+
   # Check which visualization should be used, allow abbreviations
-  vis_type <- match.arg(vis_type)
+  output_type <- match.arg(output_type)
 
 
   # Since this function uses a for loop to iterate over the visualizations that
@@ -85,12 +89,12 @@ VisualiseNetwork <- function(adj_mats,
   }
 
   # Choose visualization
-  if (vis_type == "igraph") {
+  if (output_type == "igraph") {
     for (i in seq_along(edges)) {
       vis_igraph(edge_table = edges[[i]],
                  node_table = nodes[[i]])
     }
-  } else if (vis_type == "cytoscape") {
+  } else if (output_type == "cytoscape") {
     for (i in seq_along(edges)) {
       vis_in_cytoscape(edge_table = edges[[i]],
                        node_table = nodes[[i]])
