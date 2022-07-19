@@ -268,7 +268,10 @@ test_that("avg. conn. is calculated when some some node tables miss size attribu
   nodes_minus <- nodes
   nodes_minus[[12]]$size <- NULL
 
-  # Fasligand has the second highest average for its group, check if that still
-  #   holds
-  expect_true(all(stringr::str_detect(#TODO complete test to see if this second node is properly sorted)) sort_avg_connectivity(nodes_minus))
+  sorted_nodes <- sort_avg_connectivity(nodes_minus) %>% suppressWarnings()
+  sec_node <- sapply(1:12, function (x) sorted_nodes[[x]][2,1])
+
+  # Fasligand has the second highest average for its group, check this to see
+  #   if without the connectivity of the last node table the nodes are still sorted
+  expect_true(all(stringr::str_detect(sec_node, "FasLigand")))
 })
