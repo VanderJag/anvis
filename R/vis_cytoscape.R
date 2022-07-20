@@ -1,36 +1,36 @@
 #' Visualize in Cytoscape
 #'
-#' Uses RCy3 to communicate to your running cytoscape software. Visualizes your
-#' network with a circular layout. Depending on the attributes of your
-#' `edge_table` and `node_table`, additional visual properties will be added to
-#' the visualization. Image and session object can be saved.
+#' Uses RCy3 to communicate with cytoscape. Visualizes the
+#' network with the default circular layout. Additional visual properties are appended to the network depending on the attributes specified in 
+#' edge_table` and `node_table`.
+#' Both the visualised network and the cytoscape session can be saved.
 #'
 #' @param node_table Data frame with required column 'node'. Optional are columns
-#'   'color' and 'size': when present they will be used to determine the respective
-#'   visual properties of the visualization. Other columns with node attributes
-#'   will not be used in the visualization, but they will be added to the node
-#'   table in cytoscape.
+#'   'color' and 'size': when present they are used to determine the respective
+#'   visual properties of the nodes. And additional columns present in the table 
+#'   are only appended in the cytoscape node table for conveniance. 
 #' @param edge_table Data frame with required columns 'source' and 'target'.
 #'   Optional are columns: 'width' or 'weight' to determine edge widths in the
-#'   visualization (only when 'width' is not present weight will be used), and
+#'   visualization ('weight' is used in absence of column 'width'), and
 #'   'color' to determine the color of the edges.
-#' @param export_image Logical (default TRUE), should the visualization be saved?
-#' @param save_session Logical (default TRUE), specifying whether the cytoscape
-#'   session should be saved.
-#' @param close_session Logical (default TRUE), should the cytoscape session be
-#'   closed after optional saving?
-#' @param save_name Character string that will be used to name image and session
-#'   save files, excluding file extensions, as these will be added automatically.
-#'   If this argument is `NULL`, `image_opt[["filename"]]` will be used for naming.
-#'   If both are `NULL`, "network" will be used as default name. If the name
-#'   chosen for `save_name` already exists in the current working directory
-#'   numbers will be appended to it.
-#' @param image_opts List with named values that will be used to customize
-#'   image export. Any argument accepted by [RCy3::exportImage] is valid.
-#' @param cyto3.8_check Logical (default TRUE). Should execution stop if
-#'   Cytoscape version 3.8.x is detected? `FALSE` to skip this test.
-#'   Cytoscape version 3.8.x has problems interacting with `RCy3`, first
-#'   visualization may not show.
+#' @param export_image Logical (default TRUE), Visualization is saved when TRUE.
+#' @param save_session Logical (default TRUE), Cytoscape session is saved when TRUE.
+#' @param close_session Logical (default TRUE), Cytoscape session is closed when TRUE.
+#'   Usefull when visualising diferent networks in different sessions.
+#' @param save_name Character string containing the desired name (excluding file extensions) for image and session
+#'   save files. An appropriate tailing integer is appended to avoid the overwriting of an existing file with the same name. This argument supersedes the "filename" argument of image_opts.
+#'   If both 'save-name' and 'filename' aguments are `NULL`, "network" will be used as default name. 
+#' @param image_opts List with named values that are used to specify properties of the
+#'   exported image. All arguments accepted by [RCy3::exportImage] are valid.
+#' @param cyto3.8_check Logical (default TRUE). The function is stopped if cytoscape version 3.8 is detected when `TRUE`(default) and user is asked to uprade their cytoscape software. 
+#'   Cytoscape 3.8 has issues interacting with RCy3, however the user can use the `FALSE` boolean to continue using this function with Cytoscape 3.8.
+
+#Sanjee_Cooments:
+#Add: Requires Cyotoscape open/running in the background.
+#In parameters node_table and edge_table, can the optional column name be "color" or "colour"
+
+
+
 vis_in_cytoscape <- function(node_table, edge_table,
                              export_image = TRUE,
                              save_session = TRUE,
