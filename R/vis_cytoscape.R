@@ -35,9 +35,12 @@ vis_in_cytoscape <- function(node_table, edge_table,
                              export_image = TRUE,
                              save_session = TRUE,
                              close_session = TRUE,
-                             save_name = NULL,
-                             image_opts = list(filename = "network", type = "PNG"),
+                             save_name = "network",
+                             export_format = c("PNG", "JPEG", "PDF", "SVG", "PS"),
+                             image_opts = list(),
                              cyto3.8_check = T) {
+
+  export_format <- match.arg(export_format)
 
   # Check that the input contains the required information on the nodes and edges
   if (!"node" %in% colnames(node_table)) {
@@ -66,8 +69,6 @@ vis_in_cytoscape <- function(node_table, edge_table,
                                  edge_table$target)
 
   # Prepare names for saving the networks and for naming in cytoscape
-  # Get default
-  save_name <- save_name %||% image_opts[["filename"]] %||% "network"
   # store original name for series
   save_name0 <- save_name
   # Check suffix numbers to avoid duplicate names, always checks for both image and cys file
@@ -144,6 +145,7 @@ vis_in_cytoscape <- function(node_table, edge_table,
   # Saving and closing ------------------------------------------------------
   if (export_image) {
     image_opts[["filename"]] <- save_name
+    image_opts[["type"]] <- export_format
     do.call(RCy3::exportImage, image_opts)
   }
   if (save_session) RCy3::saveSession(filename = save_name)
