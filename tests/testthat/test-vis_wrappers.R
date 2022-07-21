@@ -70,7 +70,7 @@ test_that("Igraph visualizations are made for each network in the list", {
               message = "cytoscape visualizations need to be checked manually")
 
   expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
-                                edge_attrs = "all", node_attrs = "all"),
+                                edge_attrs = "all", node_attrs = "all", arrange_co = TRUE),
                NA)
 })
 
