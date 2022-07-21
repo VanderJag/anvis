@@ -229,13 +229,14 @@ test_that("igraph plot saving works in multiple formats", {
 
   node_table <- sort_avg_connectivity(node_table)
 
-  withr::with_file(c("network.png", "network.pdf", "network.svg"), {
+  withr::with_file(c("network.png", "network.pdf", "network.svg", "network.ps"), {
     vis_igraph(edge_table, node_table, radial_labs = T)
     vis_igraph(edge_table, node_table, radial_labs = T, out_format = "svg")
     vis_igraph(edge_table, node_table, radial_labs = T, out_format = "pdf")
+    vis_igraph(edge_table, node_table, radial_labs = T, out_format = "ps")
 
     expect_setequal(list.files(pattern = "network"),
-                 c("network.png", "network.pdf", "network.svg"))
+                 c("network.png", "network.pdf", "network.svg", "network.ps"))
   })
 })
 

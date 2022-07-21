@@ -24,7 +24,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
                        scale_width = 3.25,
                        save_name = "network",
                        out_format = c("png", "print", "pdf", "svg", "jpeg", "tiff",
-                                     "bmp"),
+                                     "bmp", "ps"),
                        save_opts = list(),
                        ...) {
 
@@ -85,7 +85,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
   # Select a graphics device to save output
   if (out_format != "print") {
     save_funcs <- list("png" = png, "pdf" = pdf, "svg" = svg, "jpeg" = jpeg,
-                      "tiff" = tiff, "bmp" = bmp)
+                      "tiff" = tiff, "bmp" = bmp, "ps" = postscript)
     save_dev <- save_funcs[[out_format]]
 
     # The default ('png') creates very low resolution images, fix this
@@ -100,7 +100,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
     save_name <- paste0(save_name, ".", out_format)
     if (out_format %in% c("bmp", "jpeg", "tiff", "png", "svg")) {
       save_opts[["filename"]] <- save_name
-    } else if (out_format == "pdf") {
+    } else if (out_format %in% c("pdf", "ps")) {
       save_opts[["file"]] <- save_name
     }
 
