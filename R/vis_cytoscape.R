@@ -25,7 +25,7 @@
 #'   If both are `NULL`, "network" will be used as default name. If the name
 #'   chosen for `save_name` already exists in the current working directory
 #'   numbers will be appended to it.
-#' @param image_opts List with named values that will be used to customize
+#' @param export_opts List with named values that will be used to customize
 #'   image export. Any argument accepted by [RCy3::exportImage] is valid.
 #' @param cyto3.8_check Logical (default TRUE). Should execution stop if
 #'   Cytoscape version 3.8.x is detected? `FALSE` to skip this test.
@@ -36,11 +36,11 @@ vis_in_cytoscape <- function(node_table, edge_table,
                              save_session = TRUE,
                              close_session = TRUE,
                              save_name = "network",
-                             export_format = c("PNG", "JPEG", "PDF", "SVG", "PS"),
-                             image_opts = list(),
+                             export_type = c("PNG", "JPEG", "PDF", "SVG", "PS"),
+                             export_opts = list(),
                              cyto3.8_check = T) {
 
-  export_format <- match.arg(export_format)
+  export_type <- match.arg(export_type)
 
   # Check that the input contains the required information on the nodes and edges
   if (!"node" %in% colnames(node_table)) {
@@ -73,7 +73,7 @@ vis_in_cytoscape <- function(node_table, edge_table,
   save_name0 <- save_name
   # Check suffix numbers to avoid duplicate names, always checks for both image and cys file
   save_name <- file_pair_seq(save_name,
-                             ext1 = paste0(".", (image_opts[["type"]] %||% "PNG")),
+                             ext1 = paste0(".", (export_opts[["type"]] %||% "PNG")),
                              ext2 = ".cys")
 
   # Set names for labeling network aspects in cytoscape
@@ -102,7 +102,7 @@ vis_in_cytoscape <- function(node_table, edge_table,
     }
   }
 
-
+  RCy3::setNodeLabelColorMapping
   # Create Cytoscape network
   RCy3::createNetworkFromDataFrames(nodes = node_table,
                                     edges = edge_table,
@@ -144,9 +144,9 @@ vis_in_cytoscape <- function(node_table, edge_table,
 
   # Saving and closing ------------------------------------------------------
   if (export_image) {
-    image_opts[["filename"]] <- save_name
-    image_opts[["type"]] <- export_format
-    do.call(RCy3::exportImage, image_opts)
+    export_opts[["filename"]] <- save_name
+    export_opts[["type"]] <- export_type
+    do.call(RCy3::exportImage, export_opts)
   }
   if (save_session) RCy3::saveSession(filename = save_name)
   if (close_session) RCy3::closeSession(save.before.closing = FALSE)

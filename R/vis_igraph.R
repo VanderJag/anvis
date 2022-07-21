@@ -23,12 +23,12 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
                        rad_lab_opts = list(),
                        scale_width = 3.25,
                        save_name = "network",
-                       out_format = c("png", "print", "pdf", "svg", "jpeg", "tiff",
+                       export_type = c("png", "print", "pdf", "svg", "jpeg", "tiff",
                                      "bmp", "ps"),
-                       save_opts = list(),
+                       export_opts = list(),
                        ...) {
 
-  out_format <- match.arg(out_format)
+  export_type <- match.arg(export_type)
 
   # Validate network parameters ---------------------------------------------
 
@@ -83,30 +83,30 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
   # Visualize in igraph -----------------------------------------------------
 
   # Select a graphics device to save output
-  if (out_format != "print") {
+  if (export_type != "print") {
     save_funcs <- list("png" = png, "pdf" = pdf, "svg" = svg, "jpeg" = jpeg,
                       "tiff" = tiff, "bmp" = bmp, "ps" = postscript)
-    save_dev <- save_funcs[[out_format]]
+    save_dev <- save_funcs[[export_type]]
 
     # The default ('png') creates very low resolution images, fix this
-    if (out_format == "png") {
-      save_opts[["res"]] <- save_opts[["res"]] %||% 300
-      save_opts[["width"]] <- save_opts[["width"]] %||% 2400
-      save_opts[["height"]] <- save_opts[["height"]] %||% 2400
+    if (export_type == "png") {
+      export_opts[["res"]] <- export_opts[["res"]] %||% 300
+      export_opts[["width"]] <- export_opts[["width"]] %||% 2400
+      export_opts[["height"]] <- export_opts[["height"]] %||% 2400
     }
 
     # Set the save name
-    save_name <- file_sequence(save_name, paste0(".", out_format))
-    save_name <- paste0(save_name, ".", out_format)
-    if (out_format %in% c("bmp", "jpeg", "tiff", "png", "svg")) {
-      save_opts[["filename"]] <- save_name
-    } else if (out_format %in% c("pdf", "ps")) {
-      save_opts[["file"]] <- save_name
+    save_name <- file_sequence(save_name, paste0(".", export_type))
+    save_name <- paste0(save_name, ".", export_type)
+    if (export_type %in% c("bmp", "jpeg", "tiff", "png", "svg")) {
+      export_opts[["filename"]] <- save_name
+    } else if (export_type %in% c("pdf", "ps")) {
+      export_opts[["file"]] <- save_name
     }
 
     # Start graphics device
     do.call(save_dev,
-            save_opts)
+            export_opts)
   }
 
   # Visualize the basic graph
@@ -158,7 +158,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
   }
 
   # Finish saving
-  if (out_format != "print") {
+  if (export_type != "print") {
     dev.off()
   }
 

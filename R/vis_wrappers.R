@@ -23,6 +23,9 @@
 #'   a visualization with the respective software for the first two options, or
 #'   the appropriate download for the third option. Node widths columns will be
 #'   adjusted to match your chosen output.
+#' @param do_save Logical (default TRUE), should network visualizations be saved?
+#'   If this parameter is FALSE igraph will show a plot in your R session and
+#'   cytoscape will keep the session with all networks open.
 #' @inheritParams adj_matrix_to_network
 #' @return The section on the returned values
 #'
@@ -36,7 +39,24 @@ VisualiseNetwork <- function(adj_mats,
                              width_type = NULL,
                              output_type = c("igraph", "cytoscape", "xgmml"),
                              arrange_co = FALSE,
-                             do_save = T, save_names = NULL) {
+                             do_save = T,
+                             save_names = "network",
+                             export_type = c("png", "jpeg", "pdf", "svg", "ps"),
+                             export_opts = list(),
+                             cyto3.8_check = T
+                             ) {
+  export_type <- match.arg(export_type)
+
+  # igraph options:
+  # igr_radial_labs = T,
+  # igr_rad_lab_opts = list(),
+  # scale_width = 3.25,
+  # save_name = "network",
+  # export_type = c("png", "print", "pdf", "svg", "jpeg", "tiff",
+  #                "bmp"),
+  # igr_save_opts = list(),
+  # igr_plot_opts = list()
+
   # TODO allow user to manually specify group colors
   # TODO add option to scale igraph widths linearly
 
@@ -60,15 +80,19 @@ VisualiseNetwork <- function(adj_mats,
          "You provided: ", class(adj_mats), call. = FALSE)
   }
 
+  # Check number of matrices for later tests
+  n_mats <- length(adj_mats)
+
+
   # Check if grouping vector is list, if not, turn into list
   if (!is.null(group_vec)) {
     if (!is.list(group_vec)) {
       group_vec <- list(group_vec)
     } else {
-      if (!length(group_vec) == length(adj_mats) && !length(group_vec) == 1) {
+      if (!length(group_vec) == n_mats && !length(group_vec) == 1) {
         stop("Grouping vector list must be of equal length as adj_mats, or length 1",
              "\nℹ Length of `group_vec` = ", length(group_vec),
-             ", length of `adj_mats` = ", length(adj_mats), ".", call.=FALSE)
+             ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
 
       }
     }
@@ -81,7 +105,7 @@ VisualiseNetwork <- function(adj_mats,
                              node_attrs = node_attrs,
                              edge_attrs = edge_attrs,
                              group_vec = group_vec[[
-                               if (length(group_vec) == length(adj_mats)) x else 1]],
+                               if (length(group_vec) == n_mats) x else 1]],
                              width_type = width_type,
                              size_type = size_type)})
   nodes <- lapply(seq_along(adj_mats),
@@ -94,16 +118,39 @@ VisualiseNetwork <- function(adj_mats,
     nodes <- sort_avg_connectivity(nodes_list = nodes)
   }
 
+  # Check save names
+  names_match <- length(save_names) == n_mats
+  if (do_save) {
+    if (!(names_match || length(save_names) == 1)) {
+      stop("Length of save names must be 1 or matching with number of matrices: ",
+           "\nℹ Length of `save_names` = ", length(save_names),
+           ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
+    }
+  }
+
   # Choose visualization
   if (output_type == "igraph") {
+    # If plots are not saved show them in the R session
+    if (!do_save) export_type <- "print"
+    # Create igraph plots
     for (i in seq_along(edges)) {
       vis_igraph(edge_table = edges[[i]],
-                 node_table = nodes[[i]])
+                 node_table = nodes[[i]],
+                 save_name = save_names[[if (names_match) i else 1]],
+                 export_type = export_type,
+                 export_opts = export_opts)
     }
   } else if (output_type == "cytoscape") {
+    # If plots are not saved keep igraph session open
     for (i in seq_along(edges)) {
       vis_in_cytoscape(edge_table = edges[[i]],
-                       node_table = nodes[[i]])
+                       node_table = nodes[[i]],
+                       save_name = save_names[[if (names_match) i else 1]],
+                       export_type = export_type,
+                       close_session = !do_save,
+                       export_image = do_save,
+                       export_opts = export_opts,
+                       cyto3.8_check = cyto3.8_check)
     }
   }
 
