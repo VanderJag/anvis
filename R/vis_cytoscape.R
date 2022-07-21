@@ -102,7 +102,6 @@ vis_in_cytoscape <- function(node_table, edge_table,
     }
   }
 
-  RCy3::setNodeLabelColorMapping
   # Create Cytoscape network
   RCy3::createNetworkFromDataFrames(nodes = node_table,
                                     edges = edge_table,
@@ -117,6 +116,28 @@ vis_in_cytoscape <- function(node_table, edge_table,
   vis_props[["edgeline"]] <- RCy3::mapVisualProperty("Edge Line Type", "interaction", "d",
                                       as.vector(unique(edge_table$interaction)),
                                       as.vector(c("Solid")))
+  prep_node_pos <- function(x, y) {
+    sides <- ifelse(x < 0, "C,E,c,", "C,W,c,")
+    nudge <- paste0(0.04*x + 0.001, ",", 0.04*y + 0.001)
+    paste0(sides, nudge)
+  }
+  vis_props[["nodeLabelPosition"]] <- RCy3::mapVisualProperty("NODE LABEL POSITION",
+                                                              "id", "d",
+                                                              node_table$id, #ifelse(node_table$X < 0, "C,E,c,0.00,0.00","C,W,c,0.00,0.00"))
+                                                              prep_node_pos(node_table$X, node_table$Y))
+  # position options
+  # nodeAnchor="C", graphicAnchor="C", justification="c", xOffset=0.0, yOffset=0.0,
+  # nodeAnchor Position on node to place the graphic: NW,N,NE,E,SE,S,SW,W
+  #    or C for center (default)
+  # graphicAnchor Position on graphic to place on node: NW,N,NE,E,SE,S,SW,W
+  #    or C for center (default)
+  # justification Positioning of content within graphic: l,r,c (default)
+  # xOffset Additional offset in the x direction
+  # yOffset Additional offset in the y direction
+  vis_props[["nodeLabelRotation"]] <- RCy3::mapVisualProperty("NODE LABEL ROTATION",
+                                                              "id", "d",
+                                                              node_table$id,
+                                                             radial_angle(node_table$X, node_table$Y))
   # Optional properties
   if ("color" %in% colnames(node_table)) {
     vis_props[["nodecolor"]] <- RCy3::mapVisualProperty("Node Fill Color", "color", "p")

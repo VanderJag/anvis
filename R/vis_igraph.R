@@ -136,12 +136,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
     # Remove the used arguments from list as to pass them twice, prevents error
     rad_lab_opts[c("x","y","labels","adj","cex")] <- NULL
 
-    # create vector of angles for text based on number of nodes
-    # (flipping the orientation of the words half way around so none appear upside down)
-    angle = ifelse(atan(-(x/y))*(180/pi) < 0,
-                   90 + atan(-(x/y))*(180/pi),
-                   270 + atan(-x/y)*(180/pi))
-    # formula from: https://gist.github.com/ajhmohr/5337a5c99b504e4a243fad96203fa74f
+    angle = radial_angle(x, y)
 
     # Create a text function that vectorizes srt argument
     text <- function(...) Map(graphics::text, ...)
