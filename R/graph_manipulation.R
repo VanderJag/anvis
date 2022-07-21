@@ -152,6 +152,22 @@ node_size_connectivity <- function(node_table,
 #'   the connectivity information.
 #' @return Returns the same `nodes_list` as was used as input, with rows reordered.
 sort_avg_connectivity <- function(nodes_list) {
+  # Allow sorting of a single node_table that is not a list
+  if (!inherits(nodes_list, "list")) {
+    if (inherits(nodes_list, "data.frame")) {
+      if (all(c("node", "size") %in% colnames(nodes_list))) {
+        nodes_list <- list(nodes_list)
+      } else {
+        stop("Must provide list of node tables with attributes 'node' and 'size'.",
+             call.=FALSE)
+      }
+    } else {
+      stop("Must provide a list of node tables to calculate average connectivity.",
+           all.=FALSE)
+    }
+  }
+
+
   col_in_colnames <- function(list_item, col) {
     col_names <- colnames(list_item)
     any(stringr::str_detect(col_names, col))
