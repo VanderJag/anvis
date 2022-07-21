@@ -213,3 +213,20 @@ test_that("igraph vis. allows user to overwrite vertex sizes",{
                           vertex.size = rep(c(5,15), each = 18)),
                NA)
 })
+
+
+test_that("igraph plot saving works", {
+  Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
+                                        group_vec = group_vec,
+                                        width_type = "partcor")
+  edge_table <- network_list[["edge_table"]]
+  node_table <- network_list[["node_table"]]
+
+  expect_error(vis_igraph(edge_table, node_table, radial_labs = T),
+               NA)
+})

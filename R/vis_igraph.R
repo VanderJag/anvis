@@ -22,7 +22,13 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
                        radial_labs = T,
                        rad_lab_opts = list(),
                        scale_width = 3.25,
+                       save_name =  NULL,
+                       out_format = c("png", "print", "pdf", "svg", "jpeg", "tiff",
+                                     "bmp"),
+                       save_opts = list(),
                        ...) {
+
+  out_format <- match.arg(out_format)
 
   # Validate network parameters ---------------------------------------------
 
@@ -76,6 +82,24 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
 
   # Visualize in igraph -----------------------------------------------------
 
+  # Select a graphics device to save output
+  if (out_format != "print") {
+    save_func <- list("png" = png, "pdf" = pdf, "svg" = svg, "jpeg" = jpeg,
+                      "tiff" = tiff, "bmp" = bmp)
+    save_dev <- save_func[[out_format]]
+
+    # The default ('png') creates very low resolution images, fix this
+    if (out_format == "png") {
+      save_opts[["res"]] <- save_opts[["res"]] %||% 300
+      save_opts[["width"]] <- save_opts[["width"]] %||% 2400
+      save_opts[["height"]] <- save_opts[["height"]] %||% 2400
+    }
+
+    # Start graphics device
+    do.call(save_dev,
+            save_opts)
+  }
+
   # Visualize the basic graph
   do.call(igraph::plot.igraph,
           c(list(x = graph,
@@ -122,6 +146,11 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
                    srt = angle,
                    xpd = T),
               rad_lab_opts))
+  }
+
+  # Finish saving
+  if (out_format != "print") {
+    dev.off()
   }
 
   invisible(NULL)
