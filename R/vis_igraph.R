@@ -22,7 +22,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
                        radial_labs = T,
                        rad_lab_opts = list(),
                        scale_width = 3.25,
-                       save_name =  NULL,
+                       save_name = "network",
                        out_format = c("png", "print", "pdf", "svg", "jpeg", "tiff",
                                      "bmp"),
                        save_opts = list(),
@@ -84,15 +84,24 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
 
   # Select a graphics device to save output
   if (out_format != "print") {
-    save_func <- list("png" = png, "pdf" = pdf, "svg" = svg, "jpeg" = jpeg,
+    save_funcs <- list("png" = png, "pdf" = pdf, "svg" = svg, "jpeg" = jpeg,
                       "tiff" = tiff, "bmp" = bmp)
-    save_dev <- save_func[[out_format]]
+    save_dev <- save_funcs[[out_format]]
 
     # The default ('png') creates very low resolution images, fix this
     if (out_format == "png") {
       save_opts[["res"]] <- save_opts[["res"]] %||% 300
       save_opts[["width"]] <- save_opts[["width"]] %||% 2400
       save_opts[["height"]] <- save_opts[["height"]] %||% 2400
+    }
+
+    # Set the save name
+    save_name <- file_sequence(save_name, paste0(".", out_format))
+    save_name <- paste0(save_name, ".", out_format)
+    if (out_format %in% c("bmp", "jpeg", "tiff", "png", "svg")) {
+      save_opts[["filename"]] <- save_name
+    } else if (out_format == "pdf") {
+      save_opts[["file"]] <- save_name
     }
 
     # Start graphics device

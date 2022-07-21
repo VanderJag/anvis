@@ -215,7 +215,7 @@ test_that("igraph vis. allows user to overwrite vertex sizes",{
 })
 
 
-test_that("igraph plot saving works", {
+test_that("igraph plot saving works in multiple formats", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
@@ -227,6 +227,79 @@ test_that("igraph plot saving works", {
   edge_table <- network_list[["edge_table"]]
   node_table <- network_list[["node_table"]]
 
-  expect_error(vis_igraph(edge_table, node_table, radial_labs = T),
-               NA)
+  node_table <- sort_avg_connectivity(node_table)
+
+  withr::with_file(c("network.png", "network.pdf", "network.svg"), {
+    vis_igraph(edge_table, node_table, radial_labs = T)
+    vis_igraph(edge_table, node_table, radial_labs = T, out_format = "svg")
+    vis_igraph(edge_table, node_table, radial_labs = T, out_format = "pdf")
+
+    expect_setequal(list.files(pattern = "network"),
+                 c("network.png", "network.pdf", "network.svg"))
+  })
+})
+
+
+test_that("igraph plot saving creates name series", {
+  Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
+                                        group_vec = group_vec,
+                                        width_type = "partcor")
+  edge_table <- network_list[["edge_table"]]
+  node_table <- network_list[["node_table"]]
+
+  withr::with_file(c("network.png", "network_2.png", "network_3.png"), {
+    vis_igraph(edge_table, node_table, radial_labs = T)
+    vis_igraph(edge_table, node_table, radial_labs = T)
+    vis_igraph(edge_table, node_table, radial_labs = T)
+
+    expect_setequal(list.files(pattern = "network"),
+                    c("network.png", "network_2.png", "network_3.png"))
+  })
+})
+
+
+test_that("igraph plot saving works with custom names", {
+  Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
+                                        group_vec = group_vec,
+                                        width_type = "partcor")
+  edge_table <- network_list[["edge_table"]]
+  node_table <- network_list[["node_table"]]
+
+  withr::with_file("my_vis.png", {
+    vis_igraph(edge_table, node_table, radial_labs = T, save_name = "my_vis")
+
+    expect_setequal(list.files(pattern = "my_vis"),
+                    c("my_vis.png"))
+  })
+})
+
+
+test_that("igraph plot print option doesn't save additional files", {
+  Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
+                                        group_vec = group_vec,
+                                        width_type = "partcor")
+  edge_table <- network_list[["edge_table"]]
+  node_table <- network_list[["node_table"]]
+
+  list_files0 <- list.files()
+
+  vis_igraph(edge_table, node_table, radial_labs = T, out_format = "print")
+
+  expect_setequal(list_files0,
+                  list.files)
 })
