@@ -51,10 +51,6 @@ VisualiseNetwork <- function(adj_mats,
   # igr_radial_labs = T,
   # igr_rad_lab_opts = list(),
   # scale_width = 3.25,
-  # save_name = "network",
-  # export_type = c("png", "print", "pdf", "svg", "jpeg", "tiff",
-  #                "bmp"),
-  # igr_save_opts = list(),
   # igr_plot_opts = list()
 
   # TODO allow user to manually specify group colors
