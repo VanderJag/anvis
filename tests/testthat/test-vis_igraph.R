@@ -301,5 +301,5 @@ test_that("igraph plot print option doesn't save additional files", {
   vis_igraph(edge_table, node_table, radial_labs = T, out_format = "print")
 
   expect_setequal(list_files0,
-                  list.files)
+                  list.files())
 })
