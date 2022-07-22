@@ -20,7 +20,8 @@ test_that("basic visualization works",{
   skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
               message = "this test runs only when cytoscape is active")
 
-  expect_error(vis_in_cytoscape(edge_table = edge_table, node_table = node_table, save_session = FALSE),
+  expect_error(vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                                save_session = FALSE),
                NA)
 })
 

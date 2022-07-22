@@ -60,7 +60,11 @@ vis_in_cytoscape <- function(node_table, edge_table,
   }
 
   # Calculate positions for the nodes, also cytoscape need node column called id
-  node_table <- add_node_pos(node_table)
+  def_node_size <- 254
+  if ("size" %in% colnames(node_table)) def_node_size <- max(node_table$size)
+
+  node_table <- add_node_pos(node_table = node_table,
+                             nodesize = def_node_size)
   node_table <- node_table %>% dplyr::rename("id" = "node")
 
   # Cytoscape needs additional columns that indicate how nodes relate
@@ -84,7 +88,7 @@ vis_in_cytoscape <- function(node_table, edge_table,
 
   # Prepare defaults
   defaults <- list(NODE_SHAPE = "Ellipse",
-                   NODE_SIZE = 25.0,
+                   NODE_SIZE = def_node_size,
                    EDGE_TRANSPARENCY = 255,
                    NODE_LABEL_POSITION = "W,E,c,0.00,0.00",
                    NODE_BORDER_PAINT = "#FFFFFF")
@@ -113,8 +117,8 @@ vis_in_cytoscape <- function(node_table, edge_table,
   # Create network properties
   vis_props <- list()
   vis_props[["nodeLabels"]] <- RCy3::mapVisualProperty("Node Label", "id", "p")
-  vis_props[["nodeXlocation"]] <- RCy3::mapVisualProperty("Node X Location", "X", "p")
-  vis_props[["nodeYlocation"]] <- RCy3::mapVisualProperty("Node Y Location", "Y", "p")
+  vis_props[["nodeXlocation"]] <- RCy3::mapVisualProperty("Node X Location", "x", "p")
+  vis_props[["nodeYlocation"]] <- RCy3::mapVisualProperty("Node Y Location", "y", "p")
   vis_props[["edgeline"]] <- RCy3::mapVisualProperty("Edge Line Type", "interaction", "d",
                                       as.vector(unique(edge_table$interaction)),
                                       as.vector(c("Solid")))
@@ -122,11 +126,11 @@ vis_in_cytoscape <- function(node_table, edge_table,
   if (radial_labs) {
     vis_props[["nodeLabelPosition"]] <-
       RCy3::mapVisualProperty("NODE LABEL POSITION", "id", "d", node_table$id,
-                              prep_label_pos(node_table$X, node_table$Y))
+                              prep_label_pos(node_table$x, node_table$y, def_node_size))
 
     vis_props[["nodeLabelRotation"]] <-
       RCy3::mapVisualProperty("NODE LABEL ROTATION", "id", "d", node_table$id,
-                              radial_angle(node_table$X, node_table$Y))
+                              radial_angle(node_table$x, node_table$y))
 
   }
 
@@ -176,11 +180,14 @@ vis_in_cytoscape <- function(node_table, edge_table,
 # justification Positioning of content within graphic: l,r,c (default)
 # xOffset Additional offset in the x direction
 # yOffset Additional offset in the y direction
-prep_label_pos <- function(x, y) {
+prep_label_pos <- function(x, y, nodesize) {
+  # Check fraction of noderadius related to circle radius
+  node_space <- (nodesize/2) / max(x)
+
   # place labels left or right of a node depeding on their postion in the circle
   sides <- ifelse(x < 0, "C,E,c,", "C,W,c,")
   # Create a bit of space to account for varying nodesizes, avoid 0 value
-  nudge <- paste0(0.04*x + 0.001, ",", 0.04*y + 0.001)
+  nudge <- paste0(node_space * x + 0.001, ",", node_space * y + 0.001)
   # create properly formatted string
   paste0(sides, nudge)
 }

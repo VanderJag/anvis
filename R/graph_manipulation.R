@@ -27,28 +27,23 @@ group_nodes <- function(node_table, group_vec) {
 }
 
 
-add_node_pos <- function(node_table, layout = "circle") {
-  X = NULL
-  Y = NULL
-  R = round(nrow(node_table)/10, 0) * (100)
+
+add_node_pos <- function(node_table, nodesize, layout = c("circle"), space_fct = 1.2) {
+
+  layout <- match.arg(layout)
+  n_nodes <- nrow(node_table)
+
+  # Adjust radius to node sizes (this value should be the max nodesize)
+  R <- (n_nodes * (nodesize * space_fct)) / (2 * pi)
 
   if (layout == "circle") {
-    # Calculate position in circle
-    for (i in 0:(nrow(node_table) - 1)) {
-      x = R*cos((i*2*3.14159265359)/(nrow(node_table)))
-      X <- as.vector(append(X, x))
-      y = R*sin((i*2*3.14159265359)/(nrow(node_table)))
-      Y <- as.vector(append(Y, y))
-    }
-  } else {
-    # TODO complete error message
-    stop("Must select valid network layout. ",
-         "\nℹ you selected: ", layout,
-         "\n✖ parameter `layout` must be one of ...", call.=FALSE)
+    # Calculate the postions in a circle for all nodes
+    X <- sapply(0:(n_nodes - 1), function (i) R * cos((i * 2 * pi) / (n_nodes)))
+    Y <- sapply(0:(n_nodes - 1), function (i) R * sin((i * 2 * pi) / (n_nodes)))
   }
 
-  pos <- as.data.frame(cbind(X,Y))
-  node_table <- cbind(node_table, pos)
+  node_table$x <- X
+  node_table$y <- Y
 
   return(node_table)
 }
