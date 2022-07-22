@@ -32,6 +32,7 @@
 #'   Cytoscape version 3.8.x has problems interacting with `RCy3`, first
 #'   visualization may not show.
 vis_in_cytoscape <- function(node_table, edge_table,
+                             radial_labs = TRUE,
                              export_image = TRUE,
                              save_session = TRUE,
                              close_session = TRUE,
@@ -108,6 +109,7 @@ vis_in_cytoscape <- function(node_table, edge_table,
                                     title = Network_name,
                                     collection = Network_Collection,
                                     style.name  =  style_name)
+
   # Create network properties
   vis_props <- list()
   vis_props[["nodeLabels"]] <- RCy3::mapVisualProperty("Node Label", "id", "p")
@@ -116,28 +118,18 @@ vis_in_cytoscape <- function(node_table, edge_table,
   vis_props[["edgeline"]] <- RCy3::mapVisualProperty("Edge Line Type", "interaction", "d",
                                       as.vector(unique(edge_table$interaction)),
                                       as.vector(c("Solid")))
-  prep_node_pos <- function(x, y) {
-    sides <- ifelse(x < 0, "C,E,c,", "C,W,c,")
-    nudge <- paste0(0.04*x + 0.001, ",", 0.04*y + 0.001)
-    paste0(sides, nudge)
+  # Add radial node labels if the option is selected
+  if (radial_labs) {
+    vis_props[["nodeLabelPosition"]] <-
+      RCy3::mapVisualProperty("NODE LABEL POSITION", "id", "d", node_table$id,
+                              prep_label_pos(node_table$X, node_table$Y))
+
+    vis_props[["nodeLabelRotation"]] <-
+      RCy3::mapVisualProperty("NODE LABEL ROTATION", "id", "d", node_table$id,
+                              radial_angle(node_table$X, node_table$Y))
+
   }
-  vis_props[["nodeLabelPosition"]] <- RCy3::mapVisualProperty("NODE LABEL POSITION",
-                                                              "id", "d",
-                                                              node_table$id, #ifelse(node_table$X < 0, "C,E,c,0.00,0.00","C,W,c,0.00,0.00"))
-                                                              prep_node_pos(node_table$X, node_table$Y))
-  # position options
-  # nodeAnchor="C", graphicAnchor="C", justification="c", xOffset=0.0, yOffset=0.0,
-  # nodeAnchor Position on node to place the graphic: NW,N,NE,E,SE,S,SW,W
-  #    or C for center (default)
-  # graphicAnchor Position on graphic to place on node: NW,N,NE,E,SE,S,SW,W
-  #    or C for center (default)
-  # justification Positioning of content within graphic: l,r,c (default)
-  # xOffset Additional offset in the x direction
-  # yOffset Additional offset in the y direction
-  vis_props[["nodeLabelRotation"]] <- RCy3::mapVisualProperty("NODE LABEL ROTATION",
-                                                              "id", "d",
-                                                              node_table$id,
-                                                             radial_angle(node_table$X, node_table$Y))
+
   # Optional properties
   if ("color" %in% colnames(node_table)) {
     vis_props[["nodecolor"]] <- RCy3::mapVisualProperty("Node Fill Color", "color", "p")
@@ -171,4 +163,24 @@ vis_in_cytoscape <- function(node_table, edge_table,
   }
   if (save_session) RCy3::saveSession(filename = save_name)
   if (close_session) RCy3::closeSession(save.before.closing = FALSE)
+}
+
+
+# position options
+# default string would be like: "C,C,c,0.00,0.00"
+# nodeAnchor="C", graphicAnchor="C", justification="c", xOffset=0.0, yOffset=0.0
+# nodeAnchor Position on node to place the graphic: NW,N,NE,E,SE,S,SW,W
+#    or C for center (default)
+# graphicAnchor Position on graphic to place on node: NW,N,NE,E,SE,S,SW,W
+#    or C for center (default)
+# justification Positioning of content within graphic: l,r,c (default)
+# xOffset Additional offset in the x direction
+# yOffset Additional offset in the y direction
+prep_label_pos <- function(x, y) {
+  # place labels left or right of a node depeding on their postion in the circle
+  sides <- ifelse(x < 0, "C,E,c,", "C,W,c,")
+  # Create a bit of space to account for varying nodesizes, avoid 0 value
+  nudge <- paste0(0.04*x + 0.001, ",", 0.04*y + 0.001)
+  # create properly formatted string
+  paste0(sides, nudge)
 }
