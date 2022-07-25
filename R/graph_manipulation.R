@@ -33,6 +33,11 @@ add_node_pos <- function(node_table, nodesize, layout = c("circle"), space_fct =
   layout <- match.arg(layout)
   n_nodes <- nrow(node_table)
 
+  if (!is.numeric(space_fct)) {
+    stop("Must provide numeric for node space scaling:",
+    "\nℹ Class of your `space_fct`: ", class(space_fct), call.=FALSE)
+  }
+
   # Adjust radius to node sizes (this value should be the max nodesize)
   R <- (n_nodes * (nodesize * space_fct)) / (2 * pi)
 
