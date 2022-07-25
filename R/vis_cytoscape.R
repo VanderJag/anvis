@@ -39,6 +39,7 @@ vis_in_cytoscape <- function(node_table, edge_table,
                              save_name = "network",
                              export_type = c("PNG", "JPEG", "PDF", "SVG", "PS"),
                              export_opts = list(),
+                             node_space = 1.2,
                              cyto3.8_check = T) {
 
   export_type <- match.arg(export_type)
@@ -60,11 +61,12 @@ vis_in_cytoscape <- function(node_table, edge_table,
   }
 
   # Calculate positions for the nodes, also cytoscape need node column called id
-  def_node_size <- 254
+  def_node_size <- 25
   if ("size" %in% colnames(node_table)) def_node_size <- max(node_table$size)
 
   node_table <- add_node_pos(node_table = node_table,
-                             nodesize = def_node_size)
+                             nodesize = def_node_size,
+                             space_fct = node_space)
   node_table <- node_table %>% dplyr::rename("id" = "node")
 
   # Cytoscape needs additional columns that indicate how nodes relate
@@ -84,7 +86,11 @@ vis_in_cytoscape <- function(node_table, edge_table,
   # Set names for labeling network aspects in cytoscape
   Network_name = save_name
   Network_Collection = save_name0
-  style_name = "netvis_style"
+  # Having the same style name for multiple networks causes issues with
+  #   visualizations, avoiding this with random digits added to style name,
+  #   since this prevents the need for communication with cytoscape (slow)
+  style_name = paste0("netvis_style", paste0(sample(0:9, 10, replace=TRUE), collapse="" ))
+  paste0("netvis_style", paste0(sample(0:9, 10, replace=TRUE), collapse="" ))
 
   # Prepare defaults
   defaults <- list(NODE_SHAPE = "Ellipse",
@@ -153,7 +159,9 @@ vis_in_cytoscape <- function(node_table, edge_table,
       as.vector(edge_table$sharedname), as.vector(edge_table$color))
   }
   # Set visual style
-  RCy3::createVisualStyle(style_name, defaults, vis_props)
+  RCy3::createVisualStyle(style.name = style_name,
+                          defaults = defaults,
+                          mappings = vis_props)
   RCy3::setVisualStyle(style_name)
   # Fit content into window
   RCy3::fitContent(selected.only = FALSE)
@@ -167,6 +175,7 @@ vis_in_cytoscape <- function(node_table, edge_table,
   }
   if (save_session) RCy3::saveSession(filename = save_name)
   if (close_session) RCy3::closeSession(save.before.closing = FALSE)
+
 }
 
 
