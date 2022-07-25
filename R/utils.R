@@ -23,7 +23,7 @@ file_pair_seq <- function(name_base, ext1, ext2) {
 # Defaults for NULL values
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
-# From gplot package
+# From gplot package, convert color names like midnightblue to hex
 col2hex <- function(cname)
 {
   colMat <- col2rgb(cname)
@@ -32,5 +32,23 @@ col2hex <- function(cname)
     green=colMat[2,]/255,
     blue=colMat[3,]/255
   )
+}
+
+# Check if something is a color
+are_colors <- function(x) {
+  is_color <- sapply(x, function(X) {
+    tryCatch(is.matrix(col2rgb(X)),
+             error = function(e) FALSE)
+  })
+
+  not_colors <- names(is_color)[!is_color]
+
+  if (!all(is_color)) {
+    stop("Must provide valid color names:",
+    "\nℹ The following input could not be interpreted as color: ",
+    paste0(not_colors, collapse = ", "), ".", call.=FALSE)
+  }
+
+  invisible(is_color)
 }
 

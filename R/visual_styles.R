@@ -73,6 +73,9 @@ n_distinct_cols <- function(n, colors = NULL) {
            call.=FALSE)
     }
 
+    # Check if the provided colors are recognized by R
+    are_colors(colors)
+
     # ensure cytoscape can read colors by converting to hex
     colors <- col2hex(colors)
 
