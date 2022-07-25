@@ -37,8 +37,9 @@ VisualiseNetwork <- function(adj_mats,
                              edge_attrs = c("none", "all", "width", "color"),
                              group_vec = NULL,
                              width_type = NULL,
-                             output_type = c("igraph", "cytoscape", "xgmml"),
                              arrange_co = FALSE,
+                             output_type = c("igraph", "cytoscape", "xgmml"),
+                             radial_labs = T,
                              do_save = T,
                              save_names = "network",
                              export_type = c("png", "jpeg", "pdf", "svg", "ps"),
@@ -134,7 +135,8 @@ VisualiseNetwork <- function(adj_mats,
                  node_table = nodes[[i]],
                  save_name = save_names[[if (names_match) i else 1]],
                  export_type = export_type,
-                 export_opts = export_opts)
+                 export_opts = export_opts,
+                 radial_labs = radial_labs)
     }
   } else if (output_type == "cytoscape") {
     # If plots are not saved keep igraph session open
@@ -142,11 +144,13 @@ VisualiseNetwork <- function(adj_mats,
       vis_in_cytoscape(edge_table = edges[[i]],
                        node_table = nodes[[i]],
                        save_name = save_names[[if (names_match) i else 1]],
-                       export_type = export_type,
+                       export_type = export_type %>% stringr::str_to_upper(),
                        close_session = !do_save,
+                       save_session = !do_save,
                        export_image = do_save,
                        export_opts = export_opts,
-                       cyto3.8_check = cyto3.8_check)
+                       cyto3.8_check = cyto3.8_check,
+                       radial_labs = radial_labs)
     }
   }
 
