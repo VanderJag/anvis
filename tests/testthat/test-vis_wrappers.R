@@ -32,7 +32,8 @@ test_that("when cytoscape is available wrapper runs without error", {
               message = "this test runs only when cytoscape is active")
 
   # Visualize the network
-  expect_error(VisualiseNetwork(Mat1, group_vec = group_vec, output_type = "cyto"), NA)
+  expect_error(VisualiseNetwork(Mat1, group_vec = group_vec, output_type = "cyto",
+                                node_attrs = "all", edge_attrs = "all", arrange_co = T), NA)
 })
 
 
@@ -48,17 +49,28 @@ test_that("group vec list and adj mat list are checked for equal size", {
 })
 
 
-# test_that("Cytoscape visualizations are made for each network in the list", {
-#   adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
-#
-#   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-#
-#   # Presence of cytoscape test, not currently working because
-#   cytosc <- RCy3::cytoscapePing() %>% capture_condition()
-#   skip_if(cytosc$message == "You are connected to Cytoscape!\n",
-#           message = "this test runs only when cytoscape is inactive")
-#
-# })
+test_that("Cytoscape visualizations are made for each network in the list", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  # Presence of cytoscape test
+  cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+
+  skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+              message = "this test runs only when cytoscape is active")
+
+  withr::with_file(c("network.png", paste0("network_", 2:12, ".png")), {
+    VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "cyto",
+                     edge_attrs = "all", node_attrs = "all", arrange_co = T,
+                     width_type = "partcor", cyto_save_session = F,
+                     cyto_close_session = T)
+
+    expect_setequal(list.files(pattern = "network"),
+                    c("network.png", paste0("network_", 2:12, ".png")))
+  })
+})
+
 
 test_that("Igraph visualizations are made for each network in the list", {
   adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
@@ -70,7 +82,8 @@ test_that("Igraph visualizations are made for each network in the list", {
               message = "cytoscape visualizations need to be checked manually")
 
   expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
-                                edge_attrs = "all", node_attrs = "all", arrange_co = TRUE),
+                                edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                                width_type = "partcor"),
                NA)
 })
 
