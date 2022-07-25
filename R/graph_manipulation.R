@@ -54,7 +54,7 @@ add_node_pos <- function(node_table, nodesize, layout = c("circle"), space_fct =
 }
 
 
-add_colors <- function(node_table) {
+add_colors <- function(node_table, group_colors) {
   # Group information is required to add group coloring
   if (!"group" %in% colnames(node_table)) {
     stop("Must provide node table with group info:",
@@ -68,7 +68,7 @@ add_colors <- function(node_table) {
   groups <- node_table$group %>% unique()
 
   # same number of colors is required as group count
-  colors <- n_distinct_cols(length(groups))
+  colors <- n_distinct_cols(length(groups), group_colors)
 
   # index which group is assigned to which row
   idx <- match(node_table$group, groups)

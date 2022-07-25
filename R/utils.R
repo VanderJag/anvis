@@ -23,3 +23,14 @@ file_pair_seq <- function(name_base, ext1, ext2) {
 # Defaults for NULL values
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
+# From gplot package
+col2hex <- function(cname)
+{
+  colMat <- col2rgb(cname)
+  rgb(
+    red=colMat[1,]/255,
+    green=colMat[2,]/255,
+    blue=colMat[3,]/255
+  )
+}
+

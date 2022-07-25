@@ -44,6 +44,7 @@ VisualiseNetwork <- function(adj_mats,
                              save_names = "network",
                              export_type = c("png", "jpeg", "pdf", "svg", "ps"),
                              export_opts = list(),
+                             group_colors = NULL,
                              cyto3.8_check = T,
                              igr_rad_lab_opts = list(),
                              igr_plot_opts = list(),
@@ -99,7 +100,8 @@ VisualiseNetwork <- function(adj_mats,
                              group_vec = group_vec[[
                                if (length(group_vec) == n_mats) x else 1]],
                              width_type = width_type,
-                             size_type = size_type)})
+                             size_type = size_type,
+                             group_colors = group_colors)})
   nodes <- lapply(seq_along(adj_mats),
                   function(x) networks[[x]]$node_table)
   edges <- lapply(seq_along(adj_mats),

@@ -98,7 +98,8 @@ adj_matrix_to_network <- function(adj_matrix,
                                   edge_attrs = c("none", "all", "width", "color"),
                                   group_vec = NULL,
                                   size_type = NULL,
-                                  width_type = NULL) {
+                                  width_type = NULL,
+                                  group_colors = NULL) {
 
   # Check which attributes should be added
   node_attrs <- match.arg(node_attrs, several.ok = TRUE)
@@ -131,7 +132,7 @@ adj_matrix_to_network <- function(adj_matrix,
 
   if ((!"none" %in% node_attrs) &
       ("all" %in% node_attrs | "color_group" %in% node_attrs)) {
-    node_table <- add_colors(node_table)
+    node_table <- add_colors(node_table, group_colors = group_colors)
   }
 
 
