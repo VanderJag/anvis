@@ -44,18 +44,13 @@ VisualiseNetwork <- function(adj_mats,
                              save_names = "network",
                              export_type = c("png", "jpeg", "pdf", "svg", "ps"),
                              export_opts = list(),
-                             cyto3.8_check = T
+                             cyto3.8_check = T,
+                             igr_rad_lab_opts = list(),
+                             igr_plot_opts = list(),
+                             cyto_save_session = !do_save,
+                             cyto_close_session = do_save
                              ) {
   export_type <- match.arg(export_type)
-
-  # igraph options:
-  # igr_radial_labs = T,
-  # igr_rad_lab_opts = list(),
-  # scale_width = 3.25,
-  # igr_plot_opts = list()
-
-  # TODO allow user to manually specify group colors
-  # TODO add option to scale igraph widths linearly
 
   # Check which visualization should be used, allow abbreviations
   output_type <- match.arg(output_type)
@@ -136,7 +131,9 @@ VisualiseNetwork <- function(adj_mats,
                  save_name = save_names[[if (names_match) i else 1]],
                  export_type = export_type,
                  export_opts = export_opts,
-                 radial_labs = radial_labs)
+                 radial_labs = radial_labs,
+                 rad_lab_opts = igr_rad_lab_opts,
+                 ... = igr_plot_opts)
     }
   } else if (output_type == "cytoscape") {
     # If plots are not saved keep igraph session open
@@ -145,8 +142,8 @@ VisualiseNetwork <- function(adj_mats,
                        node_table = nodes[[i]],
                        save_name = save_names[[if (names_match) i else 1]],
                        export_type = export_type %>% stringr::str_to_upper(),
-                       close_session = !do_save,
-                       save_session = !do_save,
+                       close_session = cyto_close_session,
+                       save_session = cyto_save_session,
                        export_image = do_save,
                        export_opts = export_opts,
                        cyto3.8_check = cyto3.8_check,
