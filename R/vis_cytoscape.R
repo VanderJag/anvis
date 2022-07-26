@@ -39,6 +39,7 @@ vis_in_cytoscape <- function(node_table, edge_table,
                              save_name = "network",
                              export_type = c("PNG", "JPEG", "PDF", "SVG", "PS"),
                              export_opts = list(),
+                             scale_width = 1,
                              node_space = 1.2,
                              cyto3.8_check = T) {
 
@@ -74,6 +75,11 @@ vis_in_cytoscape <- function(node_table, edge_table,
   edge_table$sharedname <- paste(edge_table$source,
                                  "(interacts)",
                                  edge_table$target)
+
+  # Rescaling of node widths
+  if ("width" %in% colnames(edge_table)) {
+    edge_table$width <- edge_table$width * scale_width
+  }
 
   # Prepare names for saving the networks and for naming in cytoscape
   # store original name for series
