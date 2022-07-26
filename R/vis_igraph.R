@@ -1,20 +1,18 @@
-#' Visualize with igraph
+#' This function visualizes the network using igraph
 #'
 #' More extensive description of what the function does
 #'
-#' When all three network input parameters are provided, `edge_table` and
-#' `node_table` will be used instead of `igraph_obj`.
-#' Used defaults in the for vertex and label styling, but these can be overwritten
-#'   by providing arguments for igraph plot style, i.e. arguments starting
-#'   with the "vertex." or "label.". See igraph plotting docs.
+#' `node_table` and `edge_table` is used for visualising in igraph if all three input parameters (including `igraph_obj`) are provided.
+#'  Vertex and Label styling arguments can be provided for igraph plot style (See igraph plotting docs: $link). 
+#'  Default values are used in the absence of the arguments.
 #'
-#' @param radial_labs A logical to indicate whether vertex labels should be
-#'   positioned radially around the circular arrangement of vertices.
-#' @param rad_lab_opts A names list, in which the names are valid arguments for
+#' @param radial_labs A logical argument. `TRUE` indicates the vertex labels will be
+#'   positioned radially around the circular arrangement of the vertices.
+#' @param rad_lab_opts A list of names, in which the names are valid arguments for
 #'   `text()`.
 #' @param ... Additional options to be used with `igraph::plot.igraph` for
-#'   visualizing your network. Any options provided here will overwrite the
-#'   defaults. If `radial_labs` is `FALSE`, this argument can also be used to
+#'   visualizing your network. 
+#'   The argument `radial_labs` as `FALSE` can also be used to
 #'   customize the vertex labels placed by `plot.igraph`.
 #' @return The section on the returned values
 vis_igraph <- function(edge_table = NULL, node_table = NULL,
@@ -134,14 +132,13 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
 #' instead of the default found in the graph.
 #'
 #' @param graph Igraph object.
-#' @param plot_params Names list with the graphical parameters supplied by the
+#' @param plot_params list of names with the graphical parameters supplied by the
 #'   user.
-#' @param plot_arg Character string. Will be used to modify visualization with
+#' @param plot_arg Character string. Is used to modify the visualization with
 #'   `igraph::plot.igraph`.
-#' @param name_in_df Character string. Some attributes are called different in the
-#'   context of plotting vs in the object they are stored in (e.g. vertex.label
-#'   vs name, respectively)
-#' @return A vector of values that will be used for one of the arguments of
+#' @param name_in_df Character string. Consists of of charachters labeling the attributes associated with the parameters being plotted
+#'    as igraph may recognise those attributes under different label names.
+#' @return A vector of values that is used for one of the arguments of
 #'   `igraph::plot.igraph`. When the attribute is not in
 get_param <- function(graph, plot_params, plot_arg, name_in_df = NULL) {
   # Prepare a vector that contains the attributes present in the data
