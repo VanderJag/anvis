@@ -127,7 +127,7 @@ test_that("user supplied colors are used", {
 
   test_call <- deparse(sys.calls()[[1]][1])
   skip_if_not(test_call == "test_that()",
-              message = "cytoscape visualizations need to be checked manually")
+              message = "igraph visualizations need to be checked manually")
 
   colors0 <- c("midnightblue", "black", "red", "#b99055")
 
@@ -140,6 +140,31 @@ test_that("user supplied colors are used", {
   expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                                 edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
                                 width_type = "partcor", do_save = F, group_colors = colors0),
+               NA)
+})
+
+
+test_that("edge widths can be scaled", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:2]
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  test_call <- deparse(sys.calls()[[1]][1])
+  skip_if_not(test_call == "test_that()",
+              message = "igraph visualizations need to be checked manually")
+  # Check if cytoscape is active
+  cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+  skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+              message = "this test runs only when cytoscape is active")
+
+
+  expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                                edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                                width_type = "partcor", do_save = F, edge_factor = 12),
+               NA)
+  expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "cytoscape",
+                                edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                                width_type = "partcor", do_save = F, edge_factor = 6),
                NA)
 })
 

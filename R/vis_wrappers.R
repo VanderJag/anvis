@@ -44,17 +44,25 @@ VisualiseNetwork <- function(adj_mats,
                              save_names = "network",
                              export_type = c("png", "jpeg", "pdf", "svg", "ps"),
                              export_opts = list(),
+                             edge_factor = NULL,
                              group_colors = NULL,
                              cyto3.8_check = T,
                              igr_rad_lab_opts = list(),
                              igr_plot_opts = list(),
-                             cyto_save_session = !do_save,
+                             cyto_save_session = FALSE,
                              cyto_close_session = do_save
                              ) {
+  # TODO add to documenation:
+  # what are the defaults for edge factor
+
   export_type <- match.arg(export_type)
 
   # Check which visualization should be used, allow abbreviations
   output_type <- match.arg(output_type)
+
+  # Set default for edge width scaling factor
+  if (output_type == "igraph") edge_factor <- edge_factor %||% 3.25
+  if (output_type == "cytoscape") edge_factor <- edge_factor %||% 2
 
   # Get size type from output type
   if (output_type %in% c("igraph", "cytoscape")) {
@@ -134,6 +142,7 @@ VisualiseNetwork <- function(adj_mats,
                  export_type = export_type,
                  export_opts = export_opts,
                  radial_labs = radial_labs,
+                 scale_width = edge_factor,
                  rad_lab_opts = igr_rad_lab_opts,
                  ... = igr_plot_opts)
     }
@@ -148,6 +157,7 @@ VisualiseNetwork <- function(adj_mats,
                        save_session = cyto_save_session,
                        export_image = do_save,
                        export_opts = export_opts,
+                       scale_width = edge_factor,
                        cyto3.8_check = cyto3.8_check,
                        radial_labs = radial_labs)
     }
