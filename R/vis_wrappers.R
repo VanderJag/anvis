@@ -55,6 +55,7 @@ VisualiseNetwork <- function(adj_mats,
                              ) {
   # TODO add to documenation:
   # what are the defaults for edge factor
+  # width type can be length 1 or same as n matrices
 
   export_type <- match.arg(export_type)
 
@@ -100,6 +101,12 @@ VisualiseNetwork <- function(adj_mats,
     }
   }
 
+  if (!(length(width_type) == n_mats || length(width_type) == 1)) {
+    stop("Length of width type must be 1 or matching with number of matrices: ",
+         "\nℹ Length of `width_type` = ", length(width_type),
+         ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
+  }
+
   # Convert all adjacency matrices into edge and node tables
   networks <- lapply(seq_along(adj_mats),
      function(x) {
@@ -108,7 +115,8 @@ VisualiseNetwork <- function(adj_mats,
                              edge_attrs = edge_attrs,
                              group_vec = group_vec[[
                                if (length(group_vec) == n_mats) x else 1]],
-                             width_type = width_type,
+                             width_type = width_type[[
+                               if (length(width_type) == n_mats) x else 1]],
                              size_type = size_type,
                              group_colors = group_colors)})
   nodes <- lapply(seq_along(adj_mats),
@@ -130,6 +138,7 @@ VisualiseNetwork <- function(adj_mats,
            ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
     }
   }
+
 
   # Choose visualization
   if (output_type == "igraph") {
