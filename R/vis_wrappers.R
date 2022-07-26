@@ -50,7 +50,8 @@ VisualiseNetwork <- function(adj_mats,
                              igr_rad_lab_opts = list(),
                              igr_plot_opts = list(),
                              cyto_save_session = FALSE,
-                             cyto_close_session = do_save
+                             cyto_close_session = do_save,
+                             cyto_node_space = 1.2
                              ) {
   # TODO add to documenation:
   # what are the defaults for edge factor
@@ -159,7 +160,8 @@ VisualiseNetwork <- function(adj_mats,
                        export_opts = export_opts,
                        scale_width = edge_factor,
                        cyto3.8_check = cyto3.8_check,
-                       radial_labs = radial_labs)
+                       radial_labs = radial_labs,
+                       node_space = cyto_node_space)
     }
   }
 
