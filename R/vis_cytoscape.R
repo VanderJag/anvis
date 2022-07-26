@@ -92,10 +92,6 @@ vis_in_cytoscape <- function(node_table, edge_table,
   # Set names for labeling network aspects in cytoscape
   Network_name = save_name
   Network_Collection = save_name0
-  # Having the same style name for multiple networks causes issues with
-  #   visualizations, avoiding this with random digits added to style name,
-  #   since this prevents the need for communication with cytoscape (slow)
-  style_name = paste0("netvis_style", paste0(sample(0:9, 10, replace=TRUE), collapse="" ))
 
   # Prepare defaults
   defaults <- list(NODE_SHAPE = "Ellipse",
@@ -116,6 +112,22 @@ vis_in_cytoscape <- function(node_table, edge_table,
            "\n✖ Cytoscape versions 3.8.x fail to make the first visualization.",
            call.=FALSE)
     }
+  }
+
+  # Having the same style name for multiple networks causes issues with
+  #   visualizations, avoiding this by checking which visual styles already exist
+  prev_styles <- RCy3::getVisualStyleNames() %>%
+    stringr::str_subset("^netvis_style")
+
+  if (length(prev_styles) == 0) {
+    style_name <- "netvis_style_1"
+  } else {
+    # add one to the highest number found in the styles
+    style_i <- prev_styles %>%
+      stringr::str_extract(pattern = "\\d+") %>%
+      as.numeric() %>%
+      max() + 1
+    style_name <- paste0("netvis_style_", style_i)
   }
 
   # Create Cytoscape network
