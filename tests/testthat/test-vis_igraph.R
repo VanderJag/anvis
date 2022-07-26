@@ -40,7 +40,7 @@ test_that("igraph basic visualization runs without error",{
   edge_table <- network_list[["edge_table"]]
   node_table <- network_list[["node_table"]]
 
-  expect_error(vis_igraph(edge_table, node_table, radial_labs = T),
+  expect_error(vis_igraph(edge_table, node_table, radial_labs = T, export_type = "print"),
                NA)
 })
 
@@ -62,7 +62,7 @@ test_that("igraph scales widths", {
               message = "igraph visualizations need to be checked manually")
 
   expect_error(vis_igraph(edge_table, node_table, radial_labs = T, scale_width = 5,
-                          radial_labs_opts = list()),
+                          radial_labs_opts = list(), export_type = "print"),
                NA)
 })
 
@@ -83,7 +83,7 @@ test_that("igraph visualizates with additional parameters",{
   skip_if_not(test_call == "test_that()",
               message = "igraph visualizations need to be checked manually")
 
-  expect_error(vis_igraph(edge_table, node_table, radial_labs = F,
+  expect_error(vis_igraph(edge_table, node_table, radial_labs = F, export_type = "print",
                           vertex.color = c(rep("black", 18), rep("yellow", 18)),
                           vertex.label.cex = 1.2,
                           vertex.label.color = "darkgreen",
@@ -111,11 +111,12 @@ test_that("igraph vis. leaves visual styling out when it is not an attribute",{
               message = "igraph visualizations need to be checked manually")
 
   expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
-                          radial_labs_opts = list(cex = 0.8)),
+                          radial_labs_opts = list(cex = 0.8), export_type = "print"),
                NA)
   node_table <- node_table %>% dplyr::select(!color)
   expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
-                          radial_labs_opts = list(cex = 0.8)),
+                          radial_labs_opts = list(cex = 0.8),
+                          export_type = "print"),
                NA)
 })
 
@@ -137,9 +138,9 @@ test_that("igraph vis. doesn't complain when overwriting args. for text()",{
               message = "igraph visualizations need to be checked manually")
 
   expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
-                          rad_lab_opts = list(x = 0, y = 0)),
+                          rad_lab_opts = list(x = 0, y = 0), export_type = "print"),
                NA)
-  expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
+  expect_error(vis_igraph(edge_table, node_table, radial_labs = T, export_type = "print",
                           rad_lab_opts = list(labels = "test", cex = 4, adj = 1, srt = 45)),
                NA)
 })
@@ -162,7 +163,7 @@ test_that("igraph vis. shows vertex sizes",{
   skip_if_not(test_call == "test_that()",
               message = "igraph visualizations need to be checked manually")
 
-  expect_error(vis_igraph(edge_table, node_table, radial_labs = T),
+  expect_error(vis_igraph(edge_table, node_table, radial_labs = T, export_type = "print"),
                NA)
 })
 
@@ -187,7 +188,7 @@ test_that("igraph vis. shows no vertex sizes when its not in node table",{
   node_table <- node_table %>%
     dplyr::select(-size)
 
-  expect_error(vis_igraph(edge_table, node_table, radial_labs = T),
+  expect_error(vis_igraph(edge_table, node_table, radial_labs = T, export_type = "print"),
                NA)
 })
 
@@ -210,7 +211,7 @@ test_that("igraph vis. allows user to overwrite vertex sizes",{
               message = "igraph visualizations need to be checked manually")
 
   expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
-                          vertex.size = rep(c(5,15), each = 18)),
+                          vertex.size = rep(c(5,15), each = 18), export_type = "print"),
                NA)
 })
 
@@ -231,9 +232,9 @@ test_that("igraph plot saving works in multiple formats", {
 
   withr::with_file(c("network.png", "network.pdf", "network.svg", "network.ps"), {
     vis_igraph(edge_table, node_table, radial_labs = T)
-    vis_igraph(edge_table, node_table, radial_labs = T, out_format = "svg")
-    vis_igraph(edge_table, node_table, radial_labs = T, out_format = "pdf")
-    vis_igraph(edge_table, node_table, radial_labs = T, out_format = "ps")
+    vis_igraph(edge_table, node_table, radial_labs = T, export_type = "svg")
+    vis_igraph(edge_table, node_table, radial_labs = T, export_type = "pdf")
+    vis_igraph(edge_table, node_table, radial_labs = T, export_type = "ps")
 
     expect_setequal(list.files(pattern = "network"),
                  c("network.png", "network.pdf", "network.svg", "network.ps"))
@@ -299,7 +300,7 @@ test_that("igraph plot print option doesn't save additional files", {
 
   list_files0 <- list.files()
 
-  vis_igraph(edge_table, node_table, radial_labs = T, out_format = "print")
+  vis_igraph(edge_table, node_table, radial_labs = T, export_type = "print")
 
   expect_setequal(list_files0,
                   list.files())

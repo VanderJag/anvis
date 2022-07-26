@@ -96,7 +96,6 @@ vis_in_cytoscape <- function(node_table, edge_table,
   #   visualizations, avoiding this with random digits added to style name,
   #   since this prevents the need for communication with cytoscape (slow)
   style_name = paste0("netvis_style", paste0(sample(0:9, 10, replace=TRUE), collapse="" ))
-  paste0("netvis_style", paste0(sample(0:9, 10, replace=TRUE), collapse="" ))
 
   # Prepare defaults
   defaults <- list(NODE_SHAPE = "Ellipse",

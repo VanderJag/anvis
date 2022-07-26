@@ -17,8 +17,8 @@ test_that("color selection gives correct number of colors", {
   expect_equal(n_distinct_cols(14) %>% length(), 14)
   expect_equal(n_distinct_cols(24) %>% length(), 24)
   expect_equal(n_distinct_cols(51) %>% length(), 51)
-  expect_equal(n_distinct_cols(1, c("a", "b", "c")) %>% length(), 1)
-  expect_equal(n_distinct_cols(51, c("a", "b", "c")) %>% length(), 51)
+  expect_equal(n_distinct_cols(1, c("green", "red", "blue")) %>% length(), 1)
+  expect_equal(n_distinct_cols(51, c("green", "red", "blue")) %>% length(), 51)
 })
 
 test_that("color selection with custom colors fails when those are not character", {

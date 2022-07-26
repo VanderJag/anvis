@@ -177,5 +177,6 @@ VisualiseNetwork <- function(adj_mats,
   }
 
   Network = list(adjacencies = adj_mats, nodes = nodes, edges = edges)
-  return(Network)
+
+  return(invisible(Network))
 }

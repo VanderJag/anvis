@@ -50,7 +50,7 @@ test_that("group vec list and adj mat list are checked for equal size", {
 
 
 test_that("Cytoscape visualizations are made for each network in the list", {
-  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
 
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
@@ -60,14 +60,14 @@ test_that("Cytoscape visualizations are made for each network in the list", {
   skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
               message = "this test runs only when cytoscape is active")
 
-  withr::with_file(c("network.png", paste0("network_", 2:12, ".png")), {
+  withr::with_file(c("network.png", paste0("network_", 2:3, ".png")), {
     VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "cyto",
                      edge_attrs = "all", node_attrs = "all", arrange_co = T,
                      width_type = "partcor", cyto_save_session = F,
-                     cyto_close_session = T)
+                     cyto_close_session = T, do_save = T)
 
     expect_setequal(list.files(pattern = "network"),
-                    c("network.png", paste0("network_", 2:12, ".png")))
+                    c("network.png", paste0("network_", 2:3, ".png")))
   })
 })
 
