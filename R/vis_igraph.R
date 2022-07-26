@@ -83,31 +83,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
   # Visualize in igraph -----------------------------------------------------
 
   # Select a graphics device to save output
-  if (export_type != "print") {
-    save_funcs <- list("png" = png, "pdf" = pdf, "svg" = svg, "jpeg" = jpeg,
-                      "tiff" = tiff, "bmp" = bmp, "ps" = postscript)
-    save_dev <- save_funcs[[export_type]]
-
-    # The default ('png') creates very low resolution images, fix this
-    if (export_type == "png") {
-      export_opts[["res"]] <- export_opts[["res"]] %||% 300
-      export_opts[["width"]] <- export_opts[["width"]] %||% 2400
-      export_opts[["height"]] <- export_opts[["height"]] %||% 2400
-    }
-
-    # Set the save name
-    save_name <- file_sequence(save_name, paste0(".", export_type))
-    save_name <- paste0(save_name, ".", export_type)
-    if (export_type %in% c("bmp", "jpeg", "tiff", "png", "svg")) {
-      export_opts[["filename"]] <- save_name
-    } else if (export_type %in% c("pdf", "ps")) {
-      export_opts[["file"]] <- save_name
-    }
-
-    # Start graphics device
-    do.call(save_dev,
-            export_opts)
-  }
+  start_saving(export_type, export_opts, save_name)
 
   # Visualize the basic graph
   do.call(igraph::plot.igraph,
@@ -202,4 +178,35 @@ get_param <- function(graph, plot_params, plot_arg, name_in_df = NULL) {
       NULL
     }
   }
+}
+
+
+start_saving <- function(export_type, export_opts, save_name) {
+  if (export_type != "print") {
+    save_funcs <- list("png" = png, "pdf" = pdf, "svg" = svg, "jpeg" = jpeg,
+                       "tiff" = tiff, "bmp" = bmp, "ps" = postscript)
+    save_dev <- save_funcs[[export_type]]
+
+    # The default ('png') creates very low resolution images, fix this
+    if (export_type == "png") {
+      export_opts[["res"]] <- export_opts[["res"]] %||% 300
+      export_opts[["width"]] <- export_opts[["width"]] %||% 2400
+      export_opts[["height"]] <- export_opts[["height"]] %||% 2400
+    }
+
+    # Set the save name
+    save_name <- file_sequence(save_name, paste0(".", export_type))
+    save_name <- paste0(save_name, ".", export_type)
+    if (export_type %in% c("bmp", "jpeg", "tiff", "png", "svg")) {
+      export_opts[["filename"]] <- save_name
+    } else if (export_type %in% c("pdf", "ps")) {
+      export_opts[["file"]] <- save_name
+    }
+
+    # Start graphics device
+    do.call(save_dev,
+            export_opts)
+
+  }
+  invisible(NULL)
 }

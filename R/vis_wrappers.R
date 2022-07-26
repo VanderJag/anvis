@@ -49,6 +49,7 @@ VisualiseNetwork <- function(adj_mats,
                              cyto3.8_check = T,
                              igr_rad_lab_opts = list(),
                              igr_plot_opts = list(),
+                             igr_grid = FALSE,
                              cyto_save_session = FALSE,
                              cyto_close_session = do_save,
                              cyto_node_space = 1.2
@@ -56,6 +57,7 @@ VisualiseNetwork <- function(adj_mats,
   # TODO add to documenation:
   # what are the defaults for edge factor
   # width type can be length 1 or same as n matrices
+  # igr_grid, can be T, F, or a vector of two integers
 
   export_type <- match.arg(export_type)
 
@@ -144,10 +146,39 @@ VisualiseNetwork <- function(adj_mats,
 
   # Choose visualization
   if (output_type == "igraph") {
-    # If plots are not saved show them in the R session
-    if (!do_save) export_type <- "print"
+
+    if (!(isTRUE(igr_grid) || isFALSE(igr_grid))) {
+      if (!(length(igr_grid) == 2 && is.numeric(igr_grid))) {
+        stop("`igr_grid` must be TRUE, FALSE, or a vector of two integers. ",
+             call. = FALSE)
+      } else {
+        user_dims <- as.integer(igr_grid)
+        igr_grid <- TRUE
+        if ((user_dims[1] * user_dims[2]) < n_mats) {
+          stop("Product of plotting grid dimensions must exceed or equal number of networks:",
+          "\nℹ Number of networks: ", n_mats,
+          "\n✖ Provided grid dimensions: ", user_dims %>% paste(collapse = " "), call.=FALSE)
+        }
+      }
+    } else {
+      user_dims <- NULL
+    }
+
+
+    # Start graphics device for multiple plots in grid situation
+    if (igr_grid) {
+      if (do_save) start_saving(export_type, export_opts, save_names[[1]])
+      # Allow that plots can be arranged in grid
+      par(mfrow= user_dims %||% n2mfrow(n_mats))
+    }
+
+    # If plots are not saved show them in the R session, to arrange on grid
+    #   also print first
+    if (!(do_save) || (do_save && igr_grid)) export_type <- "print"
+
     # Create igraph plots
-    for (i in seq_along(edges)) {
+    for (i in 1:n_mats) {
+      # When placing in grid only save when maknig the last plot
       vis_igraph(edge_table = edges[[i]],
                  node_table = nodes[[i]],
                  save_name = save_names[[if (names_match) i else 1]],
@@ -158,6 +189,12 @@ VisualiseNetwork <- function(adj_mats,
                  rad_lab_opts = igr_rad_lab_opts,
                  ... = igr_plot_opts)
     }
+
+    if (igr_grid) {
+      if (do_save) dev.off()
+      par(mfrow=c(1,1)) # Reset if this has been changed
+    }
+
   } else if (output_type == "cytoscape") {
     # If plots are not saved keep igraph session open
     for (i in seq_along(edges)) {

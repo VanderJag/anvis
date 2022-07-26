@@ -227,3 +227,70 @@ test_that("width types can be provided as vector", {
                NA)
 })
 
+
+test_that("igraph can arrange visualizations in grid", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  test_call <- deparse(sys.calls()[[1]][1])
+  skip_if_not(test_call == "test_that()",
+              message = "igraph visualizations need to be checked manually")
+
+  expect_error(
+      VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                       edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                       width_type = "partcor", do_save = T, igr_grid = T), NA)
+  # expect_error({
+  #   for (i in seq_along(adj_mats)) {
+  #     VisualiseNetwork(adj_mats[1:i], group_vec = group_vec, output_type = "igraph",
+  #                      edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+  #                      width_type = "partcor", do_save = T, igr_grid = T)}
+  # }, NA)
+})
+
+
+test_that("igraph grid can be specified manually", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  test_call <- deparse(sys.calls()[[1]][1])
+  skip_if_not(test_call == "test_that()",
+              message = "igraph visualizations need to be checked manually")
+
+  expect_error(
+      VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                       edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                       width_type = "partcor", do_save = T, igr_grid = c(2,6),
+                       export_opts = list(width = 7000, height = 2600)), NA)
+})
+
+
+test_that("errors occur for incorrect grid igr_grid input", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  expect_error(
+      VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                       edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                       width_type = "partcor", do_save = T, igr_grid = c(2,6,3),
+                       export_opts = list(width = 7000, height = 2600)),
+      "TRUE, FALSE, or a vector of two integers")
+
+  expect_error(
+    VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                     edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                     width_type = "partcor", do_save = T, igr_grid = NULL,
+                     export_opts = list(width = 7000, height = 2600)),
+    "TRUE, FALSE, or a vector of two integers")
+
+  expect_error(
+    VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                     edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                     width_type = "partcor", do_save = T, igr_grid = c(2,2),
+                     export_opts = list(width = 7000, height = 2600)),
+    "grid dimensions must exceed or equal number of networks")
+})
+
