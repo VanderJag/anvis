@@ -88,8 +88,7 @@ test_that("Igraph visualizations are made for each network in the list", {
 })
 
 
-# test the grouping vector of length 1 and some as data
-test_that("grouping vector of lenght 1 or same as data works", {
+test_that("grouping vector of length 1 or same as data works", {
   adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
 
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
@@ -117,6 +116,17 @@ test_that("grouping vector of lenght 1 or same as data works", {
                         networks$nodes[[x]][tmp_idx,]$group}),
                       grouping_list)
 
+})
+
+
+test_that("grouping vector as list of length 1 works", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:2]
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+  group_vec <- list(group_vec)
+
+  expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "xgmml",
+                               edge_attrs = "all", node_attrs = "all", do_save = F), NA)
 })
 
 

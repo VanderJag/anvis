@@ -40,7 +40,7 @@ VisualiseNetwork <- function(adj_mats,
                              arrange_co = FALSE,
                              output_type = c("igraph", "cytoscape", "xgmml"),
                              radial_labs = T,
-                             do_save = T,
+                             do_save = FALSE,
                              save_names = "network",
                              export_type = c("png", "jpeg", "pdf", "svg", "ps"),
                              export_opts = list(),
@@ -101,10 +101,12 @@ VisualiseNetwork <- function(adj_mats,
     }
   }
 
-  if (!(length(width_type) == n_mats || length(width_type) == 1)) {
-    stop("Length of width type must be 1 or matching with number of matrices: ",
-         "\nℹ Length of `width_type` = ", length(width_type),
-         ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
+  if (!is.null(width_type)){
+    if (!(length(width_type) == n_mats || length(width_type) == 1)) {
+      stop("Length of width type must be 1 or matching with number of matrices: ",
+           "\nℹ Length of `width_type` = ", length(width_type),
+           ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
+    }
   }
 
   # Convert all adjacency matrices into edge and node tables
