@@ -26,7 +26,9 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
                        export_type = c("png", "print", "pdf", "svg", "jpeg", "tiff",
                                      "bmp", "ps"),
                        export_opts = list(),
+                       par_opts = list(),
                        ...) {
+  # TODO add to documentation how par is used with the graphical devices and reset afterwards
 
   export_type <- match.arg(export_type)
 
@@ -85,6 +87,9 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
   # Select a graphics device to save output
   start_saving(export_type, export_opts, save_name)
 
+  # Change graphical parameters here, so they will affect the newly active device
+  old_par <- do.call(par, par_opts)
+
   # Visualize the basic graph
   do.call(igraph::plot.igraph,
           c(list(x = graph,
@@ -127,6 +132,9 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
                    xpd = T),
               rad_lab_opts))
   }
+
+  # reset graphical parameters to original option
+  par(old_par)
 
   # Finish saving
   if (export_type != "print") {

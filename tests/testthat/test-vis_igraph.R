@@ -305,3 +305,29 @@ test_that("igraph plot print option doesn't save additional files", {
   expect_setequal(list_files0,
                   list.files())
 })
+
+
+test_that("igraph vis. saves plots with changed margins",{
+  Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  network_list <- adj_matrix_to_network(Mat1,
+                                        node_attrs = "all",
+                                        edge_attrs = "all",
+                                        group_vec = group_vec,
+                                        size_type = "igraph",
+                                        width_type = "partcor")
+  edge_table <- network_list[["edge_table"]]
+  node_table <- network_list[["node_table"]]
+
+  test_call <- deparse(sys.calls()[[1]][1])
+  skip_if_not(test_call == "test_that()",
+              message = "igraph visualizations need to be checked manually")
+
+  expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
+                          export_type = "png", par_opts = list(mar=c(1,1,1,1))),
+               NA)
+  expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
+                          export_type = "png", par_opts = list(mar=c(6,6,6,6))),
+               NA)
+})
