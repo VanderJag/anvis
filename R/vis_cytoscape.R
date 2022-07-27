@@ -165,6 +165,16 @@ vis_in_cytoscape <- function(node_table, edge_table,
     vis_props[["nodesize"]] <- RCy3::mapVisualProperty("Node Size", "size", "p")
   }
   if (any(c("width", "weight") %in% colnames(edge_table))) {
+    # Weights might be outside the desired range for edge widths
+    if (is.null(edge_table[["width"]])) {
+      max_weight <- max(abs(edge_table$weight))
+      if (max_weight > 5) {
+        warning("Detected high values for the edge weights. Since these are used ",
+                "for edge width they can make visualizations unclear. The issue can be",
+                " avoided by using scaled edge widths.")
+      }
+    }
+
     vis_props[["edgewidth"]] <- RCy3::mapVisualProperty(
       "Edge Width", "shared name", "d",
       as.vector(edge_table$sharedname),
