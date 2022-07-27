@@ -186,6 +186,9 @@ vis_in_cytoscape <- function(node_table, edge_table,
 
   # Saving and closing ------------------------------------------------------
   if (export_image) {
+    if (!is.null(export_opts[["filename"]])) {
+      warning('`export_opts[["filename"]` will be overwritten by `save_name`.')
+    }
     export_opts[["filename"]] <- save_name
     export_opts[["type"]] <- export_type
     do.call(RCy3::exportImage, export_opts)
