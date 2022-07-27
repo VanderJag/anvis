@@ -263,7 +263,7 @@ test_that("igraph grid can be specified manually", {
       VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                        edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
                        width_type = "partcor", do_save = T, igr_grid = c(2,6),
-                       export_opts = list(width = 7000, height = 2600)), NA)
+                       export_opts = list(width = 8200, height = 2600)), NA)
 })
 
 
