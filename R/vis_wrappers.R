@@ -50,6 +50,7 @@ VisualiseNetwork <- function(adj_mats,
                              igr_rad_lab_opts = list(),
                              igr_plot_opts = list(),
                              igr_grid = FALSE,
+                             igr_par_opts = list(),
                              cyto_save_session = FALSE,
                              cyto_close_session = do_save,
                              cyto_node_space = 1.2
@@ -187,6 +188,7 @@ VisualiseNetwork <- function(adj_mats,
                  radial_labs = radial_labs,
                  scale_width = edge_factor,
                  rad_lab_opts = igr_rad_lab_opts,
+                 par_opts = igr_par_opts,
                  ... = igr_plot_opts)
     }
 

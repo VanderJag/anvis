@@ -294,3 +294,21 @@ test_that("errors occur for incorrect grid igr_grid input", {
     "grid dimensions must exceed or equal number of networks")
 })
 
+
+test_that("igraph grid node label space can be adjusted with margins", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  test_call <- deparse(sys.calls()[[1]][1])
+  skip_if_not(test_call == "test_that()",
+              message = "igraph visualizations need to be checked manually")
+
+  expect_error(
+    VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                     edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                     width_type = "partcor", do_save = T, igr_grid = c(2,6),
+                     export_opts = list(width = 6400, height = 2400),
+                     igr_par_opts = list(mar=c(6,6,6,6))), NA)
+})
+

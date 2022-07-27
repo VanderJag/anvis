@@ -88,7 +88,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
   start_saving(export_type, export_opts, save_name)
 
   # Change graphical parameters here, so they will affect the newly active device
-  old_par <- do.call(par, par_opts)
+  if (length(par_opts) != 0) old_par <- do.call(par, par_opts)
 
   # Visualize the basic graph
   do.call(igraph::plot.igraph,
@@ -134,7 +134,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
   }
 
   # reset graphical parameters to original option
-  par(old_par)
+  if (length(par_opts) != 0) par(old_par)
 
   # Finish saving
   if (export_type != "print") {
