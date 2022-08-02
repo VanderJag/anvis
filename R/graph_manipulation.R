@@ -400,13 +400,23 @@ weights_to_color <- function(edge_table) {
   # If negative numbers are found in the weights use a diverging color palette,
   #   otherwise use a sequential color palette
   if (min(edge_table$weight) < 0) {
-    color <- as.vector(colorspace::diverging_hcl(n=nrow(edge_table), palette = "Blue-Red"))
-    edge_table <- edge_table[sort(edge_table$weight, decreasing=T, index.return=T)[[2]],]
-    edge_table <- cbind(edge_table, color)
+    color_pal <- as.vector(colorspace::diverging_hcl(n = 120, palette = "Blue-Red"))
+    # The center colors are barely visible in the visualization, remove them
+    color_pal <- c(color_pal[1:50], color_pal[71:120])
+    neg_idx <- which(edge_table$weight <= 0)
+    pos_idx <- which(edge_table$weight > 0)
+
+    neg_cols <- color_pal[as.numeric(cut(edge_table$weight[neg_idx], 50))]
+    pos_cols <- color_pal[as.numeric(cut(edge_table$weight[pos_idx], 50)) + 50]
+
+    edge_table$color <- ""
+    edge_table$color[neg_idx] <- neg_cols
+    edge_table$color[pos_idx] <- pos_cols
+
   } else {
-    color <- as.vector(colorspace::sequential_hcl(n=nrow(edge_table), palette = "Reds2"))
-    edge_table <- edge_table[sort(abs(edge_table$weight), decreasing=T, index.return=T)[[2]],]
-    edge_table <- cbind(edge_table, color)
+    color_pal <- as.vector(colorspace::sequential_hcl(n = 100, palette = "Reds2"))
+    edge_table <- dplyr::mutate(edge_table,
+                                color = color_pal[as.numeric(cut(weight, 100))])
   }
 
   return(edge_table)
