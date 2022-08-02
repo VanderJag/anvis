@@ -38,7 +38,7 @@ VisualiseNetwork <- function(adj_mats,
                              group_vec = NULL,
                              width_type = NULL,
                              arrange_co = FALSE,
-                             output_type = c("igraph", "cytoscape", "xgmml"),
+                             output_type = c("igraph", "cytoscape", "network", "none"),
                              radial_labs = T,
                              do_save = FALSE,
                              save_names = "network",
@@ -46,24 +46,31 @@ VisualiseNetwork <- function(adj_mats,
                              export_opts = list(),
                              edge_factor = NULL,
                              group_colors = NULL,
-                             cyto3.8_check = T,
                              igr_rad_lab_opts = list(),
                              igr_plot_opts = list(),
                              igr_grid = FALSE,
                              igr_par_opts = list(),
+                             cyto3.8_check = T,
                              cyto_save_session = FALSE,
                              cyto_close_session = do_save,
-                             cyto_node_space = 1.2
+                             cyto_node_space = 1.2,
+                             netw_ext = c("XGMML", "table", "sif", "tab", "tgf", "net"),
+                             netw_xgmml_title = NULL
                              ) {
   # TODO add to documenation:
   # what are the defaults for edge factor
   # width type can be length 1 or same as n matrices
   # igr_grid, can be T, F, or a vector of two integers
+  # netw_xgmml_title allows vector, netw_ext not
 
+  # visualization output type
   export_type <- match.arg(export_type)
 
   # Check which visualization should be used, allow abbreviations
   output_type <- match.arg(output_type)
+
+  # network saving file type
+  netw_ext <- match.arg(netw_ext)
 
   # Set default for edge width scaling factor
   if (output_type == "igraph") edge_factor <- edge_factor %||% 3.25
@@ -144,7 +151,6 @@ VisualiseNetwork <- function(adj_mats,
     }
   }
 
-
   # Choose visualization
   if (output_type == "igraph") {
 
@@ -212,6 +218,36 @@ VisualiseNetwork <- function(adj_mats,
                        cyto3.8_check = cyto3.8_check,
                        radial_labs = radial_labs,
                        node_space = cyto_node_space)
+    }
+
+  } else if (output_type == "network") {
+
+    # Check network, e.g. xgmml, saving options
+    if (!is.null(netw_xgmml_title)){
+      if (!(length(netw_xgmml_title) == n_mats || length(netw_xgmml_title) == 1)) {
+        stop("Length of xgmml titles must be 1 or matching with number of matrices: ",
+             "\nℹ Length of `netw_xgmml_title` = ", length(netw_xgmml_title),
+             ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
+      }
+    }
+
+    for (i in 1:n_mats) {
+      # Avoid overwriting by appending number
+      save_name <- file_sequence(name_base = save_names[[if (names_match) i else 1]],
+                                 ext = paste0(".", netw_ext))
+
+      if (!is.null(netw_xgmml_title)) {
+        xgmml_title <- netw_xgmml_title[[if (length(netw_xgmml_title) == n_mats) i else 1]]
+      } else {
+        xgmml_title <- save_name
+      }
+
+      netw <- igraph::graph_from_data_frame(edges[[i]], vertices = nodes[[i]],
+                                            directed = FALSE)
+      BioNet::saveNetwork(network = netw,
+                          name = xgmml_title,
+                          file = save_name,
+                          type = netw_ext)
     }
   }
 
