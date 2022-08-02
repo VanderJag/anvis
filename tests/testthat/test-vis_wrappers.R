@@ -93,7 +93,7 @@ test_that("grouping vector of length 1 or same as data works", {
 
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "xgmml",
+  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only",
                                edge_attrs = "all", node_attrs = "all")
 
   all_equal <- all(vapply(seq_along(networks$nodes),
@@ -104,7 +104,7 @@ test_that("grouping vector of length 1 or same as data works", {
 
   grouping_list <- replicate(length(adj_mats), sample(group_vec), simplify = FALSE)
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = grouping_list, output_type = "xgmml",
+  networks <- VisualiseNetwork(adj_mats, group_vec = grouping_list, output_type = "return_only",
                                edge_attrs = "all", node_attrs = "all")
 
   expect_equal(lapply(seq_along(networks$nodes),
@@ -125,7 +125,7 @@ test_that("grouping vector as list of length 1 works", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
   group_vec <- list(group_vec)
 
-  expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "xgmml",
+  expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only",
                                edge_attrs = "all", node_attrs = "all", do_save = F), NA)
 })
 
@@ -312,3 +312,230 @@ test_that("igraph grid node label space can be adjusted with margins", {
                      igr_par_opts = list(mar=c(6,6,6,6))), NA)
 })
 
+
+test_that("xgmml output works for a single network", {
+  # Load adjacency matrix
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+
+  # Some grouping based on column names
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+
+  withr::with_file(c("network.xgmml"), {
+    disrupt_files <- list.files(pattern = "network.*xgmml")
+    rmed <- file.remove(disrupt_files)
+
+    VisualiseNetwork(adj_mats = Mat1, node_attrs = "all", edge_attrs = "all",
+                     group_vec = group_vec, output_type = "network", netw_ext = "XGMML")
+
+    expect_setequal(list.files(pattern = "network"),
+                    c("network.xgmml"))
+  })
+
+  # VisualiseNetwork(adj_mats = Mat1, node_attrs = "all", edge_attrs = "all",
+  #                  group_vec = group_vec, output_type = "network", netw_ext = "XGMML")
+})
+
+
+test_that("xgmml output uses custom save names", {
+  # Load adjacency matrix
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+
+  # Some grouping based on column names
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+
+  withr::with_file(c("my_xgmml.xgmml"), {
+    VisualiseNetwork(adj_mats = Mat1, node_attrs = "all", edge_attrs = "all",
+                     group_vec = group_vec, output_type = "network", netw_ext = "XGMML",
+                     save_names = "my_xgmml")
+
+    expect_setequal(list.files(pattern = "my_xgmml"),
+                    c("my_xgmml.xgmml"))
+  })
+})
+
+
+test_that("xgmml output saves multiple networks using save name numbering", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:4]
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+
+  withr::with_file(c("network.xgmml", paste0("network_", 2:4, ".xgmml")), {
+    disrupt_files <- list.files(pattern = "network.*xgmml")
+    rmed <- file.remove(disrupt_files)
+
+    VisualiseNetwork(adj_mats = adj_mats, node_attrs = "all", edge_attrs = "all",
+                     group_vec = group_vec, output_type = "network",
+                     netw_ext = "XGMML")
+
+    expect_setequal(list.files(pattern = "network"),
+                    c("network.xgmml", paste0("network_", 2:4, ".xgmml")))
+  })
+})
+
+
+test_that("xgmml output writes xgmml title", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:4]
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+
+  withr::with_file(c("network.xgmml", paste0("network_", 2:4, ".xgmml")), {
+    disrupt_files <- list.files(pattern = "network.*xgmml")
+    rmed <- file.remove(disrupt_files)
+
+    VisualiseNetwork(adj_mats = adj_mats, node_attrs = "all", edge_attrs = "all",
+                     group_vec = group_vec, output_type = "network",
+                     netw_ext = "XGMML")
+
+    title_tags <- sapply(list.files(pattern = "network"), function (x) x %>%
+      readLines() %>%
+        stringr::str_trim() %>%
+        stringr::str_subset("^<dc:title>") %>%
+        stringr::str_sub(start = 11, end = -12)
+      ) %>%
+      unname()
+
+    expect_setequal(title_tags,
+                    c("network", paste0("network_", 2:4)))
+  })
+})
+
+
+test_that("xgmml output can use vector of xgmml titles", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:4]
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+
+  withr::with_file(c("network.xgmml", paste0("network_", 2:4, ".xgmml")), {
+    disrupt_files <- list.files(pattern = "network.*xgmml")
+    rmed <- file.remove(disrupt_files)
+
+    VisualiseNetwork(adj_mats = adj_mats, node_attrs = "all", edge_attrs = "all",
+                     group_vec = group_vec, output_type = "network",
+                     netw_ext = "XGMML", netw_xgmml_title = c("one", "two",
+                                                              "three", "four"))
+
+    title_tags <- sapply(list.files(pattern = "network"), function (x) x %>%
+                           readLines() %>%
+                           stringr::str_trim() %>%
+                           stringr::str_subset("^<dc:title>") %>%
+                           stringr::str_sub(start = 11, end = -12)
+    ) %>%
+      unname()
+
+    expect_setequal(title_tags,
+                    c("one", "two", "three", "four"))
+  })
+})
+
+
+test_that("xgmml output throws error for incorrect length xgmml titles", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:4]
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+
+  withr::with_file(c("network.xgmml", paste0("network_", 2:4, ".xgmml")), {
+    disrupt_files <- list.files(pattern = "network.*xgmml")
+    rmed <- file.remove(disrupt_files)
+
+    expect_error(VisualiseNetwork(adj_mats = adj_mats, node_attrs = "all",
+                                  edge_attrs = "all",
+                     group_vec = group_vec, output_type = "network",
+                     netw_ext = "XGMML", netw_xgmml_title = c("one", "two",
+                                                              "three")),
+                 "Length of xgmml titles must be 1 or matching with")
+
+  })
+})
+
+
+test_that("xgmml output has a matching number of nodes and edges compared to original data", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+
+  withr::with_file("network.xgmml", {
+    disrupt_files <- list.files(pattern = "network.*xgmml")
+    rmed <- file.remove(disrupt_files)
+
+    output <- VisualiseNetwork(adj_mats = adj_mats, node_attrs = "all",
+                               edge_attrs = "all",
+                               group_vec = group_vec, output_type = "return",
+                               netw_ext = "XGMML",
+                               netw_xgmml_title = c("one", "two", "three", "four"))
+    nr_edges <- output$edges[[1]] %>% nrow()
+    nr_nodes <- output$nodes[[1]] %>% nrow()
+
+    VisualiseNetwork(adj_mats = adj_mats, node_attrs = "all", edge_attrs = "all",
+                     group_vec = group_vec, output_type = "network",
+                     netw_ext = "XGMML")
+
+    xml_nodes <- readLines("network.xgmml") %>%
+      stringr::str_trim() %>%
+      stringr::str_subset("^<node label") %>%
+      length()
+    xml_edges <- readLines("network.xgmml") %>%
+      stringr::str_trim() %>%
+      stringr::str_subset("^<edge label") %>%
+      length()
+
+
+    expect_equal(nr_edges, xml_edges)
+    expect_equal(nr_nodes, xml_nodes)
+  })
+})
+
+
+test_that("xgmml output contains the same attributes as the input data", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
+
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+
+  withr::with_file("network.xgmml", {
+    disrupt_files <- list.files(pattern = "network.*xgmml")
+    rmed <- file.remove(disrupt_files)
+
+    output <- VisualiseNetwork(adj_mats = adj_mats, node_attrs = "all",
+                               edge_attrs = "all",
+                               group_vec = group_vec, output_type = "return",
+                               netw_ext = "XGMML",
+                               netw_xgmml_title = c("one", "two", "three", "four"))
+    edge_attrs <- output$edges[[1]] %>% names()
+    edge_attrs <- edge_attrs[!(edge_attrs %in% c("source", "target"))]
+    node_attrs <- output$nodes[[1]] %>% names()
+    node_attrs[(node_attrs %in% c("node"))] <- "name"
+
+    VisualiseNetwork(adj_mats = adj_mats, node_attrs = "all", edge_attrs = "all",
+                     group_vec = group_vec, output_type = "network",
+                     netw_ext = "XGMML")
+
+    xgmml_l <- readLines("network.xgmml")
+    start_node1 <- which(stringr::str_trim(xgmml_l) %>%
+                           stringr::str_starts("<node"))[1]
+    end_node1 <- which(stringr::str_trim(xgmml_l) %>%
+                           stringr::str_starts("</node>"))[1]
+    attrs_node1 <- xgmml_l[(start_node1+1):(end_node1-1)] %>%
+      stringr::str_extract_all('name=.*\" value') %>%
+      unlist() %>%
+      stringr::str_sub(start = 7, end = -8)
+
+    start_edge1 <- which(stringr::str_trim(xgmml_l) %>%
+                           stringr::str_starts("<edge"))[1]
+    end_edge1 <- which(stringr::str_trim(xgmml_l) %>%
+                           stringr::str_starts("</edge>"))[1]
+    attrs_edge1 <- xgmml_l[(start_edge1+1):(end_edge1-1)] %>%
+      stringr::str_extract_all('name=.*\" value') %>%
+      unlist() %>%
+      stringr::str_sub(start = 7, end = -8)
+
+    expect_equal(edge_attrs, attrs_edge1)
+    expect_equal(node_attrs, attrs_node1)
+  })
+})
