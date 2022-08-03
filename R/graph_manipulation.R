@@ -4,7 +4,7 @@
 #' The rows of `node_table` will be reordered so the group column is sorted
 #' alphabetically.
 #'
-#' @param node_table A data.frame in which rows correspond to the nodes of a
+#' @param node_table A data frame in which rows correspond to the nodes of a
 #'   network.
 #' @param group_vec A vector contains group labels for each row in `node_table`.
 #' @return Returns `node_table` with 'group' column added, sorted by group.
@@ -24,10 +24,26 @@ group_nodes <- function(node_table, group_vec) {
   # Add grouping vector as column and sort the rows
   node_table$group <- group_vec
   node_table <- node_table[order(node_table$group),]
+
+  return(node_table)
 }
 
 
-
+#' Calculate x and y coordinates for nodes
+#'
+#' Calculates coordinates for each node in the node table. To avoid overlap the
+#' size of nodes is takes into account when creating the layout.
+#'
+#' @inheritParams group_nodes
+#' @param nodesize A number that represents the maximum node width. This will be
+#'   used to calculate the minimum radius that a circular layout can have to
+#'   avoid overlap of nodes.
+#' @param layout A character string (default: 'circle') that determines which
+#'   layout will be used to arrange the nodes.
+#' @param space_fct A number (default: 1.2) that is used as multiplier for
+#'   nodesize. It increases the spacing between nodes.
+#'
+#' @return Returns `node_table` with 'x' and 'y' column added or overwritten.
 add_node_pos <- function(node_table, nodesize, layout = c("circle"), space_fct = 1.2) {
 
   layout <- match.arg(layout)
@@ -54,6 +70,20 @@ add_node_pos <- function(node_table, nodesize, layout = c("circle"), space_fct =
 }
 
 
+#' Add a distinct color to each group
+#'
+#' Adds a 'color' column with hex values to `node_table`. The colors will be
+#' assigned based on the 'group' column of `node_table`. Nodes that are in the
+#' same group obtain the same color.
+#'
+#' @param node_table A data frame in which rows correspond to the nodes of a
+#'   network. Must contain a column names `group`.
+#' @param group_colors A vector of character strings representing colors, with
+#'   a color for each node group. Colors may be provided either
+#'   as color names, e.g. 'green', or as hex, e.g. "#00FF00".
+#'
+#' @return Returns `node_table` with 'color' column, that contains a different
+#'   color for each node group.
 add_colors <- function(node_table, group_colors) {
   # Group information is required to add group coloring
   if (!"group" %in% colnames(node_table)) {
