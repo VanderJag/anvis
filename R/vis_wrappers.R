@@ -179,7 +179,11 @@ VisualiseNetwork <- function(adj_mats,
              ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
       }
 
-      if (do_save) start_saving(export_type, export_opts, save_names[[1]])
+      if (do_save) {
+        start_saving(export_type, export_opts, save_names[[1]])
+        on.exit(dev.off())
+      }
+
       # Allow that plots can be arranged in grid
       par(mfrow= user_dims %||% n2mfrow(n_mats))
     }
