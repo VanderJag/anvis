@@ -49,6 +49,7 @@ VisualiseNetwork <- function(adj_mats,
                              igr_rad_lab_opts = list(),
                              igr_plot_opts = list(),
                              igr_grid = FALSE,
+                             igr_grid_names = FALSE,
                              igr_par_opts = list(),
                              cyto3.8_check = T,
                              cyto_save_session = FALSE,
@@ -143,12 +144,10 @@ VisualiseNetwork <- function(adj_mats,
 
   # Check save names
   names_match <- length(save_names) == n_mats
-  if (do_save) {
-    if (!(names_match || length(save_names) == 1)) {
-      stop("Length of save names must be 1 or matching with number of matrices: ",
-           "\nℹ Length of `save_names` = ", length(save_names),
-           ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
-    }
+  if (!(names_match || length(save_names) == 1)) {
+    stop("Length of save names must be 1 or matching with number of matrices: ",
+         "\nℹ Length of `save_names` = ", length(save_names),
+         ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
   }
 
   # Choose visualization
@@ -177,6 +176,12 @@ VisualiseNetwork <- function(adj_mats,
       if (do_save) start_saving(export_type, export_opts, save_names[[1]])
       # Allow that plots can be arranged in grid
       par(mfrow= user_dims %||% n2mfrow(n_mats))
+
+      if (!isFALSE(igr_grid_names) && !(length(igr_grid_names) == n_mats)) {
+        stop("Grid names must be FALSE or of length matching with number of matrices: ",
+             "\nℹ Length of `igr_grid_names` = ", length(igr_grid_names),
+             ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
+      }
     }
 
     # If plots are not saved show them in the R session, to arrange on grid
@@ -185,8 +190,13 @@ VisualiseNetwork <- function(adj_mats,
 
     # Create igraph plots
     for (i in 1:n_mats) {
-      # When placing in grid only save when maknig the last plot
-      vis_igraph(edge_table = edges[[i]],
+      # Set plot title for grip plots when it is requested
+      if (igr_grid && !isFALSE(igr_grid_names)) {
+        igr_plot_opts[["main"]] <- igr_grid_names[i]
+      }
+
+      do.call(vis_igraph,
+              c(list(edge_table = edges[[i]],
                  node_table = nodes[[i]],
                  save_name = save_names[[if (names_match) i else 1]],
                  export_type = export_type,
@@ -194,8 +204,9 @@ VisualiseNetwork <- function(adj_mats,
                  radial_labs = radial_labs,
                  scale_width = edge_factor,
                  rad_lab_opts = igr_rad_lab_opts,
-                 par_opts = igr_par_opts,
-                 ... = igr_plot_opts)
+                 par_opts = igr_par_opts),
+                 igr_plot_opts)
+      )
     }
 
     if (igr_grid) {

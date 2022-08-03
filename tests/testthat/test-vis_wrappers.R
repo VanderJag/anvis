@@ -539,3 +539,28 @@ test_that("xgmml output contains the same attributes as the input data", {
     expect_equal(node_attrs, attrs_node1)
   })
 })
+
+
+test_that("igraph grid visualization allows adding titles to plots", {
+  adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  test_call <- deparse(sys.calls()[[1]][1])
+  skip_if_not(test_call == "test_that()",
+              message = "igraph visualizations need to be checked manually")
+
+  expect_error(
+    VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                     edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                     width_type = "partcor", do_save = T, igr_grid = c(2,6),
+                     export_opts = list(width = 6400, height = 2600),
+                     igr_par_opts = list(mar=c(2,4,5,4)),
+                     igr_grid_names = paste("patient", LETTERS[seq_along(adj_mats)])), NA)
+  # expect_error(
+  #   VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+  #                    edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+  #                    width_type = "partcor", do_save = T, igr_grid = c(2,6),
+  #                    export_opts = list(width = 18, height = 7.5),
+  #                    igr_par_opts = list(mar=c(2,4,5,4)), export_type = "svg",
+  #                    igr_grid_names = paste("patient", LETTERS[seq_along(adj_mats)])), NA)
+})
