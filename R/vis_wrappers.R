@@ -173,15 +173,15 @@ VisualiseNetwork <- function(adj_mats,
 
     # Start graphics device for multiple plots in grid situation
     if (igr_grid) {
-      if (do_save) start_saving(export_type, export_opts, save_names[[1]])
-      # Allow that plots can be arranged in grid
-      par(mfrow= user_dims %||% n2mfrow(n_mats))
-
       if (!isFALSE(igr_grid_names) && !(length(igr_grid_names) == n_mats)) {
         stop("Grid names must be FALSE or of length matching with number of matrices: ",
              "\nℹ Length of `igr_grid_names` = ", length(igr_grid_names),
              ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
       }
+
+      if (do_save) start_saving(export_type, export_opts, save_names[[1]])
+      # Allow that plots can be arranged in grid
+      par(mfrow= user_dims %||% n2mfrow(n_mats))
     }
 
     # If plots are not saved show them in the R session, to arrange on grid
