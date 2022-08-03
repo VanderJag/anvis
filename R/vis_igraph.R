@@ -215,6 +215,7 @@ start_saving <- function(export_type, export_opts, save_name) {
     do.call(save_dev,
             export_opts)
 
+    on.exit(dev.off())
   }
   invisible(NULL)
 }
