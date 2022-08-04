@@ -577,5 +577,47 @@ test_that("igraph grid titles need correct length else error", {
                      export_opts = list(width = 6400, height = 2600),
                      igr_par_opts = list(mar=c(2,4,5,4)),
                      igr_grid_names = paste("patient", LETTERS[1:length(adj_mats)-1])),
-    "Grid names must be FALSE or of length matching")
+    "Grid names must be TRUE, FALSE, or of length matching")
 })
+
+
+test_that("igraph grid titles cause warning when requested but adj list unnamed", {
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    expect_warning(
+        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                         width_type = "partcor", do_save = F, igr_grid = c(1,3),
+                         igr_par_opts = list(mar=c(2,4,5,4)),
+                         igr_grid_names = T),
+        "`igr_grid_names` is TRUE but no names were found")
+})
+
+
+test_that("igraph grid titles can be drawn from names of adj_mats list", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
+    names(adj_mats) <- paste("person", LETTERS[1:3])
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    expect_error(
+        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                         width_type = "partcor", do_save = F, igr_grid = c(1,3),
+                         igr_par_opts = list(mar=c(2,4,5,4)),
+                         igr_grid_names = T),
+        NA)
+})
+

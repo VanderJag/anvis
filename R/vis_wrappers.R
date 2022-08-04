@@ -62,6 +62,8 @@ VisualiseNetwork <- function(adj_mats,
   # what are the defaults for edge factor
   # width type can be length 1 or same as n matrices
   # igr_grid, can be T, F, or a vector of two integers
+    # igr_grid_names will not show when it is F, will use matrix names when it is
+    #   T, will use names from vector otherwise
   # netw_xgmml_title allows vector, netw_ext not
 
   # visualization output type
@@ -173,19 +175,26 @@ VisualiseNetwork <- function(adj_mats,
 
     # Start graphics device for multiple plots in grid situation
     if (igr_grid) {
-      if (!isFALSE(igr_grid_names) && !(length(igr_grid_names) == n_mats)) {
-        stop("Grid names must be FALSE or of length matching with number of matrices: ",
-             "\nℹ Length of `igr_grid_names` = ", length(igr_grid_names),
-             ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
-      }
+        if (!is.logical(igr_grid_names)) {
+            if (length(igr_grid_names) != n_mats) {
+                stop("Grid names must be TRUE, FALSE, or of length matching with number of matrices: ",
+                     "\nℹ Length of `igr_grid_names` = ", length(igr_grid_names),
+                     ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
+            }
+        } else if (isTRUE(igr_grid_names)) {
+            if (length(names(adj_mats)) != n_mats) {
+                warning("`igr_grid_names` is TRUE but no names were found in ",
+                        "adjacency matrix list.")
+            }
+        }
 
-      if (do_save) {
-        start_saving(export_type, export_opts, save_names[[1]])
-        on.exit(dev.off())
-      }
+        if (do_save) {
+            start_saving(export_type, export_opts, save_names[[1]])
+            on.exit(dev.off())
+        }
 
-      # Allow that plots can be arranged in grid
-      par(mfrow= user_dims %||% n2mfrow(n_mats))
+        # Allow that plots can be arranged in grid
+        par(mfrow= user_dims %||% n2mfrow(n_mats))
     }
 
     # If plots are not saved show them in the R session, to arrange on grid
@@ -195,8 +204,10 @@ VisualiseNetwork <- function(adj_mats,
     # Create igraph plots
     for (i in 1:n_mats) {
       # Set plot title for grip plots when it is requested
-      if (igr_grid && !isFALSE(igr_grid_names)) {
-        igr_plot_opts[["main"]] <- igr_grid_names[i]
+      if (igr_grid && isTRUE(igr_grid_names)) {
+          igr_plot_opts[["main"]] <- names(adj_mats)[i]
+      } else if (igr_grid && !isFALSE(igr_grid_names)) {
+          igr_plot_opts[["main"]] <- igr_grid_names[i]
       }
 
       do.call(vis_igraph,
