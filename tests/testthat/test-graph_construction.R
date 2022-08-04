@@ -226,5 +226,40 @@ test_that("error is shown by edge to adj when to weight column is not found", {
                  NA)
 })
 
-test_that("other functions can make use of the adj. matrix created from edgelist")
-# TODO documentation of this function
+# the two plots created by this function should be identical
+test_that("other functions can make use of the adj. matrix created from edgelist", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    # data to make matrix
+    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+    names_order <- colnames(Mat1)
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+    network_list <- adj_matrix_to_network(Mat1,
+                                          node_attrs = "all",
+                                          edge_attrs = "all",
+                                          group_vec = group_vec,
+                                          width_type = "partcor")
+    edge_table <- network_list[["edge_table"]]
+    node_table <- network_list[["node_table"]]
+
+    expect_error(vis_igraph(edge_table, node_table, radial_labs = T, export_type = "print"),
+                 NA)
+
+    # use matrix for visualization
+    new_adj <- edgelist_to_adj(edge_table)
+    new_adj <- new_adj[names_order,names_order]
+    network_list <- adj_matrix_to_network(new_adj,
+                                          node_attrs = "all",
+                                          edge_attrs = "all",
+                                          group_vec = group_vec,
+                                          width_type = "partcor")
+    edge_table <- network_list[["edge_table"]]
+    node_table <- network_list[["node_table"]]
+
+    node_table <- sort_avg_connectivity(node_table)
+
+    expect_error(vis_igraph(edge_table, node_table, radial_labs = T, export_type = "print"),
+                 NA)
+})

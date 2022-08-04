@@ -184,5 +184,8 @@ edgelist_to_adj <- function(edge_list, weight_col = "weight") {
     graph <- igraph::graph_from_data_frame(edge_list,
                                            directed = FALSE)
 
-    adj <- igraph::as_adjacency_matrix(graph = graph, type = "both", attr = weight_col)
+    adj <- igraph::as_adjacency_matrix(graph = graph, type = "both", attr = weight_col,
+                                       sparse = F)
+
+    return(adj)
 }
