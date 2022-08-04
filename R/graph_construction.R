@@ -167,3 +167,15 @@ adj_matrix_to_network <- function(adj_matrix,
   return(list("edge_table" = edge_table,
               "node_table" = node_table))
 }
+
+
+edgelist_to_adj <- function(edge_list) {
+    # TODO additional argument for attr
+    # TODO warning for when attr is not present (set default attr to weight)
+
+    # Igraph has a function to convert it's objects into adj, create igraph obj
+    graph <- igraph::graph_from_data_frame(edge_list,
+                                           directed = FALSE)
+
+    adj <- igraph::as_adjacency_matrix(graph = graph, type = "both", attr = "weight")
+}
