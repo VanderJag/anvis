@@ -169,6 +169,19 @@ adj_matrix_to_network <- function(adj_matrix,
 }
 
 
+#' Convert edge list to adjacency matrix
+#'
+#' Creates an adjacency matrix from edgelist.
+#'
+#' @param edge_list Data frame. The first two columns should describe the
+#'   connected nodes. Another column with edge weights can be used by this
+#'   function. Any additional columns/attributes of the edges will be lost.
+#' @param weight_col Character string, the name of the column that contains edge
+#'   weights (default: 'weight'). If this argument is NULL all edges will have
+#'   weight 1 in the adjacency matrix.
+#'
+#' @return Returns a square adjacency matrix with column and row names representing
+#'   the interacting nodes. The matrix will by symmetric along the diagonal.
 edgelist_to_adj <- function(edge_list, weight_col = "weight") {
     # Check if a weight column exists with the correct name
     if (!is.null(weight_col) && !(weight_col %in% colnames(edge_list))) {
