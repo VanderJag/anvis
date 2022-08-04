@@ -169,13 +169,20 @@ adj_matrix_to_network <- function(adj_matrix,
 }
 
 
-edgelist_to_adj <- function(edge_list) {
-    # TODO additional argument for attr
-    # TODO warning for when attr is not present (set default attr to weight)
+edgelist_to_adj <- function(edge_list, weight_col = "weight") {
+    # Check if a weight column exists with the correct name
+    if (!is.null(weight_col) && !(weight_col %in% colnames(edge_list))) {
+        stop("Weight column name must be NULL or present in names of edge_list: ",
+             "\nℹ your `weight_col`: ",
+             weight_col,
+             "\n  `colnames(edge_list)`: ",
+             colnames(edge_list) %>% paste(collapse = ", "),
+             ".", call.=FALSE)
+    }
 
     # Igraph has a function to convert it's objects into adj, create igraph obj
     graph <- igraph::graph_from_data_frame(edge_list,
                                            directed = FALSE)
 
-    adj <- igraph::as_adjacency_matrix(graph = graph, type = "both", attr = "weight")
+    adj <- igraph::as_adjacency_matrix(graph = graph, type = "both", attr = weight_col)
 }

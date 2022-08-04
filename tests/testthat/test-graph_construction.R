@@ -210,4 +210,21 @@ test_that("creating adj matrix from edgelist creates original matrix",{
 })
 
 
+test_that("error is shown by edge to adj when to weight column is not found", {
+    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+    network_list <- adj_matrix_to_network(Mat1, width_type = "partcor",
+                                          edge_attrs = "width")
+    edge_table <- network_list[["edge_table"]]
+    edge_table2 <- edge_table %>% dplyr::select(-weight)
+
+    expect_error(edgelist_to_adj(edge_table2, weight_col = "weight"),
+                 "Weight column name must be NULL or present in names")
+    expect_error(edgelist_to_adj(edge_table2, weight_col = "width"),
+                 NA)
+    expect_error(edgelist_to_adj(edge_table2, weight_col = NULL),
+                 NA)
+})
+
 test_that("other functions can make use of the adj. matrix created from edgelist")
+# TODO documentation of this function
