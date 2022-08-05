@@ -23,7 +23,7 @@
 #'   a visualization with the respective software for the first two options, or
 #'   the appropriate download for the third option. Node widths columns will be
 #'   adjusted to match your chosen output.
-#' @param do_save Logical (default TRUE), should network visualizations be saved?
+#' @param vis_save Logical (default TRUE), should network visualizations be saved?
 #'   If this parameter is FALSE igraph will show a plot in your R session and
 #'   cytoscape will keep the session with all networks open.
 #' @inheritParams adj_matrix_to_network
@@ -36,24 +36,24 @@ VisualiseNetwork <- function(adj_mats,
                              node_attrs = c("none", "all", "group", "color_group", "size"),
                              edge_attrs = c("none", "all", "width", "color"),
                              group_vec = NULL,
-                             width_type = NULL,
-                             arrange_co = FALSE,
-                             output_type = c("igraph", "cytoscape", "network", "return_only"),
-                             radial_labs = T,
-                             do_save = FALSE,
-                             save_names = "network",
-                             export_type = c("png", "jpeg", "pdf", "svg", "ps"),
-                             export_opts = list(),
-                             edge_factor = NULL,
                              group_colors = NULL,
+                             width_type = NULL,
+                             edge_factor = NULL,
+                             arrange_co = FALSE,
+                             save_names = "network",
+                             output_type = c("igraph", "cytoscape", "network", "return_only"),
+                             vis_radial_labs = T,
+                             vis_save = FALSE,
+                             vis_export_type = c("png", "jpeg", "pdf", "svg", "ps"),
+                             vis_export_opts = list(),
                              igr_rad_lab_opts = list(),
                              igr_plot_opts = list(),
                              igr_grid = FALSE,
                              igr_grid_names = FALSE,
                              igr_par_opts = list(),
-                             cyto3.8_check = T,
+                             cyto3.8_check = TRUE,
                              cyto_save_session = FALSE,
-                             cyto_close_session = do_save,
+                             cyto_close_session = vis_save,
                              cyto_node_space = 1.2,
                              netw_ext = c("XGMML", "table", "sif", "tab", "tgf", "net"),
                              netw_xgmml_title = NULL
@@ -67,7 +67,7 @@ VisualiseNetwork <- function(adj_mats,
   # netw_xgmml_title allows vector, netw_ext not
 
   # visualization output type
-  export_type <- match.arg(export_type)
+  vis_export_type <- match.arg(vis_export_type)
 
   # Check which visualization should be used, allow abbreviations
   output_type <- match.arg(output_type)
@@ -188,8 +188,8 @@ VisualiseNetwork <- function(adj_mats,
             }
         }
 
-        if (do_save) {
-            start_saving(export_type, export_opts, save_names[[1]])
+        if (vis_save) {
+            start_saving(vis_export_type, vis_export_opts, save_names[[1]])
             on.exit(if (dev.cur() > 1) dev.off())
         }
 
@@ -199,7 +199,7 @@ VisualiseNetwork <- function(adj_mats,
 
     # If plots are not saved show them in the R session, to arrange on grid
     #   also print first
-    if (!(do_save) || (do_save && igr_grid)) export_type <- "print"
+    if (!(vis_save) || (vis_save && igr_grid)) vis_export_type <- "print"
 
     # Create igraph plots
     for (i in 1:n_mats) {
@@ -214,9 +214,9 @@ VisualiseNetwork <- function(adj_mats,
               c(list(edge_table = edges[[i]],
                  node_table = nodes[[i]],
                  save_name = save_names[[if (names_match) i else 1]],
-                 export_type = export_type,
-                 export_opts = export_opts,
-                 radial_labs = radial_labs,
+                 export_type = vis_export_type,
+                 export_opts = vis_export_opts,
+                 radial_labs = vis_radial_labs,
                  scale_width = edge_factor,
                  rad_lab_opts = igr_rad_lab_opts,
                  par_opts = igr_par_opts),
@@ -225,7 +225,7 @@ VisualiseNetwork <- function(adj_mats,
     }
 
     if (igr_grid) {
-      if (do_save) dev.off()
+      if (vis_save) dev.off()
       par(mfrow=c(1,1)) # Reset if this has been changed
     }
 
@@ -235,14 +235,14 @@ VisualiseNetwork <- function(adj_mats,
       vis_in_cytoscape(edge_table = edges[[i]],
                        node_table = nodes[[i]],
                        save_name = save_names[[if (names_match) i else 1]],
-                       export_type = export_type %>% stringr::str_to_upper(),
+                       export_type = vis_export_type %>% stringr::str_to_upper(),
                        close_session = cyto_close_session,
                        save_session = cyto_save_session,
-                       export_image = do_save,
-                       export_opts = export_opts,
+                       export_image = vis_save,
+                       export_opts = vis_export_opts,
                        scale_width = edge_factor,
                        cyto3.8_check = cyto3.8_check,
-                       radial_labs = radial_labs,
+                       radial_labs = vis_radial_labs,
                        node_space = cyto_node_space)
     }
 

@@ -64,7 +64,7 @@ test_that("Cytoscape visualizations are made for each network in the list", {
     VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "cyto",
                      edge_attrs = "all", node_attrs = "all", arrange_co = T,
                      width_type = "partcor", cyto_save_session = F,
-                     cyto_close_session = T, do_save = T)
+                     cyto_close_session = T, vis_save = T)
 
     expect_setequal(list.files(pattern = "network"),
                     c("network.png", paste0("network_", 2:3, ".png")))
@@ -126,7 +126,7 @@ test_that("grouping vector as list of length 1 works", {
   group_vec <- list(group_vec)
 
   expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only",
-                               edge_attrs = "all", node_attrs = "all", do_save = F), NA)
+                               edge_attrs = "all", node_attrs = "all", vis_save = F), NA)
 })
 
 
@@ -143,13 +143,13 @@ test_that("user supplied colors are used", {
 
   expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                                 edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                                width_type = "partcor", do_save = F, group_colors = colors0),
+                                width_type = "partcor", vis_save = F, group_colors = colors0),
                NA)
   colors0 <- c("midnightblue", "red", "#b99055")
 
   expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                                 edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                                width_type = "partcor", do_save = F, group_colors = colors0),
+                                width_type = "partcor", vis_save = F, group_colors = colors0),
                NA)
 })
 
@@ -170,11 +170,11 @@ test_that("edge widths can be scaled", {
 
   expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                                 edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                                width_type = "partcor", do_save = F, edge_factor = 12),
+                                width_type = "partcor", vis_save = F, edge_factor = 12),
                NA)
   expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "cytoscape",
                                 edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                                width_type = "partcor", do_save = F, edge_factor = 6),
+                                width_type = "partcor", vis_save = F, edge_factor = 6),
                NA)
 })
 
@@ -195,7 +195,7 @@ test_that("cytoscape nodespace works", {
 
   expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "cytoscape",
                                 edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                                width_type = "partcor", do_save = F, cyto_node_space = 4),
+                                width_type = "partcor", vis_save = F, cyto_node_space = 4),
                NA)
 })
 
@@ -207,7 +207,7 @@ test_that("error is thrown when length of width type doesn't match", {
 
   expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                                 edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                                width_type = c("partcor", "MI"), do_save = F, ),
+                                width_type = c("partcor", "MI"), vis_save = F, ),
                "width type must be 1 or matching with")
 })
 
@@ -223,7 +223,7 @@ test_that("width types can be provided as vector", {
 
   expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                                 edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                                width_type = c("partcor", "partcor", "default"), do_save = F),
+                                width_type = c("partcor", "partcor", "default"), vis_save = F),
                NA)
 })
 
@@ -240,12 +240,12 @@ test_that("igraph can arrange visualizations in grid", {
   expect_error(
       VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                        edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                       width_type = "partcor", do_save = T, igr_grid = T), NA)
+                       width_type = "partcor", vis_save = T, igr_grid = T), NA)
   # expect_error({
   #   for (i in seq_along(adj_mats)) {
   #     VisualiseNetwork(adj_mats[1:i], group_vec = group_vec, output_type = "igraph",
   #                      edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-  #                      width_type = "partcor", do_save = T, igr_grid = T)}
+  #                      width_type = "partcor", vis_save = T, igr_grid = T)}
   # }, NA)
 })
 
@@ -262,8 +262,8 @@ test_that("igraph grid can be specified manually", {
   expect_error(
       VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                        edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                       width_type = "partcor", do_save = T, igr_grid = c(2,6),
-                       export_opts = list(width = 8200, height = 2600)), NA)
+                       width_type = "partcor", vis_save = T, igr_grid = c(2,6),
+                       vis_export_opts = list(width = 8200, height = 2600)), NA)
 })
 
 
@@ -275,22 +275,22 @@ test_that("errors occur for incorrect grid igr_grid input", {
   expect_error(
       VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                        edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                       width_type = "partcor", do_save = T, igr_grid = c(2,6,3),
-                       export_opts = list(width = 7000, height = 2600)),
+                       width_type = "partcor", vis_save = T, igr_grid = c(2,6,3),
+                       vis_export_opts = list(width = 7000, height = 2600)),
       "TRUE, FALSE, or a vector of two integers")
 
   expect_error(
     VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                      edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                     width_type = "partcor", do_save = T, igr_grid = NULL,
-                     export_opts = list(width = 7000, height = 2600)),
+                     width_type = "partcor", vis_save = T, igr_grid = NULL,
+                     vis_export_opts = list(width = 7000, height = 2600)),
     "TRUE, FALSE, or a vector of two integers")
 
   expect_error(
     VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                      edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                     width_type = "partcor", do_save = T, igr_grid = c(2,2),
-                     export_opts = list(width = 7000, height = 2600)),
+                     width_type = "partcor", vis_save = T, igr_grid = c(2,2),
+                     vis_export_opts = list(width = 7000, height = 2600)),
     "grid dimensions must exceed or equal number of networks")
 })
 
@@ -307,8 +307,8 @@ test_that("igraph grid node label space can be adjusted with margins", {
   expect_error(
     VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                      edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                     width_type = "partcor", do_save = T, igr_grid = c(2,6),
-                     export_opts = list(width = 6400, height = 2400),
+                     width_type = "partcor", vis_save = T, igr_grid = c(2,6),
+                     vis_export_opts = list(width = 6400, height = 2400),
                      igr_par_opts = list(mar=c(6,6,6,6))), NA)
 })
 
@@ -552,16 +552,16 @@ test_that("igraph grid visualization allows adding titles to plots", {
   expect_error(
     VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                      edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                     width_type = "partcor", do_save = T, igr_grid = c(2,6),
-                     export_opts = list(width = 6400, height = 2600),
+                     width_type = "partcor", vis_save = T, igr_grid = c(2,6),
+                     vis_export_opts = list(width = 6400, height = 2600),
                      igr_par_opts = list(mar=c(2,4,5,4)),
                      igr_grid_names = paste("patient", LETTERS[seq_along(adj_mats)])), NA)
   # expect_error(
   #   VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
   #                    edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-  #                    width_type = "partcor", do_save = T, igr_grid = c(2,6),
-  #                    export_opts = list(width = 18, height = 7.5),
-  #                    igr_par_opts = list(mar=c(2,4,5,4)), export_type = "svg",
+  #                    width_type = "partcor", vis_save = T, igr_grid = c(2,6),
+  #                    vis_export_opts = list(width = 18, height = 7.5),
+  #                    igr_par_opts = list(mar=c(2,4,5,4)), vis_export_type = "svg",
   #                    igr_grid_names = paste("patient", LETTERS[seq_along(adj_mats)])), NA)
 })
 
@@ -573,8 +573,8 @@ test_that("igraph grid titles need correct length else error", {
   expect_error(
     VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                      edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                     width_type = "partcor", do_save = T, igr_grid = c(2,6),
-                     export_opts = list(width = 6400, height = 2600),
+                     width_type = "partcor", vis_save = T, igr_grid = c(2,6),
+                     vis_export_opts = list(width = 6400, height = 2600),
                      igr_par_opts = list(mar=c(2,4,5,4)),
                      igr_grid_names = paste("patient", LETTERS[1:length(adj_mats)-1])),
     "Grid names must be TRUE, FALSE, or of length matching")
@@ -592,7 +592,7 @@ test_that("igraph grid titles cause warning when requested but adj list unnamed"
     expect_warning(
         VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                          edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                         width_type = "partcor", do_save = F, igr_grid = c(1,3),
+                         width_type = "partcor", vis_save = F, igr_grid = c(1,3),
                          igr_par_opts = list(mar=c(2,4,5,4)),
                          igr_grid_names = T),
         "`igr_grid_names` is TRUE but no names were found")
@@ -615,7 +615,7 @@ test_that("igraph grid titles can be drawn from names of adj_mats list", {
     expect_error(
         VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                          edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                         width_type = "partcor", do_save = F, igr_grid = c(1,3),
+                         width_type = "partcor", vis_save = F, igr_grid = c(1,3),
                          igr_par_opts = list(mar=c(2,4,5,4)),
                          igr_grid_names = T),
         NA)
