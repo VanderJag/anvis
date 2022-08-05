@@ -70,8 +70,6 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
   plot_params <- list(...)
 
   # Get the values from additional user input or otherwise use the defaults
-  node_arrangement <- plot_params[["layout"]] %||%
-      igraph::layout_in_circle(graph, order = order(igraph::V(graph)$group))
   edge_width <- plot_params[["edge.width"]] %||%
       igraph::edge.attributes(graph)[["width"]]
   edge_color <- plot_params[["edge.color"]] %||%
@@ -82,6 +80,15 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
       igraph::vertex.attributes(graph)[["size"]]
   vertex_label0 <- plot_params[["vertex.label"]] %||%
       igraph::vertex.attributes(graph)[["name"]]
+  # If group info is present order based on group, otherwise keep node order
+  if ("group" %in% igraph::vertex_attr_names(graph)) {
+      layout_ord <- order(igraph::V(graph)$group)
+  } else {
+      layout_ord <- igraph::V(graph)
+  }
+
+  node_arrangement <- plot_params[["layout"]] %||%
+      igraph::layout_in_circle(graph, order = layout_ord)
 
   # If vertex labels are to be placed radially, there should be none placed
   #   by plot.igraph.
