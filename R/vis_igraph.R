@@ -86,7 +86,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
 
   # Select a graphics device to save output
   start_saving(export_type, export_opts, save_name)
-  if (export_type != "print") on.exit(dev.off())
+  if (export_type != "print") on.exit(if (dev.cur() > 1) dev.off())
 
   # Change graphical parameters here, so they will affect the newly active device
   if (length(par_opts) != 0) old_par <- do.call(par, par_opts)

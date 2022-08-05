@@ -190,7 +190,7 @@ VisualiseNetwork <- function(adj_mats,
 
         if (do_save) {
             start_saving(export_type, export_opts, save_names[[1]])
-            on.exit(dev.off())
+            on.exit(if (dev.cur() > 1) dev.off())
         }
 
         # Allow that plots can be arranged in grid
