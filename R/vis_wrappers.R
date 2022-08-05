@@ -66,6 +66,13 @@ VisualiseNetwork <- function(adj_mats,
     #   T, will use names from vector otherwise
   # netw_xgmml_title allows vector, netw_ext not
 
+
+    # Check if arguments are list with named elements
+    named_list_check(vis_export_opts)
+    named_list_check(igr_rad_lab_opts)
+    named_list_check(igr_plot_opts)
+    named_list_check(igr_par_opts)
+
   # visualization output type
   vis_export_type <- match.arg(vis_export_type)
 

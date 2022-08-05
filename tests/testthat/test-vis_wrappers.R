@@ -541,6 +541,7 @@ test_that("xgmml output contains the same attributes as the input data", {
 })
 
 
+# Run below test to see example -------------------------------------------
 test_that("igraph grid visualization allows adding titles to plots", {
   adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
@@ -608,10 +609,6 @@ test_that("igraph grid titles can be drawn from names of adj_mats list", {
     names(adj_mats) <- paste("person", LETTERS[1:3])
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    test_call <- deparse(sys.calls()[[1]][1])
-    skip_if_not(test_call == "test_that()",
-                message = "igraph visualizations need to be checked manually")
-
     expect_error(
         VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                          edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
@@ -620,4 +617,24 @@ test_that("igraph grid titles can be drawn from names of adj_mats list", {
                          igr_grid_names = T),
         NA)
 })
+
+
+test_that("validation of list arguments works", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
+    names(adj_mats) <- paste("person", LETTERS[1:3])
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    expect_error(
+        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                         width_type = "partcor", vis_save = F, igr_grid = c(1,3),
+                         igr_par_opts = list(mar=c(2,4,5,4)), igr_plot_opts = c("a"),
+                         igr_grid_names = T),
+        "must be a list")
+})
+
 

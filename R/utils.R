@@ -52,3 +52,24 @@ are_colors <- function(x) {
   invisible(is_color)
 }
 
+# Check if all list elements are named
+named_list_check <- function(test_list) {
+    list_name <- deparse(substitute(test_list))
+
+    if (!inherits(test_list, "list")) {
+        stop("Argument `", list_name, "` must be a list:",
+        "\nℹ class(", list_name, "): ", class(test_list), call.=FALSE)
+    }
+
+    all_named <- (length(test_list) == sum(names(test_list) != "", na.rm=TRUE))
+
+    if (!all_named) {
+        stop("All elements in list `", list_name, "` must be named:",
+        "\nℹ names(", list_name, "): ", names(test_list) %>% paste(collapse = ", "),
+        "\n✖ Number of non-empty names required: ", length(test_list),
+        call.=FALSE)
+    }
+
+    return(invisible(all_named))
+}
+
