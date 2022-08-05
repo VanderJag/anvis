@@ -70,12 +70,18 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
   plot_params <- list(...)
 
   # Get the values from additional user input or otherwise use the defaults
-  node_arrangement <- get_param(graph, plot_params, "layout")
-  edge_width <- get_param(graph, plot_params, "edge.width", "width")
-  edge_color <- get_param(graph, plot_params, "edge.color", "color")
-  vertex_color <- get_param(graph, plot_params, "vertex.color", "color")
-  vertex_size <- get_param(graph, plot_params, "vertex.size", "size")
-  vertex_label0 <- get_param(graph, plot_params, "vertex.label", "name")
+  node_arrangement <- plot_params[["layout"]] %||%
+      igraph::layout_in_circle(graph, order = order(igraph::V(graph)$group))
+  edge_width <- plot_params[["edge.width"]] %||%
+      igraph::edge.attributes(graph)[["width"]]
+  edge_color <- plot_params[["edge.color"]] %||%
+      igraph::edge.attributes(graph)[["color"]]
+  vertex_color <- plot_params[["vertex.color"]] %||%
+      igraph::vertex.attributes(graph)[["color"]]
+  vertex_size <- plot_params[["vertex.size"]] %||%
+      igraph::vertex.attributes(graph)[["size"]]
+  vertex_label0 <- plot_params[["vertex.label"]] %||%
+      igraph::vertex.attributes(graph)[["name"]]
 
   # If vertex labels are to be placed radially, there should be none placed
   #   by plot.igraph.
@@ -143,50 +149,6 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
   }
 
   invisible(NULL)
-}
-
-#' Use user parameters over default
-#'
-#' This is a helper function for `vis_igraph`. I makes sure that when there are
-#' plotting arguments that have been provided by the user, these will be used
-#' instead of the default found in the graph.
-#'
-#' @param graph Igraph object.
-#' @param plot_params Names list with the graphical parameters supplied by the
-#'   user.
-#' @param plot_arg Character string. Will be used to modify visualization with
-#'   `igraph::plot.igraph`.
-#' @param name_in_df Character string. Some attributes are called different in the
-#'   context of plotting vs in the object they are stored in (e.g. vertex.label
-#'   vs name, respectively)
-#' @return A vector of values that will be used for one of the arguments of
-#'   `igraph::plot.igraph`. When the attribute is not in
-get_param <- function(graph, plot_params, plot_arg, name_in_df = NULL) {
-  # Prepare a vector that contains the attributes present in the data
-  in_edge_attr <- function(attr) attr %in% igraph::edge_attr_names(graph)
-  in_vertex_attr <- function(attr) attr %in% igraph::vertex_attr_names(graph)
-
-  # Use user input if present
-  if (plot_arg %in% names(plot_params)) {
-    # Return value from user input
-    plot_params[[plot_arg]]
-
-    # If there is no user input for a variable, use data from graph
-  } else {
-    # Take the desired data from the graph
-    if (plot_arg == "layout") {
-      igraph::layout_in_circle(graph, order = order(igraph::V(graph)$group))
-
-    } else if (stringr::str_starts(plot_arg, "vertex") & in_vertex_attr(name_in_df)) {
-      igraph::vertex.attributes(graph)[[name_in_df]]
-
-    } else if (stringr::str_starts(plot_arg, "edge") & in_edge_attr(name_in_df)) {
-      igraph::edge.attributes(graph)[[name_in_df]]
-
-    } else {
-      NULL
-    }
-  }
 }
 
 
