@@ -638,3 +638,38 @@ test_that("validation of list arguments works", {
 })
 
 
+test_that("large network can be visualized with igraph", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    large_adj <- readRDS(test_path("fixtures", "large_network.RDS"))
+    # group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    expect_error(
+        VisualiseNetwork(large_adj, output_type = "igraph",
+                         edge_attrs = "all", node_attrs = "size", arrange_co = TRUE,
+                         width_type = "partcor", vis_save = T),
+        NA)
+})
+
+
+test_that("large network can be visualized with cytoscape", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    # Check if cytoscape is active
+    cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+    skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+                message = "this test runs only when cytoscape is active")
+
+    large_adj <- readRDS(test_path("fixtures", "large_network.RDS"))
+    # group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    expect_error(
+        VisualiseNetwork(large_adj, output_type = "cytoscape",
+                         edge_attrs = "all", node_attrs = "size", arrange_co = TRUE,
+                         width_type = "partcor", vis_save = T),
+        NA)
+})
