@@ -649,7 +649,9 @@ test_that("large network can be visualized with igraph", {
     expect_error(
         VisualiseNetwork(large_adj, output_type = "igraph",
                          edge_attrs = "all", node_attrs = "size", arrange_co = TRUE,
-                         width_type = "partcor", vis_save = T),
+                         width_type = "partcor", vis_save = T, vis_export_type = "svg",
+                         vis_export_opts = list(width = 30, height = 30),
+                         igr_par_opts = list(mar=c(5,5,5,5))),
         NA)
 })
 
