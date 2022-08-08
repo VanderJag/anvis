@@ -417,6 +417,21 @@ percentile_widths <- function(n_edges) {
 }
 
 
+#' Color edges based on weight
+#'
+#' This function adds a column of hex colors to and edge table. The colors are
+#' determined by the weight of an edge. When both positive and negative weights
+#' are found, a blue-red divergent color palette will be used to select colors.
+#' For only positive weights, colors are selected from a white to red color
+#' gradient.
+#'
+#' Colors are assigned by placing the edge weights into 100 bins, and assigning
+#' 100 colors from the appropriate palette.
+#'
+#' @inheritParams edge_weight_to_width
+#'
+#' @return Returns the input `edge_table` with a column called 'color' added
+#' (or overwritten if it was already present).
 weights_to_color <- function(edge_table) {
   # A column named 'weight' is required to determine edge colors
   if (!"weight" %in% colnames(edge_table)) {
