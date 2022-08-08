@@ -35,6 +35,7 @@ n_distinct_cols <- function(n, colors = NULL) {
            "#FF83FA", "#00CED1", "#8B4500", "#A52A2A", "#FB9A99", "#CAB2D6",
            "#EEE685", "#FF1493", "#0000FF", "#36648B", "#00FF00", "#8B8B00",
            "#CDCD00")
+  # pie(rep(1, 25), col = c25) # to check the colors
 
   # Are manual colors supplied?
   if(is.null(colors)) {
