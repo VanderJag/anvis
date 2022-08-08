@@ -30,39 +30,16 @@ n_distinct_cols <- function(n, colors = NULL) {
   n <- as.integer(round(n, digits = 0))
 
   # Define colors palettes with distinct colors
-  sanjee_cols4 <- as.vector(c("#0073C2", "#EFC000", "#868686", "#CD534C"))
-  c16 <- c("#1C86EE", "#E31A1C", "#008B00", "#6A3D9A", "#FF7F00", "#000000",
-           "#FFD700", "#7EC0EE", "#90EE90", "#FDBF6F", "#B3B3B3", "#B03060",
-           "#FF83FA", "#00CED1", "#8B4500", "#A52A2A")
-    # c("dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00", "black", "gold1",
-    #        "skyblue2", "palegreen2", "#FDBF6F", "gray70", "maroon", "orchid1",
-    #        "darkturquoise", "darkorange4", "brown")
-  c25 <- c("#1C86EE", "#E31A1C", "#008B00", "#6A3D9A", "#FF7F00", "#000000",
-           "#FFD700", "#7EC0EE", "#FB9A99", "#90EE90", "#CAB2D6", "#FDBF6F",
-           "#B3B3B3", "#EEE685", "#B03060", "#FF83FA", "#FF1493", "#0000FF",
-           "#36648B", "#00CED1", "#00FF00", "#8B8B00", "#CDCD00", "#8B4500",
-           "#A52A2A")
-    # c("dodgerblue2", "#E31A1C", # red
-    #        "green4", "#6A3D9A", # purple
-    #        "#FF7F00", # orange
-    #        "black", "gold1", "skyblue2", "#FB9A99", # lt pink
-    #        "palegreen2", "#CAB2D6", # lt purple
-    #        "#FDBF6F", # lt orange
-    #        "gray70", "khaki2", "maroon", "orchid1", "deeppink1", "blue1", "steelblue4",
-    #        "darkturquoise", "green1", "yellow4", "yellow3", "darkorange4", "brown")
+  c25 <- c("#0073C2", "#EFC000", "#868686", "#CD534C", "#008B00", "#6A3D9A", "#FF7F00", "#000000",
+            "#7EC0EE", "#90EE90", "#FDBF6F",  "#B03060",
+           "#FF83FA", "#00CED1", "#8B4500", "#A52A2A", "#FB9A99", "#CAB2D6",
+           "#EEE685", "#FF1493", "#0000FF", "#36648B", "#00FF00", "#8B8B00",
+           "#CDCD00")
 
   # Are manual colors supplied?
   if(is.null(colors)) {
-    # If fewer colors are returned we try to select prettier ones
-    if (n <= 4) {
-      return(sanjee_cols4[1:n])
-    } else if (n <= 16) {
-      return(c16[1:n])
-    } else if (n <= 25) {
-      return(c25[1:n])
-    } else if (n > 25) {
       return(rep(c25, length.out = n))
-    }
+
     # When manual colors are supplied return a selection of those instead
   } else {
 
