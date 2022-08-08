@@ -444,7 +444,7 @@ weights_to_color <- function(edge_table) {
     edge_table$color[pos_idx] <- pos_cols
 
   } else {
-    color_pal <- as.vector(colorspace::sequential_hcl(n = 100, palette = "Reds2"))
+    color_pal <- rev(colorspace::sequential_hcl(n = 100, palette = "Reds2"))
     edge_table <- dplyr::mutate(edge_table,
                                 color = color_pal[as.numeric(cut(weight, 100))])
   }
