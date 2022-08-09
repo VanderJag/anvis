@@ -1,36 +1,87 @@
 #' Visualize with igraph
 #'
-#' More extensive description of what the function does
+#' This function takes an node and edge list, or an igraph object, to create a
+#' network visualization. Depending on the attributes that are present in these
+#' input options, nodes and edges will be visually styled.
 #'
 #' When all three network input parameters are provided, `edge_table` and
-#' `node_table` will be used instead of `igraph_obj`.
-#' Used defaults in the for vertex and label styling, but these can be overwritten
-#'   by providing arguments for igraph plot style, i.e. arguments starting
-#'   with the "vertex." or "label.". See igraph plotting docs.
+#' `node_table` will be used instead of `igraph_obj`. This function uses defaults
+#' for visual styling, based on a series of fixed names such as 'color'. The used
+#' defaults can be overwritten by supplying additional arguments to this function
+#' that are specified in `?igraph::igraph.plotting`.
 #'
-#' @param radial_labs A logical to indicate whether vertex labels should be
-#'   positioned radially around the circular arrangement of vertices.
+#' @param edge_table Data frame of which the first two columns contain names of
+#'     vertices connected by edges. Additional columns may be present, columns
+#'     with the names 'width' and 'color' will be used to style the edges in the
+#'     visualization.
+#' @param node_table Data frame in which the first column contains the names of
+#'     the vertices in the network. Additional columns may be present, column
+#'     'group' will be used to arrange vertices so those with the same group
+#'     label will be placed next to each other, 'color' and 'size' will be used
+#'     to adjust the corresponding features of the vertices.
+#' @param igraph_obj Object of class igraph. Can be provided instead of
+#'     `edge_table` and `node_table`. Edge attributes 'width' and 'color' and
+#'     vertex attributes 'group', 'size', and 'color', will be used to style the
+#'     visualization.
+#' @param radial_labs A logical (default `TRUE`) to indicate whether vertex labels
+#'     should be positioned radially around the circular arrangement of vertices.
+#'     If `FALSE`, they will be placed on top of the vertices (as is the default
+#'     for igraph). When this argument is `FALSE`, use the options described
+#'     in `?igraph::igraph.plotting` as additional arguments for this function
+#'     to adjust label styling.
 #' @param rad_lab_opts A names list, in which the names are valid arguments for
-#'   `text()`.
+#'     `text()`. These styling options apply to vertex labels when `radial_lab`
+#'     is TRUE.
+#' @param scale_width Numeric, a number that will be multiplied with the edge
+#'     widths, scaling the edge widths linearly.
+#' @param save_name A character string that will be used as the base file name
+#'     when saving the visualization. Don't include the file extension, as this
+#'     will be added automatically based on the `export_type`. Numbers will be
+#'     appended if a file with the same name and extension already exists in the
+#'     directory used for saving.
+#' @param export_type Character string, one of the following graphical devices:
+#'     'png' (default), 'print' (instead of saving, show the plot in your R
+#'     session), 'pdf', 'svg', 'jpeg', 'tiff', 'bmp', 'ps'.
+#' @param export_opts A list with named elements. The list items will be used
+#'     as arguments for the graphical device selected with `export_type`. Check
+#'     which options are available for your graphical device with e.g. `?png`.
+#'     any file name in this list will be overwritten by `save_name`.
+#' @param par_opts A list with named elements. The list items will be used
+#'     as arguments for `par()`. Changes to the graphical parameters will be
+#'     applied to your selected graphical device before making the visualization.
+#'     After the visualization is completed, the graphical parameters will be
+#'     reset to their original value.
 #' @param ... Additional options to be used with `igraph::plot.igraph` for
-#'   visualizing your network. Any options provided here will overwrite the
-#'   defaults. If `radial_labs` is `FALSE`, this argument can also be used to
-#'   customize the vertex labels placed by `plot.igraph`.
-#' @return The section on the returned values
+#'     visualizing your network. Any options provided here will overwrite the
+#'     defaults. If `radial_labs` is `FALSE`, this argument can also be used to
+#'     customize the vertex labels placed by `plot.igraph`.
+#'
+#' @return Returns `NULL` invisibly. This functions creates visualizations and
+#'     will show them directly in your R session or save them to the selected
+#'     graphical device.
 vis_igraph <- function(edge_table = NULL, node_table = NULL,
                        igraph_obj = NULL,
                        radial_labs = T,
                        rad_lab_opts = list(),
                        scale_width = 3.25,
                        save_name = "network",
-                       export_type = c("png", "print", "pdf", "svg", "jpeg", "tiff",
-                                     "bmp", "ps"),
+                       export_type = c("png", "print", "pdf", "svg", "jpeg",
+                                       "tiff", "bmp", "ps"),
                        export_opts = list(),
                        par_opts = list(),
                        ...) {
-  # TODO add to documentation how par is used with the graphical devices and reset afterwards
 
-  export_type <- match.arg(export_type)
+
+  # TODO add to documentation how par is used with the graphical devices and reset afterwards
+    # TODO add a check to make sure the save name is not empty
+    # TODO add a check to make sure scale width is a number
+
+    # input validation
+    named_list_check(rad_lab_opts)
+    named_list_check(export_opts)
+    named_list_check(par_opts)
+
+    export_type <- match.arg(export_type)
 
   # Validate network parameters ---------------------------------------------
 
@@ -52,6 +103,8 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
 
   # Prepare igraph graph for visualization
   if (!is.null(edge_table) & !is.null(node_table)) {
+      # Check if the required columns are present
+
     graph <- igraph::graph_from_data_frame(edge_table,
                                            vertices = node_table,
                                            directed = FALSE)
@@ -159,6 +212,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
 }
 
 
+# Internal function that starts graphical devices for saving.
 start_saving <- function(export_type, export_opts, save_name) {
   if (export_type != "print") {
     save_funcs <- list("png" = png, "pdf" = pdf, "svg" = svg, "jpeg" = jpeg,
