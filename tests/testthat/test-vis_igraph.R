@@ -349,3 +349,27 @@ test_that("igraph vis names list check works",{
                             export_type = "print", par_opts = list(c(1,2))),
                  "must be named")
 })
+
+
+test_that("igraph vis save_name input validation works",{
+    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    network_list <- adj_matrix_to_network(Mat1,
+                                          node_attrs = "all",
+                                          edge_attrs = "all",
+                                          group_vec = group_vec,
+                                          width_type = "partcor")
+    edge_table <- network_list[["edge_table"]]
+    node_table <- network_list[["node_table"]]
+
+    expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
+                            export_type = "png", save_name = c("a", "b")),
+                 "single save name")
+    expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
+                            export_type = "png", save_name = 6),
+                 "must be of class character")
+    expect_error(vis_igraph(edge_table, node_table, radial_labs = T,
+                            export_type = "png", save_name = ""),
+                 "Save name must be 1 or more characters")
+})

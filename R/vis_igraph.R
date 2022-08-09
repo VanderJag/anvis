@@ -70,9 +70,6 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
                        export_opts = list(),
                        par_opts = list(),
                        ...) {
-
-
-  # TODO add to documentation how par is used with the graphical devices and reset afterwards
     # TODO add a check to make sure the save name is not empty
     # TODO add a check to make sure scale width is a number
 
@@ -82,6 +79,18 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
     named_list_check(par_opts)
 
     export_type <- match.arg(export_type)
+
+    if (length(save_name) != 1) {
+        stop("Must provide a single save name:",
+        "\nℹ For your input length(save_name): ", length(save_name),
+        "\n✖ Length of save name object must be 1.", call.=FALSE)
+    } else if (!inherits(save_name, "character")) {
+        stop("Save name must be of class character: ",
+        "\nℹ For your input class(save_name): ", class(save_name),
+        call.=FALSE)
+    } else if (nchar(save_name) <= 0) {
+        stop("Save name must be 1 or more characters.", call.=FALSE)
+    }
 
   # Validate network parameters ---------------------------------------------
 
