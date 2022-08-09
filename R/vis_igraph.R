@@ -70,9 +70,6 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
                        export_opts = list(),
                        par_opts = list(),
                        ...) {
-    # TODO add a check to make sure the save name is not empty
-    # TODO add a check to make sure scale width is a number
-
     # input validation
     named_list_check(rad_lab_opts)
     named_list_check(export_opts)
@@ -82,23 +79,33 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
 
     if (length(save_name) != 1) {
         stop("Must provide a single save name:",
-        "\nℹ For your input length(save_name): ", length(save_name),
-        "\n✖ Length of save name object must be 1.", call.=FALSE)
+             "\nℹ For your input length(save_name): ", length(save_name),
+             "\n✖ Length of save name object must be 1.", call.=FALSE)
     } else if (!inherits(save_name, "character")) {
         stop("Save name must be of class character: ",
-        "\nℹ For your input class(save_name): ", class(save_name),
-        call.=FALSE)
+             "\nℹ For your input class(save_name): ", class(save_name),
+             call.=FALSE)
     } else if (nchar(save_name) <= 0) {
         stop("Save name must be 1 or more characters.", call.=FALSE)
     }
 
-  # Validate network parameters ---------------------------------------------
+    if (length(scale_width) != 1) {
+        stop("Must provide a single number for scale_width:",
+             "\nℹ For your input length(scale_width): ", length(scale_width),
+             call. = FALSE)
+    } else if (!inherits(scale_width, "numeric")) {
+        stop("Edge width scaling factor must be of class numeric: ",
+             "\nℹ For your input class(scale_width): ", class(scale_width),
+             call.=FALSE)
+    }
 
-  # error for when all network input is missing
-  if (is.null(edge_table) & is.null(node_table) & is.null(igraph_obj)) {
-    stop("Must provide either edge and node table or igraph object",
-         "\nℹ edge_table, node_table and igraph_obj parameters are NULL", call.=FALSE)
-  }
+    # Validate network parameters ---------------------------------------------
+
+    # error for when all network input is missing
+    if (is.null(edge_table) & is.null(node_table) & is.null(igraph_obj)) {
+        stop("Must provide either edge and node table or igraph object",
+             "\nℹ edge_table, node_table and igraph_obj parameters are NULL", call.=FALSE)
+    }
 
   # Error when network table input is incomplete
   if (!is.null(edge_table) & is.null(node_table) |
