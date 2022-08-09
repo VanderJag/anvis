@@ -375,7 +375,7 @@ test_that("igraph vis save_name input validation works",{
 })
 
 
-test_that("igraph vis save_name input validation works",{
+test_that("igraph vis scale_width input validation works",{
     Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
