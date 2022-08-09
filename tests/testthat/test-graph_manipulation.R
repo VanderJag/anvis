@@ -196,7 +196,7 @@ test_that("avg conn. shows warning when not all node tables have size column", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
   group_vec <- list(group_vec)
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "xgmml")
+  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
                        adj_matrix_to_network(adj_mats[[x]],
@@ -230,7 +230,7 @@ test_that("avg conn. gives the same result for reordered node tables", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
   group_vec <- list(group_vec)
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "xgmml")
+  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
                        adj_matrix_to_network(adj_mats[[x]],
@@ -254,7 +254,7 @@ test_that("avg. conn. is calculated when some some node tables miss size attribu
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
   group_vec <- list(group_vec)
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "xgmml")
+  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
                        adj_matrix_to_network(adj_mats[[x]],
@@ -283,7 +283,7 @@ test_that("avg. conn. give error for missing node column", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
   group_vec <- list(group_vec)
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "xgmml")
+  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
                        adj_matrix_to_network(adj_mats[[x]],
@@ -308,7 +308,7 @@ test_that("avg. conn. give error for unequal node sets", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
   group_vec <- list(group_vec)
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "xgmml")
+  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
                        adj_matrix_to_network(adj_mats[[x]],
