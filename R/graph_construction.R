@@ -71,35 +71,56 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 }
 
 
-# TODO finish this documentation
-# use color_group in combination with group
-# NULL for size_type and for width_type will use the default arguments of the fucntions
-
 #' Create edge and node table from adjacency matrix
 #'
 #' Creates edge and node tables with various optional attributes.
 #'
 #' When `node_attrs` or `edge_attrs` is a vector containing 'none' and any other
 #' option, no additional attributes will be added.
-#' # TODO write about the options for attributes, for node and edge individually
-#' # TODO integrate choice of your own color
+#'
+#' When selecting 'group' as node attribute `group_vec` becomes a required
+#' argument. When selecting 'color_group' as a node attribute, 'group' must also
+#' be selected. The colors for the groups can be adjusted with `group_colors`,
+#' but this is optional. When selecting 'size' as node attribute the range of
+#' node sizes can be adjusted with the `size_type` argument (when this argument
+#' is NULL the nodes sizes will be set to work neatly for igraph visualization).
+#' When 'width' is added as edge attribute, it is wise to check the options for
+#' `width_type`, to obtain width that show the most logical contrasts for your
+#' data. `width_type = NULL` (default), will scale the data to range 0 to 1 and
+#' apply a sigmoid, so the lowest edge weights will have even lower width, and
+#' higher weight maintain high values.
 #'
 #' @inheritParams adj_matrix_to_edgelist
 #' @param node_attrs Character strings, one or multiple of 'none', 'all', 'group',
-#'   'color_group', and 'size'.
+#'     'color_group', and 'size'. This argument can be used to choose which
+#'     additional attributes should be added to the node table. Selecting 'group'
+#'     will append a column to the node table that corresponds to `group_vec`.
+#'     Selecting 'color_group' in addition to 'group' will add a column that
+#'     contains a color for each node, selected based on the group of this node.
+#'     Selecting 'size' will add a column with node sizes, that are based on the
+#'     connectivity of the nodes.
 #' @param edge_attrs Character strings, one or multiple of 'none, 'all', 'width',
-#'   'color'.
+#'   'color'. This argument can be used to choose which additional attributes
+#'   should be added to the edge table. Selecting 'width' will add a column to
+#'   edge table that contains edge width values. These are determined by scaling
+#'   the edge weights to range 0 to 1 using a sigmoid and a method based on
+#'   `width_type` (more info in `?edge_weight_to_widths`).
 #' @inheritParams group_nodes
+#' @inheritParams add_colors
 #' @inheritParams node_size_connectivity
 #' @inheritParams edge_weight_to_widths
-#' @return The section on the returned values
+#'
+#' @return Will return a list with two data frames, named edge_table and
+#' node_table. The node_table data frame has a 'node' column and other columns
+#' for the additional attributes that were added. The edge_table has columns
+#' 'source' and 'target', and more columns for the added attributes.
 adj_matrix_to_network <- function(adj_matrix,
                                   node_attrs = c("none", "all", "group", "color_group", "size"),
                                   edge_attrs = c("none", "all", "width", "color"),
                                   group_vec = NULL,
+                                  group_colors = NULL,
                                   size_type = NULL,
-                                  width_type = NULL,
-                                  group_colors = NULL) {
+                                  width_type = NULL) {
 
   # Check which attributes should be added
   node_attrs <- match.arg(node_attrs, several.ok = TRUE)

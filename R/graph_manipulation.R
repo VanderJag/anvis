@@ -78,13 +78,13 @@ add_node_pos <- function(node_table, nodesize, layout = c("circle"), space_fct =
 #'
 #' @param node_table A data frame in which rows correspond to the nodes of a
 #'   network. Must contain a column names `group`.
-#' @param group_colors A vector of character strings representing colors, with
-#'   a color for each node group. Colors may be provided either
-#'   as color names, e.g. 'green', or as hex, e.g. "#00FF00".
+#' @param group_colors Optional (default: NULL), vector of character strings
+#'   representing colors, with a color for each node group. Colors may be
+#'   provided either as color names, e.g. 'green', or as hex, e.g. "#00FF00".
 #'
 #' @return Returns `node_table` with 'color' column, that contains a different
 #'   color for each node group.
-add_colors <- function(node_table, group_colors) {
+add_colors <- function(node_table, group_colors = NULL) {
   # Group information is required to add group coloring
   if (!"group" %in% colnames(node_table)) {
     stop("Must provide node table with group info:",
