@@ -1,12 +1,15 @@
+# Internal function to transform using a sigmoid
 sigmoid_xB <- function(x, B){
   T = (1/(1+((x/(1-x))^-B)))
   return(T)
 }
 
+# Internal function to calculate the n-th root of a number
 nthroot = function(x,n) {
   (abs(x)^(1/n))*sign(x)
 }
 
+# Internal function
 # create vector of angles for text based on number of nodes
 # (flipping the orientation of the words half way around so none appear upside down)
 radial_angle <- function(x, y) {
