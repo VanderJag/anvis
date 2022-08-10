@@ -1,3 +1,6 @@
+# Check if a file with the same base name and extension already exists in the
+#     working directory. If it does, keep appending higher numbers to the base
+#     name until there is no file with this number present in the folder.
 file_sequence <- function(name_base, ext) {
   if (!file.exists(paste0(name_base, ext))) return(name_base)
   i = 2
@@ -8,6 +11,8 @@ file_sequence <- function(name_base, ext) {
   }
 }
 
+# Works like file sequence but will check if the base name exists with either of
+#     two file extensions.
 file_pair_seq <- function(name_base, ext1, ext2) {
   if (!file.exists(paste0(name_base, ext1)) &&
       !file.exists(paste0(name_base, ext2))) return(name_base)
