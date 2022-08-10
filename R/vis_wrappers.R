@@ -5,27 +5,63 @@
 #' arranged in a circle. To highlight relevant interactions, there are different
 #' options available that determine the scaling of the weights in the network.
 #'
-#' @param adj_mats A square adjacency matrix or data frame or a list of these. The data
-#'   should reprensed the strength of the relation between what will be the nodes in
-#'   the network. Rownames and column names are required.
+#' @param adj_mats A square adjacency matrix or data frame or a list of these.
+#'     The data in the matrix is used as edge weights for the network. Row names
+#'     and column names specify interacting nodes, and are required.
+#' @inheritParams adj_matrix_to_network
 #' @param group_vec A vector of character strings that assigns group labels to
-#'   the nodes. The order of this vector should match the order of column and
-#'   rownames of the input
-#'   adjacency matrices. If `adj_mats` is a list, a single group vector can be
-#'   used if it matches all adjacency matrices. Alternatively, provide a list of
-#'   group vectors with one vector for each adj. matrix in the list.
+#'     the nodes. The order of this vector should match the order of column and
+#'     rownames of the input adjacency matrices. If `adj_mats` is a list, a single
+#'     group vector can be used if it matches all adjacency matrices.
+#'     Alternatively, provide a list of group vectors with one vector for each
+#'     adj. matrix in the list. For this information to be added, `node_attrs`
+#'     must be 'group' or 'all'.
+#' @param edge_factor Numeric, a number that will be multiplied with the edge
+#'     widths, scaling the edge widths linearly. When this argument is NULL,
+#'     default values will be used (3.25 for igraph and 2 for cytoscape).
+#' @param width_type Argument used to convert edge weights into widths for
+#'     visualizations that are more easy to interpret. Find a description of the
+#'     options in `?edge_weight_to_widths`. This argument can be a single type,
+#'     that will be used for all networks, or a vector of types that matches the
+#'     number of networks.
 #' @param arrange_co Logical (default FALSE), should nodes be reordered based on
-#'   their average connectivity in multiple networks? Requires
-#'   the same names nodes to be present in all networks. Also requires 'size'
-#'   column to be present in node tables, so `node_attrs` should be 'all' or
-#'   include 'size'.
-#' @param output_type Choose "igraph" (default), "cytoscape", or "xgmml" to get
-#'   a visualization with the respective software for the first two options, or
-#'   the appropriate download for the third option. Node widths columns will be
-#'   adjusted to match your chosen output.
-#' @param vis_save Logical (default TRUE), should network visualizations be saved?
-#'   If this parameter is FALSE igraph will show a plot in your R session and
-#'   cytoscape will keep the session with all networks open.
+#'     their average connectivity in multiple networks? Requires
+#'     the same names nodes to be present in all networks. Also requires 'size'
+#'     column to be present in node tables, so `node_attrs` should be 'all' or
+#'     include 'size'.
+#' @param save_names Base name for the files that are saved by this function
+#'     (default: 'network'). If a single name is provided for multiple networks,
+#'     numbers will be appended to the base name while saving. Alternatively,
+#'     this argument can be a vector with a name for each network that will be
+#'     saved. If in any case one of the same names already exist in the save
+#'     target directory, numbers will added to the base file name, and incremented
+#'     until a no file with the same base name and number exists.
+#' @param output_type Choose 'igraph' (default), 'cytoscape', 'network', or
+#'     'return_only', can be abbreviated. This argument determines the main
+#'     output of this function. The first two options will make a
+#'     visualization with the respective software. The third option will save
+#'     the networks in a format that is determined by the `netw_ext` argument.
+#'     The 'return_only' returns the networks created by this function, just
+#'     like all other options, but without any side effects.
+#' @param vis_radial_labs A logical (default `TRUE`) to indicate whether node
+#'     labels should be positioned radially around the circular arrangement of
+#'     vertices. If `FALSE`, they will be placed on top or next to the vertices,
+#'     depending on your visualization method. This argument is only used when
+#'     the output type is 'cytoscape' or 'igraph'.
+#' @param vis_save Logical (default FALSE), should network visualizations be saved?
+#'     If this parameter is FALSE igraph will show a plot in your R session and
+#'     cytoscape will keep the session with all networks open.
+#' @param vis_export_type Character string, one of 'png' (default), 'jpeg', 'pdf',
+#'     'svg' and 'ps'. Use this argument to choose the file type with which
+#'     visualizations are saved.
+#' @param vis_export_opts A list with named elements. The list items will be used
+#'     as arguments for the function that exports your visualization. When
+#'     exporting a visualization made with igraph, the available options for
+#'     exporting are those that work for the graphical device you selected with
+#'     `vis_export_type`. In this case, you can check which options are available
+#'     for your graphical device with e.g. `?png`. When the visualization was
+#'     made with cytoscape, valid export options are those accepted by
+#'     ..... [RCy3::exportImage] is valid. # check if I should also use square brackets in other documentations.
 #' @inheritParams adj_matrix_to_network
 #' @return The section on the returned values
 #'
@@ -59,12 +95,11 @@ VisualiseNetwork <- function(adj_mats,
                              netw_xgmml_title = NULL
                              ) {
   # TODO add to documenation:
-  # what are the defaults for edge factor
-  # width type can be length 1 or same as n matrices
   # igr_grid, can be T, F, or a vector of two integers
     # igr_grid_names will not show when it is F, will use matrix names when it is
     #   T, will use names from vector otherwise
   # netw_xgmml_title allows vector, netw_ext not
+    # Node widths columns will be adjusted to match your chosen output.
 
 
     # Check if arguments are list with named elements
