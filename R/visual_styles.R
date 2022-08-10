@@ -1,12 +1,15 @@
-#' Select n colors of distinct appearance
+#' Select n colors with distinct appearance
 #'
 #' This function contains a pre-selected collection of colors and will provide
 #' the selected number of these. Optionally, custom vectors with colors can be
-#' provided. If the number of requested colors exceeds the avaible colors (25),
+#' provided. If the number of requested colors exceeds the available colors (25),
 #' the available colors will be repeated.
 #'
 #' @param n Single numeric value that determines how many colors are returned.
-#' @return A character vector containing the number of requested colors
+#' @param colors Character vector of colors that should be selected instead of
+#'    the default colors.
+#'
+#' @return Returns a character vector containing the requested number of colors.
 #'
 #' @examples
 #' n_distinct_cols(6)
