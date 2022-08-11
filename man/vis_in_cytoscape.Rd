@@ -7,11 +7,15 @@
 vis_in_cytoscape(
   node_table,
   edge_table,
+  radial_labs = TRUE,
   export_image = TRUE,
   save_session = TRUE,
-  save_name = NULL,
   close_session = TRUE,
-  image_opts = list(filename = "network", type = "PNG"),
+  save_name = "network",
+  export_type = c("PNG", "JPEG", "PDF", "SVG", "PS"),
+  export_opts = list(),
+  scale_width = 1,
+  node_space = 1.2,
   cyto3.8_check = T
 )
 }
@@ -27,10 +31,13 @@ Optional are columns: 'width' or 'weight' to determine edge widths in the
 visualization (only when 'width' is not present weight will be used), and
 'color' to determine the color of the edges.}
 
-\item{export_image}{Logical (default TRUE), should the visualization be saved?}
+\item{export_image}{Logical (default \code{TRUE}), should the visualization be saved?}
 
-\item{save_session}{Logical (default TRUE), specifying whether the cytoscape
+\item{save_session}{Logical (default \code{TRUE}), specifying whether the cytoscape
 session should be saved.}
+
+\item{close_session}{Logical (default \code{TRUE}), should the cytoscape session be
+closed after optional saving?}
 
 \item{save_name}{Character string that will be used to name image and session
 save files, excluding file extensions, as these will be added automatically.
@@ -39,10 +46,7 @@ If both are \code{NULL}, "network" will be used as default name. If the name
 chosen for \code{save_name} already exists in the current working directory
 numbers will be appended to it.}
 
-\item{close_session}{Logical (default TRUE), should the cytoscape session be
-closed after optional saving?}
-
-\item{image_opts}{List with named values that will be used to customize
+\item{export_opts}{List with named values that will be used to customize
 image export. Any argument accepted by \link[RCy3:exportImage]{RCy3::exportImage} is valid.}
 
 \item{cyto3.8_check}{Logical (default TRUE). Should execution stop if

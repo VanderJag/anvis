@@ -2,20 +2,23 @@
 % Please edit documentation in R/visual_styles.R
 \name{n_distinct_cols}
 \alias{n_distinct_cols}
-\title{Select n colors of distinct appearance}
+\title{Select n colors with distinct appearance}
 \usage{
 n_distinct_cols(n, colors = NULL)
 }
 \arguments{
 \item{n}{Single numeric value that determines how many colors are returned.}
+
+\item{colors}{Character vector of colors that should be selected instead of
+the default colors.}
 }
 \value{
-A character vector containing the number of requested colors
+Returns a character vector containing the requested number of colors.
 }
 \description{
 This function contains a pre-selected collection of colors and will provide
 the selected number of these. Optionally, custom vectors with colors can be
-provided. If the number of requested colors exceeds the avaible colors (25),
+provided. If the number of requested colors exceeds the available colors (25),
 the available colors will be repeated.
 }
 \examples{

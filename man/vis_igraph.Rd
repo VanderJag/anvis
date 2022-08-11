@@ -11,31 +11,84 @@ vis_igraph(
   radial_labs = T,
   rad_lab_opts = list(),
   scale_width = 3.25,
+  save_name = "network",
+  export_type = c("png", "print", "pdf", "svg", "jpeg", "tiff", "bmp", "ps"),
+  export_opts = list(),
+  par_opts = list(),
   ...
 )
 }
 \arguments{
-\item{radial_labs}{A logical to indicate whether vertex labels should be
-positioned radially around the circular arrangement of vertices.}
+\item{edge_table}{Data frame of which the first two columns contain names of
+vertices connected by edges. Additional columns may be present, columns
+with the names 'width' and 'color' will be used to style the edges in the
+visualization.}
+
+\item{node_table}{Data frame in which the first column contains the names of
+the vertices in the network. Additional columns may be present, column
+'group' will be used to arrange vertices so those with the same group
+label will be placed next to each other, 'color' and 'size' will be used
+to adjust the corresponding features of the vertices.}
+
+\item{igraph_obj}{Object of class igraph. Can be provided instead of
+\code{edge_table} and \code{node_table}. Edge attributes 'width' and 'color' and
+vertex attributes 'group', 'size', and 'color', will be used to style the
+visualization.}
+
+\item{radial_labs}{A logical (default \code{TRUE}) to indicate whether vertex labels
+should be positioned radially around the circular arrangement of vertices.
+If \code{FALSE}, they will be placed on top of the vertices (as is the default
+for igraph). When this argument is \code{FALSE}, use the options described
+in \link[igraph:plot.common]{igraph::igraph.plotting} as additional arguments for this function
+to adjust label styling.}
 
 \item{rad_lab_opts}{A names list, in which the names are valid arguments for
-\code{text()}.}
+\link{text}. These styling options apply to vertex labels when \code{radial_lab}
+is \code{TRUE.}}
 
-\item{...}{Additional options to be used with \code{igraph::plot.igraph} for
+\item{scale_width}{Numeric, a number that will be multiplied with the edge
+widths, scaling the edge widths linearly.}
+
+\item{save_name}{A character string that will be used as the base file name
+when saving the visualization. Don't include the file extension, as this
+will be added automatically based on the \code{export_type}. Numbers will be
+appended if a file with the same name and extension already exists in the
+directory used for saving.}
+
+\item{export_type}{Character string, one of the following graphical devices:
+'png' (default), 'print' (instead of saving, show the plot in your R
+session), 'pdf', 'svg', 'jpeg', 'tiff', 'bmp', 'ps'.}
+
+\item{export_opts}{A list with named elements. The list items will be used
+as arguments for the graphical device selected with \code{export_type}. Check
+which options are available for your graphical device with e.g. \link{png}.
+any file name in this list will be overwritten by \code{save_name}.}
+
+\item{par_opts}{A list with named elements. The list items will be used
+as arguments for \link{par}. Changes to the graphical parameters will be
+applied to your selected graphical device before making the visualization.
+After the visualization is completed, the graphical parameters will be
+reset to their original value.}
+
+\item{...}{Additional options to be used with \link[igraph:plot.igraph]{igraph::plot.igraph} for
 visualizing your network. Any options provided here will overwrite the
 defaults. If \code{radial_labs} is \code{FALSE}, this argument can also be used to
 customize the vertex labels placed by \code{plot.igraph}.}
 }
 \value{
-The section on the returned values
+Returns \code{NULL} invisibly. This functions creates visualizations and
+will show them directly in your R session or save them to the selected
+graphical device.
 }
 \description{
-More extensive description of what the function does
+This function takes an node and edge list, or an igraph object, to create a
+network visualization. Depending on the attributes that are present in these
+input options, nodes and edges will be visually styled.
 }
 \details{
 When all three network input parameters are provided, \code{edge_table} and
-\code{node_table} will be used instead of \code{igraph_obj}.
-Used defaults in the for vertex and label styling, but these can be overwritten
-by providing arguments for igraph plot style, i.e. arguments starting
-with the "vertex." or "label.". See igraph plotting docs.
+\code{node_table} will be used instead of \code{igraph_obj}. This function uses defaults
+for visual styling, based on a series of fixed names such as 'color'. The used
+defaults can be overwritten by supplying additional arguments to this function
+that are specified in \link[igraph:plot.common]{igraph::igraph.plotting}.
 }

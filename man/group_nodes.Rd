@@ -7,7 +7,7 @@
 group_nodes(node_table, group_vec)
 }
 \arguments{
-\item{node_table}{A data.frame in which rows correspond to the nodes of a
+\item{node_table}{A data frame in which rows correspond to the nodes of a
 network.}
 
 \item{group_vec}{A vector contains group labels for each row in \code{node_table}.}

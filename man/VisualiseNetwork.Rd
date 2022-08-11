@@ -5,18 +5,120 @@
 \title{Create formatted circular network}
 \usage{
 VisualiseNetwork(
-  df_adjacency,
+  adj_mats,
+  node_attrs = c("none", "all", "group", "color_group", "size"),
+  edge_attrs = c("none", "all", "width", "color"),
   group_vec = NULL,
-  vis_type = c("igraph", "cytoscape"),
+  group_colors = NULL,
   width_type = NULL,
-  do_save = T,
-  save_names = NULL
+  edge_factor = NULL,
+  arrange_co = FALSE,
+  save_names = "network",
+  output_type = c("igraph", "cytoscape", "network", "return_only"),
+  vis_radial_labs = T,
+  vis_save = FALSE,
+  vis_export_type = c("png", "jpeg", "pdf", "svg", "ps"),
+  vis_export_opts = list(),
+  igr_rad_lab_opts = list(),
+  igr_plot_opts = list(),
+  igr_grid = FALSE,
+  igr_grid_names = FALSE,
+  igr_par_opts = list(),
+  cyto3.8_check = TRUE,
+  cyto_save_session = FALSE,
+  cyto_close_session = vis_save,
+  cyto_node_space = 1.2,
+  netw_ext = c("XGMML", "table", "sif", "tab", "tgf", "net"),
+  netw_xgmml_title = NULL
 )
 }
 \arguments{
-\item{df_adjacency}{A square matrix or data frame or a list of these. The data
-should reprensed the strength of the relation between what will be the nodes in
-the network. Rownames and column names are required.}
+\item{adj_mats}{A square adjacency matrix or data frame or a list of these.
+The data in the matrix is used as edge weights for the network. Row names
+and column names specify interacting nodes, and are required.}
+
+\item{node_attrs}{Character strings, one or multiple of 'none', 'all', 'group',
+'color_group', and 'size'. This argument can be used to choose which
+additional attributes should be added to the node table. Selecting 'group'
+will append a column to the node table that corresponds to \code{group_vec}.
+Selecting 'color_group' in addition to 'group' will add a column that
+contains a color for each node, selected based on the group of this node.
+Selecting 'size' will add a column with node sizes, that are based on the
+connectivity of the nodes.}
+
+\item{edge_attrs}{Character strings, one or multiple of 'none, 'all', 'width',
+'color'. This argument can be used to choose which additional attributes
+should be added to the edge table. Selecting 'width' will add a column to
+edge table that contains edge width values. These are determined by scaling
+the edge weights to range 0 to 1 using a sigmoid and a method based on
+\code{width_type} (more info in \link{edge_weight_to_widths}).}
+
+\item{group_vec}{A vector of character strings that assigns group labels to
+the nodes. The order of this vector should match the order of column and
+rownames of the input adjacency matrices. If \code{adj_mats} is a list, a single
+group vector can be used if it matches all adjacency matrices.
+Alternatively, provide a list of group vectors with one vector for each
+adj. matrix in the list. For this information to be added, \code{node_attrs}
+must be 'group' or 'all'.}
+
+\item{group_colors}{Optional (default: \code{NULL}), vector of character strings
+representing colors, with a color for each node group. Colors may be
+provided either as color names, e.g. 'green', or as hex, e.g. "#00FF00".}
+
+\item{width_type}{Argument used to convert edge weights into widths for
+visualizations that are more easy to interpret. Find a description of the
+options in \link{edge_weight_to_widths}. This argument can be a single type,
+that will be used for all networks, or a vector of types that matches the
+number of networks.}
+
+\item{edge_factor}{Numeric, a number that will be multiplied with the edge
+widths, scaling the edge widths linearly. When this argument is \code{NULL},
+default values will be used (3.25 for igraph and 2 for cytoscape).}
+
+\item{arrange_co}{Logical (default \code{FALSE}), should nodes be reordered based on
+their average connectivity in multiple networks? Requires
+the same names nodes to be present in all networks. Also requires 'size'
+column to be present in node tables, so \code{node_attrs} should be 'all' or
+include 'size'.}
+
+\item{save_names}{Base name for the files that are saved by this function
+(default: 'network'). If a single name is provided for multiple networks,
+numbers will be appended to the base name while saving. Alternatively,
+this argument can be a vector with a name for each network that will be
+saved. If in any case one of the same names already exist in the save
+target directory, numbers will added to the base file name, and incremented
+until a no file with the same base name and number exists.}
+
+\item{output_type}{Choose 'igraph' (default), 'cytoscape', 'network', or
+'return_only', can be abbreviated. This argument determines the main
+output of this function. The first two options will make a
+visualization with the respective software. The third option will save
+the networks in a format that is determined by the \code{netw_ext} argument.
+The 'return_only' returns the networks created by this function, just
+like all other options, but without any side effects.}
+
+\item{vis_radial_labs}{A logical (default \code{TRUE}) to indicate whether node
+labels should be positioned radially around the circular arrangement of
+vertices. If \code{FALSE}, they will be placed on top or next to the vertices,
+depending on your visualization method. This argument is only used when
+the output type is 'cytoscape' or 'igraph'.}
+
+\item{vis_save}{Logical (default \code{FALSE}), should network visualizations be saved?
+If this parameter is \code{FALSE} igraph will show a plot in your R session and
+cytoscape will keep the session with all networks open.}
+
+\item{vis_export_type}{Character string, one of 'png' (default), 'jpeg', 'pdf',
+'svg' and 'ps'. Use this argument to choose the file type with which
+visualizations are saved.}
+
+\item{vis_export_opts}{A list with named elements. The list items will be used
+as arguments for the function that exports your visualization. When
+exporting a visualization made with igraph, the available options for
+exporting are those that work for the graphical device you selected with
+\code{vis_export_type}. In this case, you can check which options are available
+for your graphical device with e.g. \link{png}. When the visualization was
+made with cytoscape, valid export options are those accepted by
+..... \link[RCy3:exportImage]{RCy3::exportImage} is valid. # check if I should also use square brackets in other documentations.}
 }
 \value{
 The section on the returned values
@@ -35,7 +137,3 @@ options available that determine the scaling of the weights in the network.
 }
 }
 
-\examples{
-sum(1:10)
-
-}
