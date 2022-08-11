@@ -29,7 +29,7 @@
 #'     for igraph). When this argument is `FALSE`, use the options described
 #'     in [igraph::igraph.plotting] as additional arguments for this function
 #'     to adjust label styling.
-#' @param rad_lab_opts A names list, in which the names are valid arguments for
+#' @param rad_lab_opts A named list, in which the names are valid arguments for
 #'     [text]. These styling options apply to vertex labels when `radial_lab`
 #'     is `TRUE.`
 #' @param scale_width Numeric, a number that will be multiplied with the edge

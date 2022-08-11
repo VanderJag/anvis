@@ -16,7 +16,7 @@
 #'   'color' to determine the color of the edges.
 #' @param export_image Logical (default `TRUE`), should the visualization be saved?
 #' @param save_session Logical (default `TRUE`), specifying whether the cytoscape
-#'   session should be saved.
+#'   session should be saved (as .cys file).
 #' @param close_session Logical (default `TRUE`), should the cytoscape session be
 #'   closed after optional saving?
 #' @param save_name Character string that will be used to name image and session
@@ -27,7 +27,7 @@
 #'   numbers will be appended to it.
 #' @param export_opts List with named values that will be used to customize
 #'   image export. Any argument accepted by [RCy3::exportImage] is valid.
-#' @param cyto3.8_check Logical (default TRUE). Should execution stop if
+#' @param cyto3.8_check Logical (default `TRUE`). Should execution stop if
 #'   Cytoscape version 3.8.x is detected? `FALSE` to skip this test.
 #'   Cytoscape version 3.8.x has problems interacting with `RCy3`, first
 #'   visualization may not show.
