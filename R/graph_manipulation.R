@@ -78,7 +78,7 @@ add_node_pos <- function(node_table, nodesize, layout = c("circle"), space_fct =
 #'
 #' @param node_table A data frame in which rows correspond to the nodes of a
 #'   network. Must contain a column names `group`.
-#' @param group_colors Optional (default: NULL), vector of character strings
+#' @param group_colors Optional (default: `NULL`), vector of character strings
 #'   representing colors, with a color for each node group. Colors may be
 #'   provided either as color names, e.g. 'green', or as hex, e.g. "#00FF00".
 #'
@@ -428,7 +428,7 @@ percentile_widths <- function(n_edges) {
 #' Colors are assigned by placing the edge weights into 100 bins, and assigning
 #' 100 colors from the appropriate palette.
 #'
-#' @inheritParams edge_weight_to_width
+#' @inheritParams edge_weight_to_widths
 #'
 #' @return Returns the input `edge_table` with a column called 'color' added
 #' (or overwritten if it was already present).

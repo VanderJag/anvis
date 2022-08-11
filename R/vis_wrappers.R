@@ -17,14 +17,14 @@
 #'     adj. matrix in the list. For this information to be added, `node_attrs`
 #'     must be 'group' or 'all'.
 #' @param edge_factor Numeric, a number that will be multiplied with the edge
-#'     widths, scaling the edge widths linearly. When this argument is NULL,
+#'     widths, scaling the edge widths linearly. When this argument is `NULL`,
 #'     default values will be used (3.25 for igraph and 2 for cytoscape).
 #' @param width_type Argument used to convert edge weights into widths for
 #'     visualizations that are more easy to interpret. Find a description of the
-#'     options in `?edge_weight_to_widths`. This argument can be a single type,
+#'     options in [edge_weight_to_widths]. This argument can be a single type,
 #'     that will be used for all networks, or a vector of types that matches the
 #'     number of networks.
-#' @param arrange_co Logical (default FALSE), should nodes be reordered based on
+#' @param arrange_co Logical (default `FALSE`), should nodes be reordered based on
 #'     their average connectivity in multiple networks? Requires
 #'     the same names nodes to be present in all networks. Also requires 'size'
 #'     column to be present in node tables, so `node_attrs` should be 'all' or
@@ -48,8 +48,8 @@
 #'     vertices. If `FALSE`, they will be placed on top or next to the vertices,
 #'     depending on your visualization method. This argument is only used when
 #'     the output type is 'cytoscape' or 'igraph'.
-#' @param vis_save Logical (default FALSE), should network visualizations be saved?
-#'     If this parameter is FALSE igraph will show a plot in your R session and
+#' @param vis_save Logical (default `FALSE`), should network visualizations be saved?
+#'     If this parameter is `FALSE` igraph will show a plot in your R session and
 #'     cytoscape will keep the session with all networks open.
 #' @param vis_export_type Character string, one of 'png' (default), 'jpeg', 'pdf',
 #'     'svg' and 'ps'. Use this argument to choose the file type with which
@@ -59,7 +59,7 @@
 #'     exporting a visualization made with igraph, the available options for
 #'     exporting are those that work for the graphical device you selected with
 #'     `vis_export_type`. In this case, you can check which options are available
-#'     for your graphical device with e.g. `?png`. When the visualization was
+#'     for your graphical device with e.g. [png]. When the visualization was
 #'     made with cytoscape, valid export options are those accepted by
 #'     ..... [RCy3::exportImage] is valid. # check if I should also use square brackets in other documentations.
 #' @inheritParams adj_matrix_to_network

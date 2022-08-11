@@ -8,7 +8,7 @@
 #' `node_table` will be used instead of `igraph_obj`. This function uses defaults
 #' for visual styling, based on a series of fixed names such as 'color'. The used
 #' defaults can be overwritten by supplying additional arguments to this function
-#' that are specified in `?igraph::igraph.plotting`.
+#' that are specified in [igraph::igraph.plotting].
 #'
 #' @param edge_table Data frame of which the first two columns contain names of
 #'     vertices connected by edges. Additional columns may be present, columns
@@ -27,11 +27,11 @@
 #'     should be positioned radially around the circular arrangement of vertices.
 #'     If `FALSE`, they will be placed on top of the vertices (as is the default
 #'     for igraph). When this argument is `FALSE`, use the options described
-#'     in `?igraph::igraph.plotting` as additional arguments for this function
+#'     in [igraph::igraph.plotting] as additional arguments for this function
 #'     to adjust label styling.
 #' @param rad_lab_opts A names list, in which the names are valid arguments for
-#'     `text()`. These styling options apply to vertex labels when `radial_lab`
-#'     is TRUE.
+#'     [text]. These styling options apply to vertex labels when `radial_lab`
+#'     is `TRUE.`
 #' @param scale_width Numeric, a number that will be multiplied with the edge
 #'     widths, scaling the edge widths linearly.
 #' @param save_name A character string that will be used as the base file name
@@ -44,14 +44,14 @@
 #'     session), 'pdf', 'svg', 'jpeg', 'tiff', 'bmp', 'ps'.
 #' @param export_opts A list with named elements. The list items will be used
 #'     as arguments for the graphical device selected with `export_type`. Check
-#'     which options are available for your graphical device with e.g. `?png`.
+#'     which options are available for your graphical device with e.g. [png].
 #'     any file name in this list will be overwritten by `save_name`.
 #' @param par_opts A list with named elements. The list items will be used
-#'     as arguments for `par()`. Changes to the graphical parameters will be
+#'     as arguments for [par]. Changes to the graphical parameters will be
 #'     applied to your selected graphical device before making the visualization.
 #'     After the visualization is completed, the graphical parameters will be
 #'     reset to their original value.
-#' @param ... Additional options to be used with `igraph::plot.igraph` for
+#' @param ... Additional options to be used with [igraph::plot.igraph] for
 #'     visualizing your network. Any options provided here will overwrite the
 #'     defaults. If `radial_labs` is `FALSE`, this argument can also be used to
 #'     customize the vertex labels placed by `plot.igraph`.

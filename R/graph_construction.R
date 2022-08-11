@@ -104,15 +104,15 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #'   should be added to the edge table. Selecting 'width' will add a column to
 #'   edge table that contains edge width values. These are determined by scaling
 #'   the edge weights to range 0 to 1 using a sigmoid and a method based on
-#'   `width_type` (more info in `?edge_weight_to_widths`).
+#'   `width_type` (more info in [edge_weight_to_widths]).
 #' @inheritParams group_nodes
 #' @inheritParams add_colors
 #' @inheritParams node_size_connectivity
 #' @inheritParams edge_weight_to_widths
 #'
-#' @return Will return a list with two data frames, named edge_table and
-#' node_table. The node_table data frame has a 'node' column and other columns
-#' for the additional attributes that were added. The edge_table has columns
+#' @return Will return a list with two data frames, named 'edge_table' and
+#' 'node_table'. The 'node_table' data frame has a 'node' column and other columns
+#' for the additional attributes that were added. The 'edge_table' has columns
 #' 'source' and 'target', and more columns for the added attributes.
 adj_matrix_to_network <- function(adj_matrix,
                                   node_attrs = c("none", "all", "group", "color_group", "size"),

@@ -14,10 +14,10 @@
 #'   Optional are columns: 'width' or 'weight' to determine edge widths in the
 #'   visualization (only when 'width' is not present weight will be used), and
 #'   'color' to determine the color of the edges.
-#' @param export_image Logical (default TRUE), should the visualization be saved?
-#' @param save_session Logical (default TRUE), specifying whether the cytoscape
+#' @param export_image Logical (default `TRUE`), should the visualization be saved?
+#' @param save_session Logical (default `TRUE`), specifying whether the cytoscape
 #'   session should be saved.
-#' @param close_session Logical (default TRUE), should the cytoscape session be
+#' @param close_session Logical (default `TRUE`), should the cytoscape session be
 #'   closed after optional saving?
 #' @param save_name Character string that will be used to name image and session
 #'   save files, excluding file extensions, as these will be added automatically.
