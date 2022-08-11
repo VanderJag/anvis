@@ -1,9 +1,13 @@
-#' Create formatted circular network
+#' Create network and visualize or export
 #'
-#' This function creates a visualization for the input network
-#' information. The present implementation creates a network in which nodes are
-#' arranged in a circle. To highlight relevant interactions, there are different
-#' options available that determine the scaling of the weights in the network.
+#' This function takes one or more adjacency matrices as input. It uses the
+#' adjacency information (weights) to create several attributes for network
+#' visualization such as scaled edge widths and node sizes based on node
+#' connectivity. The created network with additional attributes can be visualized
+#' with igraph or cytoscape, or exported in several common file formats.
+#'
+#' Note: When using this function to create visualizations with cytoscape, the
+#' cytoscape software needs to be running in the background already.
 #'
 #' @param adj_mats A square adjacency matrix or data frame or a list of these.
 #'     The data in the matrix is used as edge weights for the network. Row names
@@ -108,13 +112,12 @@
 #'     networks, to provide each networks its own title.
 #' @inheritParams adj_matrix_to_network
 #'
-#'
-#'
-#' @return The section on the returned values
-#'
-#' @section Additional criteria for the use of this function:
-#' * The Cytoscape software needs to be running.
-#' * ...
+#' @return The main purpose of this function is to create visualizations or
+#' export networks. In addition, this function returns a list of two lists,
+#' containing the information of the created networks. The first is named 'nodes'
+#' and it is a list containing a node table (data frame) for each input adjacency
+#' matrix. The second list is named 'edges' and it contains edge tables. The
+#' return is invisible, so it will not print when not assigned.
 VisualiseNetwork <- function(adj_mats,
                              node_attrs = c("none", "all", "group", "color_group", "size"),
                              edge_attrs = c("none", "all", "width", "color"),
@@ -141,9 +144,6 @@ VisualiseNetwork <- function(adj_mats,
                              netw_ext = c("XGMML", "table", "sif", "tab", "tgf", "net"),
                              netw_xgmml_title = NULL
                              ) {
-  # TODO add to documenation:
-    # saves networks in individual file (XGMML) case i mean
-    # TODO does igr_grid_names TRUE work when there are actually no list names?
 
     # Check if arguments are list with named elements
     named_list_check(vis_export_opts)
@@ -362,7 +362,7 @@ VisualiseNetwork <- function(adj_mats,
     }
   }
 
-  Network = list(adjacencies = adj_mats, nodes = nodes, edges = edges)
+  Network = list(nodes = nodes, edges = edges)
 
   return(invisible(Network))
 }
