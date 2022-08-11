@@ -34,7 +34,7 @@ visualization (only when 'width' is not present weight will be used), and
 \item{export_image}{Logical (default \code{TRUE}), should the visualization be saved?}
 
 \item{save_session}{Logical (default \code{TRUE}), specifying whether the cytoscape
-session should be saved.}
+session should be saved (as .cys file).}
 
 \item{close_session}{Logical (default \code{TRUE}), should the cytoscape session be
 closed after optional saving?}
@@ -49,7 +49,7 @@ numbers will be appended to it.}
 \item{export_opts}{List with named values that will be used to customize
 image export. Any argument accepted by \link[RCy3:exportImage]{RCy3::exportImage} is valid.}
 
-\item{cyto3.8_check}{Logical (default TRUE). Should execution stop if
+\item{cyto3.8_check}{Logical (default \code{TRUE}). Should execution stop if
 Cytoscape version 3.8.x is detected? \code{FALSE} to skip this test.
 Cytoscape version 3.8.x has problems interacting with \code{RCy3}, first
 visualization may not show.}

@@ -21,9 +21,9 @@ VisualiseNetwork(
   vis_export_opts = list(),
   igr_rad_lab_opts = list(),
   igr_plot_opts = list(),
+  igr_par_opts = list(),
   igr_grid = FALSE,
   igr_grid_names = FALSE,
-  igr_par_opts = list(),
   cyto3.8_check = TRUE,
   cyto_save_session = FALSE,
   cyto_close_session = vis_save,
@@ -118,7 +118,62 @@ exporting are those that work for the graphical device you selected with
 \code{vis_export_type}. In this case, you can check which options are available
 for your graphical device with e.g. \link{png}. When the visualization was
 made with cytoscape, valid export options are those accepted by
-..... \link[RCy3:exportImage]{RCy3::exportImage} is valid. # check if I should also use square brackets in other documentations.}
+\link[RCy3:exportImage]{RCy3::exportImage}.}
+
+\item{igr_rad_lab_opts}{A named list, in which the names are valid arguments
+for \link{text}. These styling options apply to igraph node labels when
+\code{vis_radial_labs} is \code{TRUE}.}
+
+\item{igr_plot_opts}{A named list containing additional options to be used with
+\link[igraph:plot.igraph]{igraph::plot.igraph} for customizing the igraph visualizations. If
+\code{vis_radial_labs} is \code{FALSE}, this argument can also be used to
+customize igraph visualization node labels.}
+
+\item{igr_par_opts}{A list with named elements. The list items will be used
+as arguments for \link{par} while making visualizations with igraph. Changes to
+the graphical parameters will be applied to your selected graphical device
+before making the visualization. After the visualization is completed,
+the graphical parameters will be reset to their original value.}
+
+\item{igr_grid}{Logical (default: \code{FALSE}), or a vector with two numbers
+representing grid dimensions. This argument will determine whether igraph
+visualization are be made separately, or arranged on a grid in a single
+image. \code{TRUE} will automatically determine grid size.}
+
+\item{igr_grid_names}{Logical (default: \code{FALSE}) determining whether titles
+should be placed above the individual networks in the grid layout. \code{TRUE}
+will use the names of the \code{adj_mats} list to place titles. Alternatively,
+a vector with a name for each network can be provided as input for this
+argument.}
+
+\item{cyto3.8_check}{Logical (default \code{TRUE}). Should execution stop if
+Cytoscape version 3.8.x is detected? \code{FALSE} to skip this test.
+Cytoscape version 3.8.x has problems interacting with \code{RCy3}, first
+visualization may not show.}
+
+\item{cyto_save_session}{Logical (default \code{FALSE}). When visualizing with
+cytoscape, should the session be saved (as .cys file)?}
+
+\item{cyto_close_session}{Logical (default same as \code{vis_save}), should the
+cytoscape session be closed after visualization has been completed?}
+
+\item{cyto_node_space}{Numeric (default 1.2). By default nodes are arranged
+with a circular layout, where the space between the nodes is adjusted with
+this argument. When this argument is 1, the borders of the largest nodes
+can be touching. When e.g. a value of 2 is chosen for this argument, the
+space around a node will be twice the (maximum) node size. This argument
+only increases node spacing for cytoscape visualizations.}
+
+\item{netw_ext}{Character string (default 'XGMML'). When \code{output_type} is
+'network', which file format should be used to save the network? Options
+are 'XGMML', 'table', 'sif', 'tab', 'tgf', 'net'.}
+
+\item{netw_xgmml_title}{Only used when \code{output_type} is 'network' and \code{netw_ext}
+is 'XGMML'. This argument determines the title attribute of a network in
+the XGMML file. Possible values are \code{NULL} (default), to use the
+\code{save_names} as a network title, a single string, to give all networks
+the same title, or a vector of strings matching the length of input
+networks, to provide each networks its own title.}
 }
 \value{
 The section on the returned values

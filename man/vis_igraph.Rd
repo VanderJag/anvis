@@ -42,7 +42,7 @@ for igraph). When this argument is \code{FALSE}, use the options described
 in \link[igraph:plot.common]{igraph::igraph.plotting} as additional arguments for this function
 to adjust label styling.}
 
-\item{rad_lab_opts}{A names list, in which the names are valid arguments for
+\item{rad_lab_opts}{A named list, in which the names are valid arguments for
 \link{text}. These styling options apply to vertex labels when \code{radial_lab}
 is \code{TRUE.}}
 
