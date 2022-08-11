@@ -61,8 +61,55 @@
 #'     `vis_export_type`. In this case, you can check which options are available
 #'     for your graphical device with e.g. [png]. When the visualization was
 #'     made with cytoscape, valid export options are those accepted by
-#'     ..... [RCy3::exportImage] is valid. # check if I should also use square brackets in other documentations.
+#'     [RCy3::exportImage].
+#' @param igr_rad_lab_opts A named list, in which the names are valid arguments
+#'     for [text]. These styling options apply to igraph node labels when
+#'     `vis_radial_labs` is `TRUE`.
+#' @param igr_plot_opts A named list containing additional options to be used with
+#'     [igraph::plot.igraph] for customizing the igraph visualizations. If
+#'     `vis_radial_labs` is `FALSE`, this argument can also be used to
+#'     customize igraph visualization node labels.
+#' @param igr_par_opts A list with named elements. The list items will be used
+#'     as arguments for [par] while making visualizations with igraph. Changes to
+#'     the graphical parameters will be applied to your selected graphical device
+#'     before making the visualization. After the visualization is completed,
+#'     the graphical parameters will be reset to their original value.
+#' @param igr_grid Logical (default: `FALSE`), or a vector with two numbers
+#'     representing grid dimensions. This argument will determine whether igraph
+#'     visualization are be made separately, or arranged on a grid in a single
+#'     image. `TRUE` will automatically determine grid size.
+#' @param igr_grid_names Logical (default: `FALSE`) determining whether titles
+#'     should be placed above the individual networks in the grid layout. `TRUE`
+#'     will use the names of the `adj_mats` list to place titles. Alternatively,
+#'     a vector with a name for each network can be provided as input for this
+#'     argument.
+#' @param cyto3.8_check Logical (default `TRUE`). Should execution stop if
+#'     Cytoscape version 3.8.x is detected? `FALSE` to skip this test.
+#'     Cytoscape version 3.8.x has problems interacting with `RCy3`, first
+#'     visualization may not show.
+#' @param cyto_save_session Logical (default `FALSE`). When visualizing with
+#'     cytoscape, should the session be saved (as .cys file)?
+#' @param cyto_close_session Logical (default same as `vis_save`), should the
+#'     cytoscape session be closed after visualization has been completed?
+#' @param cyto_node_space Numeric (default 1.2). By default nodes are arranged
+#'     with a circular layout, where the space between the nodes is adjusted with
+#'     this argument. When this argument is 1, the borders of the largest nodes
+#'     can be touching. When e.g. a value of 2 is chosen for this argument, the
+#'     space around a node will be twice the (maximum) node size. This argument
+#'     only increases node spacing for cytoscape visualizations.
+#' @param netw_ext Character string (default 'XGMML'). When `output_type` is
+#'     'network', which file format should be used to save the network? Options
+#'     are 'XGMML', 'table', 'sif', 'tab', 'tgf', 'net'.
+#' @param netw_xgmml_title Only used when `output_type` is 'network' and `netw_ext`
+#'     is 'XGMML'. This argument determines the title attribute of a network
+#'     when it's saved as XGMML file. Possible values are `NULL` (default), to use
+#'     the `save_names` as a network title, a single string, to give all networks
+#'     the same title, or a vector of strings matching the length of input
+#'     networks, to provide each networks its own title.
 #' @inheritParams adj_matrix_to_network
+#'
+#'
+#'
 #' @return The section on the returned values
 #'
 #' @section Additional criteria for the use of this function:
@@ -84,9 +131,9 @@ VisualiseNetwork <- function(adj_mats,
                              vis_export_opts = list(),
                              igr_rad_lab_opts = list(),
                              igr_plot_opts = list(),
+                             igr_par_opts = list(),
                              igr_grid = FALSE,
                              igr_grid_names = FALSE,
-                             igr_par_opts = list(),
                              cyto3.8_check = TRUE,
                              cyto_save_session = FALSE,
                              cyto_close_session = vis_save,
@@ -95,12 +142,8 @@ VisualiseNetwork <- function(adj_mats,
                              netw_xgmml_title = NULL
                              ) {
   # TODO add to documenation:
-  # igr_grid, can be T, F, or a vector of two integers
-    # igr_grid_names will not show when it is F, will use matrix names when it is
-    #   T, will use names from vector otherwise
-  # netw_xgmml_title allows vector, netw_ext not
-    # Node widths columns will be adjusted to match your chosen output.
-
+    # saves networks in individual file (XGMML) case i mean
+    # TODO does igr_grid_names TRUE work when there are actually no list names?
 
     # Check if arguments are list with named elements
     named_list_check(vis_export_opts)
