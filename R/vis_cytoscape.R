@@ -6,31 +6,41 @@
 #' the visualization. Image and session object can be saved.
 #'
 #' @param node_table Data frame with required column 'node'. Optional are columns
-#'   'color' and 'size': when present they will be used to determine the respective
-#'   visual properties of the visualization. Other columns with node attributes
-#'   will not be used in the visualization, but they will be added to the node
-#'   table in cytoscape.
+#'     'color' and 'size': when present, these will be used to determine the
+#'     respective visual properties of the visualization. Other columns with
+#'     node attributes will not be used in the visualization, but they will be
+#'     added to the node table in cytoscape.
 #' @param edge_table Data frame with required columns 'source' and 'target'.
-#'   Optional are columns: 'width' or 'weight' to determine edge widths in the
-#'   visualization (only when 'width' is not present weight will be used), and
-#'   'color' to determine the color of the edges.
+#'     Optional are columns: 'width' or 'weight' to determine edge widths in the
+#'     visualization (only when 'width' is not present weight will be used), and
+#'     'color' to determine the color of the edges.
 #' @param export_image Logical (default `TRUE`), should the visualization be saved?
 #' @param save_session Logical (default `TRUE`), specifying whether the cytoscape
-#'   session should be saved (as .cys file).
+#'     session should be saved (as .cys file).
 #' @param close_session Logical (default `TRUE`), should the cytoscape session be
-#'   closed after optional saving?
-#' @param save_name Character string that will be used to name image and session
-#'   save files, excluding file extensions, as these will be added automatically.
-#'   If this argument is `NULL`, `image_opt[["filename"]]` will be used for naming.
-#'   If both are `NULL`, "network" will be used as default name. If the name
-#'   chosen for `save_name` already exists in the current working directory
-#'   numbers will be appended to it.
+#'     closed after optional saving?
+#' @param save_name Character string (default 'network') that will be used to
+#'     name image and session save files. File extensions should not be included
+#'     for this argument, as they will be added automatically. If the name
+#'     chosen for `save_name` already exists in the current working directory
+#'     numbers will be appended to it.
+#' @param export_type Character string, one of 'PNG' (default), 'JPEG', 'PDF',
+#'     'SVG', or 'PS'. Determines which file format will be used to save the
+#'     network visualization.
 #' @param export_opts List with named values that will be used to customize
-#'   image export. Any argument accepted by [RCy3::exportImage] is valid.
+#'     image export. Any argument accepted by [RCy3::exportImage] is valid.
+#'     The options 'filename' and 'type' of this list will be overwritten
+#'     by `save_name` and `export_type`, respectively.
+#' @param scale_width Numeric, a number that will be multiplied with the edge
+#'     widths, scaling the edge widths linearly.
+#' @param node_space Numeric (default 1.2). Adjusts spacing between nodes.
+#'     When this argument is 1, the borders of the largest nodes
+#'     can be touching. When e.g. a value of 2 is chosen for this argument, the
+#'     space around a node will be twice the (maximum) node size.
 #' @param cyto3.8_check Logical (default `TRUE`). Should execution stop if
-#'   Cytoscape version 3.8.x is detected? `FALSE` to skip this test.
-#'   Cytoscape version 3.8.x has problems interacting with `RCy3`, first
-#'   visualization may not show.
+#'     Cytoscape version 3.8.x is detected? `FALSE` to skip this test.
+#'     Cytoscape version 3.8.x has problems interacting with `RCy3`, first
+#'     visualization may not show.
 vis_in_cytoscape <- function(node_table, edge_table,
                              radial_labs = TRUE,
                              export_image = TRUE,
@@ -206,6 +216,7 @@ vis_in_cytoscape <- function(node_table, edge_table,
   if (save_session) RCy3::saveSession(filename = save_name)
   if (close_session) RCy3::closeSession(save.before.closing = FALSE)
 
+  invisible(NULL)
 }
 
 
