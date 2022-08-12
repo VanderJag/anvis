@@ -21,10 +21,10 @@ vis_in_cytoscape(
 }
 \arguments{
 \item{node_table}{Data frame with required column 'node'. Optional are columns
-'color' and 'size': when present they will be used to determine the respective
-visual properties of the visualization. Other columns with node attributes
-will not be used in the visualization, but they will be added to the node
-table in cytoscape.}
+'color' and 'size': when present, these will be used to determine the
+respective visual properties of the visualization. Other columns with
+node attributes will not be used in the visualization, but they will be
+added to the node table in cytoscape.}
 
 \item{edge_table}{Data frame with required columns 'source' and 'target'.
 Optional are columns: 'width' or 'weight' to determine edge widths in the
@@ -39,15 +39,28 @@ session should be saved (as .cys file).}
 \item{close_session}{Logical (default \code{TRUE}), should the cytoscape session be
 closed after optional saving?}
 
-\item{save_name}{Character string that will be used to name image and session
-save files, excluding file extensions, as these will be added automatically.
-If this argument is \code{NULL}, \code{image_opt[["filename"]]} will be used for naming.
-If both are \code{NULL}, "network" will be used as default name. If the name
+\item{save_name}{Character string (default 'network') that will be used to
+name image and session save files. File extensions should not be included
+for this argument, as they will be added automatically. If the name
 chosen for \code{save_name} already exists in the current working directory
 numbers will be appended to it.}
 
+\item{export_type}{Character string, one of 'PNG' (default), 'JPEG', 'PDF',
+'SVG', or 'PS'. Determines which file format will be used to save the
+network visualization.}
+
 \item{export_opts}{List with named values that will be used to customize
-image export. Any argument accepted by \link[RCy3:exportImage]{RCy3::exportImage} is valid.}
+image export. Any argument accepted by \link[RCy3:exportImage]{RCy3::exportImage} is valid.
+The options 'filename' and 'type' of this list will be overwritten
+by \code{save_name} and \code{export_type}, respectively.}
+
+\item{scale_width}{Numeric, a number that will be multiplied with the edge
+widths, scaling the edge widths linearly.}
+
+\item{node_space}{Numeric (default 1.2). Adjusts spacing between nodes.
+When this argument is 1, the borders of the largest nodes
+can be touching. When e.g. a value of 2 is chosen for this argument, the
+space around a node will be twice the (maximum) node size.}
 
 \item{cyto3.8_check}{Logical (default \code{TRUE}). Should execution stop if
 Cytoscape version 3.8.x is detected? \code{FALSE} to skip this test.

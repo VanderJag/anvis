@@ -2,7 +2,7 @@
 % Please edit documentation in R/vis_wrappers.R
 \name{VisualiseNetwork}
 \alias{VisualiseNetwork}
-\title{Create formatted circular network}
+\title{Create network and visualize or export}
 \usage{
 VisualiseNetwork(
   adj_mats,
@@ -169,26 +169,28 @@ only increases node spacing for cytoscape visualizations.}
 are 'XGMML', 'table', 'sif', 'tab', 'tgf', 'net'.}
 
 \item{netw_xgmml_title}{Only used when \code{output_type} is 'network' and \code{netw_ext}
-is 'XGMML'. This argument determines the title attribute of a network in
-the XGMML file. Possible values are \code{NULL} (default), to use the
-\code{save_names} as a network title, a single string, to give all networks
+is 'XGMML'. This argument determines the title attribute of a network
+when it's saved as XGMML file. Possible values are \code{NULL} (default), to use
+the \code{save_names} as a network title, a single string, to give all networks
 the same title, or a vector of strings matching the length of input
 networks, to provide each networks its own title.}
 }
 \value{
-The section on the returned values
+The main purpose of this function is to create visualizations or
+export networks. In addition, this function returns a list of two lists,
+containing the information of the created networks. The first is named 'nodes'
+and it is a list containing a node table (data frame) for each input adjacency
+matrix. The second list is named 'edges' and it contains edge tables. The
+return is invisible, so it will not print when not assigned.
 }
 \description{
-This function creates a visualization for the input network
-information. The present implementation creates a network in which nodes are
-arranged in a circle. To highlight relevant interactions, there are different
-options available that determine the scaling of the weights in the network.
+This function takes one or more adjacency matrices as input. It uses the
+adjacency information (weights) to create several attributes for network
+visualization such as scaled edge widths and node sizes based on node
+connectivity. The created network with additional attributes can be visualized
+with igraph or cytoscape, or exported in several common file formats.
 }
-\section{Additional criteria for the use of this function}{
-
-\itemize{
-\item The Cytoscape software needs to be running.
-\item ...
+\details{
+Note: When using this function to create visualizations with cytoscape, the
+cytoscape software needs to be running in the background already.
 }
-}
-
