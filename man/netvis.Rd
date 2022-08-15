@@ -3,10 +3,9 @@
 \docType{package}
 \name{netvis}
 \alias{netvis}
-\title{foo: A package for computating the notorious bar statistic}
+\title{anvis: A package for convenient network visualizations}
 \description{
-The foo package provides three categories of important functions:
-foo, bar and baz.
+Here there will be a short package functionality summary later
 }
 \section{Foo functions}{
 

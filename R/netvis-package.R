@@ -1,7 +1,6 @@
-#' foo: A package for computating the notorious bar statistic
+#' anvis: A package for convenient network visualizations
 #'
-#' The foo package provides three categories of important functions:
-#' foo, bar and baz.
+#' Here there will be a short package functionality summary later
 #'
 #' @section Foo functions:
 #' The foo functions ...

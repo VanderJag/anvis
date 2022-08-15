@@ -8,6 +8,8 @@
 #'   in row names and column names.
 #' @return Returns data frame representing a network as weighted edge list. Columns are
 #'   source, target, and weight.
+#'
+#' @export
 adj_matrix_to_edgelist <- function(adj_matrix) {
   # Column names and row names are required to determine connected vertices
   if (is.null(colnames(adj_matrix))) {
@@ -65,6 +67,8 @@ adj_matrix_to_edgelist <- function(adj_matrix) {
 #'   names.
 #' @return Returns a data frame with a single column: 'node', which holds the
 #'   names of the network's nodes.
+#'
+#' @export
 adj_matrix_to_nodetable <- function(adj_matrix) {
 
   data.frame("node" = colnames(adj_matrix))
@@ -114,6 +118,8 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #' 'node_table'. The 'node_table' data frame has a 'node' column and other columns
 #' for the additional attributes that were added. The 'edge_table' has columns
 #' 'source' and 'target', and more columns for the added attributes.
+#'
+#' @export
 adj_matrix_to_network <- function(adj_matrix,
                                   node_attrs = c("none", "all", "group", "color_group", "size"),
                                   edge_attrs = c("none", "all", "width", "color"),

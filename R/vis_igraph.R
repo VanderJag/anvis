@@ -59,6 +59,8 @@
 #' @return Returns `NULL` invisibly. This functions creates visualizations and
 #'     will show them directly in your R session or save them to the selected
 #'     graphical device.
+#'
+#' @export
 vis_igraph <- function(edge_table = NULL, node_table = NULL,
                        igraph_obj = NULL,
                        radial_labs = T,

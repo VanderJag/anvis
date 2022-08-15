@@ -118,6 +118,8 @@
 #' and it is a list containing a node table (data frame) for each input adjacency
 #' matrix. The second list is named 'edges' and it contains edge tables. The
 #' return is invisible, so it will not print when not assigned.
+#'
+#' @export
 VisualiseNetwork <- function(adj_mats,
                              node_attrs = c("none", "all", "group", "color_group", "size"),
                              edge_attrs = c("none", "all", "width", "color"),

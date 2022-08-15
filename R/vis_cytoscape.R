@@ -41,6 +41,8 @@
 #'     Cytoscape version 3.8.x is detected? `FALSE` to skip this test.
 #'     Cytoscape version 3.8.x has problems interacting with `RCy3`, first
 #'     visualization may not show.
+#'
+#' @export
 vis_in_cytoscape <- function(node_table, edge_table,
                              radial_labs = TRUE,
                              export_image = TRUE,
