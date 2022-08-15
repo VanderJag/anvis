@@ -149,6 +149,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
       igraph::vertex.attributes(graph)[["color"]]
   vertex_size <- plot_params[["vertex.size"]] %||%
       igraph::vertex.attributes(graph)[["size"]]
+  vertex_brd_col<- plot_params[["vertex.frame.color"]] %||% "white"
   vertex_label0 <- plot_params[["vertex.label"]] %||%
       igraph::vertex.attributes(graph)[["name"]]
   # If group info is present order based on group, otherwise keep node order
@@ -183,7 +184,8 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
             edge.color = edge_color,
             vertex.size = vertex_size,
             vertex.color = vertex_color,
-            vertex.label = vertex_label),
+            vertex.label = vertex_label,
+            vertex.frame.color = vertex_brd_col),
             plot_params
           )
   )
