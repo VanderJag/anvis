@@ -125,6 +125,7 @@ VisualiseNetwork <- function(adj_mats,
                              edge_attrs = c("none", "all", "width", "color"),
                              group_vec = NULL,
                              group_colors = NULL,
+                             colorblind = FALSE,
                              width_type = NULL,
                              edge_factor = NULL,
                              arrange_co = FALSE,
@@ -207,6 +208,18 @@ VisualiseNetwork <- function(adj_mats,
            "\nℹ Length of `width_type` = ", length(width_type),
            ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
     }
+  }
+
+  # See if colorblind accessible colors should be used
+  if (colorblind) {
+      # Manually chosed colors overrule colorblind option
+      if (!is.null(group_colors)) {
+          warning("Colors provided with `group_colors` will be used instead of ",
+                  "colorblind accessible colors. To prevent this use ",
+                  "`group_colors = NULL`.")
+      }
+
+      group_colors <- group_colors %||% palette.colors(palette = "Okabe-Ito")
   }
 
   # Convert all adjacency matrices into edge and node tables
