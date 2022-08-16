@@ -20,6 +20,8 @@
 #'     Alternatively, provide a list of group vectors with one vector for each
 #'     adj. matrix in the list. For this information to be added, `node_attrs`
 #'     must be 'group' or 'all'.
+#' @param colorblind Logical (default `FALSE`), determining if the default colors
+#'     should be exchanged for colorblind accessible colors.
 #' @param edge_factor Numeric, a number that will be multiplied with the edge
 #'     widths, scaling the edge widths linearly. When this argument is `NULL`,
 #'     default values will be used (3.25 for igraph and 2 for cytoscape).
