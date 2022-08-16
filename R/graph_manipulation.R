@@ -443,6 +443,7 @@ percentile_widths <- function(n_edges) {
 #' @inheritParams edge_weight_to_widths
 #' @param edge_color_func A function that takes as first argument a number, and
 #'     returns a vector of colors, which matches in length with the input number.
+#'     This argument is optional (default `NULL`).
 #'
 #' @return Returns the input `edge_table` with a column called 'color' added
 #' (or overwritten if it was already present).
