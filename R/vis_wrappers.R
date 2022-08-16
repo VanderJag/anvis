@@ -20,6 +20,7 @@
 #'     Alternatively, provide a list of group vectors with one vector for each
 #'     adj. matrix in the list. For this information to be added, `node_attrs`
 #'     must be 'group' or 'all'.
+#' @inheritParams weights_to_color
 #' @param colorblind Logical (default `FALSE`), determining if the default colors
 #'     should be exchanged for colorblind accessible colors.
 #' @param edge_factor Numeric, a number that will be multiplied with the edge
@@ -127,6 +128,7 @@ VisualiseNetwork <- function(adj_mats,
                              edge_attrs = c("none", "all", "width", "color"),
                              group_vec = NULL,
                              group_colors = NULL,
+                             edge_color_func = NULL,
                              colorblind = FALSE,
                              width_type = NULL,
                              edge_factor = NULL,
@@ -235,7 +237,8 @@ VisualiseNetwork <- function(adj_mats,
                              width_type = width_type[[
                                if (length(width_type) == n_mats) x else 1]],
                              size_type = size_type,
-                             group_colors = group_colors)})
+                             group_colors = group_colors,
+                             edge_color_func = edge_color_func)})
   nodes <- lapply(seq_along(adj_mats),
                   function(x) networks[[x]]$node_table)
   edges <- lapply(seq_along(adj_mats),
