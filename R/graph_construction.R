@@ -113,6 +113,7 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #' @inheritParams add_colors
 #' @inheritParams node_size_connectivity
 #' @inheritParams edge_weight_to_widths
+#' @inheritParams weights_to_color
 #'
 #' @return Will return a list with two data frames, named 'edge_table' and
 #' 'node_table'. The 'node_table' data frame has a 'node' column and other columns
@@ -126,7 +127,8 @@ adj_matrix_to_network <- function(adj_matrix,
                                   group_vec = NULL,
                                   group_colors = NULL,
                                   size_type = NULL,
-                                  width_type = NULL) {
+                                  width_type = NULL,
+                                  edge_color_func = NULL) {
 
   # Check which attributes should be added
   node_attrs <- match.arg(node_attrs, several.ok = TRUE)
@@ -188,7 +190,7 @@ adj_matrix_to_network <- function(adj_matrix,
 
   if ((!"none" %in% edge_attrs) &
       ("all" %in% edge_attrs | "color" %in% edge_attrs)) {
-    edge_table <- weights_to_color(edge_table)
+    edge_table <- weights_to_color(edge_table, edge_color_func = edge_color_func)
   }
 
   return(list("edge_table" = edge_table,
