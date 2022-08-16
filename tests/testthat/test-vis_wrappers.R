@@ -715,3 +715,43 @@ test_that("warning occurs is colorblind colors are overwritten by manually selec
                          group_colors = c("red", "green", "blue", "yellow")),
         "instead of colorblind accessible colors")
 })
+
+
+test_that("custom edge color function can be used for pos. + neg. data", {
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:6]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    expect_error(
+        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                         width_type = "partcor", vis_save = F, igr_grid = c(2,3),
+                         igr_par_opts = list(mar=c(2,4,5,4)),
+                         edge_color_func = pals::brewer.piyg),
+        NA)
+})
+
+
+test_that("custom edge color function can be used for positive only data", {
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:6]
+    adj_mats <- lapply(adj_mats, abs)
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    my_cols <- function (n) rev(pals::magma(n))
+    my_cols <- function (n) rev(pals::kovesi.linear_grey_10_95_c0(n))
+
+    expect_error(
+        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                         width_type = "partcor", vis_save = F, igr_grid = c(2,3),
+                         igr_par_opts = list(mar=c(2,4,5,4)),
+                         edge_color_func = my_cols),
+        NA)
+})
