@@ -586,10 +586,6 @@ test_that("igraph grid titles cause warning when requested but adj list unnamed"
     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    test_call <- deparse(sys.calls()[[1]][1])
-    skip_if_not(test_call == "test_that()",
-                message = "igraph visualizations need to be checked manually")
-
     expect_warning(
         VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
                          edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
@@ -620,10 +616,6 @@ test_that("igraph grid titles can be drawn from names of adj_mats list", {
 
 
 test_that("validation of list arguments works", {
-    test_call <- deparse(sys.calls()[[1]][1])
-    skip_if_not(test_call == "test_that()",
-                message = "igraph visualizations need to be checked manually")
-
     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
     names(adj_mats) <- paste("person", LETTERS[1:3])
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
@@ -638,43 +630,43 @@ test_that("validation of list arguments works", {
 })
 
 
-test_that("large network can be visualized with igraph", {
-    test_call <- deparse(sys.calls()[[1]][1])
-    skip_if_not(test_call == "test_that()",
-                message = "igraph visualizations need to be checked manually")
-
-    large_adj <- readRDS(test_path("fixtures", "large_network.RDS"))
-    # group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-
-    expect_error(
-        VisualiseNetwork(large_adj, output_type = "igraph",
-                         edge_attrs = "all", node_attrs = "size", arrange_co = TRUE,
-                         width_type = "partcor", vis_save = T, vis_export_type = "svg",
-                         vis_export_opts = list(width = 30, height = 30),
-                         igr_par_opts = list(mar=c(5,5,5,5))),
-        NA)
-})
-
-
-test_that("large network can be visualized with cytoscape", {
-    test_call <- deparse(sys.calls()[[1]][1])
-    skip_if_not(test_call == "test_that()",
-                message = "igraph visualizations need to be checked manually")
-
-    # Check if cytoscape is active
-    cytosc <- RCy3::cytoscapePing() %>% capture_condition()
-    skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
-                message = "this test runs only when cytoscape is active")
-
-    large_adj <- readRDS(test_path("fixtures", "large_network.RDS"))
-    # group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-
-    expect_error(
-        VisualiseNetwork(large_adj, output_type = "cytoscape",
-                         edge_attrs = "all", node_attrs = "size", arrange_co = TRUE,
-                         width_type = "partcor", vis_save = T),
-        NA)
-})
+# test_that("large network can be visualized with igraph", {
+#     test_call <- deparse(sys.calls()[[1]][1])
+#     skip_if_not(test_call == "test_that()",
+#                 message = "igraph visualizations need to be checked manually")
+#
+#     large_adj <- readRDS(test_path("fixtures", "large_network.RDS"))
+#     # group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+#
+#     expect_error(
+#         VisualiseNetwork(large_adj, output_type = "igraph",
+#                          edge_attrs = "all", node_attrs = "size", arrange_co = TRUE,
+#                          width_type = "partcor", vis_save = T, vis_export_type = "svg",
+#                          vis_export_opts = list(width = 30, height = 30),
+#                          igr_par_opts = list(mar=c(5,5,5,5))),
+#         NA)
+# })
+#
+#
+# test_that("large network can be visualized with cytoscape", {
+#     test_call <- deparse(sys.calls()[[1]][1])
+#     skip_if_not(test_call == "test_that()",
+#                 message = "igraph visualizations need to be checked manually")
+#
+#     # Check if cytoscape is active
+#     cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+#     skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+#                 message = "this test runs only when cytoscape is active")
+#
+#     large_adj <- readRDS(test_path("fixtures", "large_network.RDS"))
+#     # group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+#
+#     expect_error(
+#         VisualiseNetwork(large_adj, output_type = "cytoscape",
+#                          edge_attrs = "all", node_attrs = "size", arrange_co = TRUE,
+#                          width_type = "partcor", vis_save = T),
+#         NA)
+# })
 
 test_that("visualization with only positive values is informative", {
     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
@@ -693,4 +685,33 @@ test_that("visualization with only positive values is informative", {
                          vis_export_opts = list(width = 6400, height = 2600),
                          igr_par_opts = list(mar=c(2,4,5,4)),
                          igr_grid_names = paste("patient", LETTERS[seq_along(adj_mats)])), NA)
+})
+
+
+test_that("colorblind accessible colors can be used", {
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    netw <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only",
+                             edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                             width_type = "partcor", vis_save = F, igr_grid = c(1,2),
+                             igr_par_opts = list(mar=c(2,4,5,4)), colorblind = T)
+
+    colours <- netw$nodes[[1]]$color %>% unique()
+
+    expect_true(all(colours %in% palette.colors(palette = "Okabe-Ito")))
+})
+
+
+test_that("warning occurs is colorblind colors are overwritten by manually selected colors", {
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:2]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    expect_warning(
+        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only",
+                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                         width_type = "partcor", vis_save = F, igr_grid = c(1,2),
+                         igr_par_opts = list(mar=c(2,4,5,4)), colorblind = T,
+                         group_colors = c("red", "green", "blue", "yellow")),
+        "instead of colorblind accessible colors")
 })
