@@ -446,37 +446,93 @@ percentile_widths <- function(n_edges) {
 #' (or overwritten if it was already present).
 #'
 #' @export
-weights_to_color <- function(edge_table) {
-  # A column named 'weight' is required to determine edge colors
-  if (!"weight" %in% colnames(edge_table)) {
-    stop("Must provide edge table with weights:",
-         "\nℹ Your edge table contains these columns: ",
-         colnames(edge_table) %>% paste(collapse = ", "),
-         ".\n✖ `colnames(edge_table)` must include 'weight'.",
-         call.=FALSE)
-  }
+weights_to_color <- function(edge_table, edge_color_func = NULL) {
+    # A column named 'weight' is required to determine edge colors
+    if (!"weight" %in% colnames(edge_table)) {
+        stop("Must provide edge table with weights:",
+             "\nℹ Your edge table contains these columns: ",
+             colnames(edge_table) %>% paste(collapse = ", "),
+             ".\n✖ `colnames(edge_table)` must include 'weight'.",
+             call.=FALSE)
+    }
 
-  # If negative numbers are found in the weights use a diverging color palette,
-  #   otherwise use a sequential color palette
-  if (min(edge_table$weight) < 0) {
-    color_pal <- as.vector(colorspace::diverging_hcl(n = 120, palette = "Blue-Red"))
-    # The center colors are barely visible in the visualization, remove them
-    color_pal <- c(color_pal[1:50], color_pal[71:120])
-    neg_idx <- which(edge_table$weight <= 0)
-    pos_idx <- which(edge_table$weight > 0)
+    # Validate user color function input
+    if (!is.null(edge_color_func)) {
+        if (!is.function(edge_color_func)) {
+            stop("Must provide a function to change edge colors: ",
+                 "\nℹ Class of your `edge_color_func`: ", class(edge_color_func),
+                 "\n✖ `edge_color_func` must be a function.", call.=FALSE)
+        }
 
-    neg_cols <- color_pal[as.numeric(cut(edge_table$weight[neg_idx], 50))]
-    pos_cols <- color_pal[as.numeric(cut(edge_table$weight[pos_idx], 50)) + 50]
+        message_base <- "While getting 100 colors from your `edge_color_func`"
+        color_pal <- tryCatch(edge_color_func(100),
+                              error = function (e) {
+                                  message(paste(message_base, "an error occurred."))
+                                  message("Make sure that `edge_color_func(100)` ",
+                                          "works without errors: ")
+                                  stop(e)
+                              },
+                              warning = function (w) {
+                                  message(paste(message_base, "the following",
+                                                "warning was raised: "))
+                                  warning(w)
 
-    edge_table$color <- ""
-    edge_table$color[neg_idx] <- neg_cols
-    edge_table$color[pos_idx] <- pos_cols
+                                  return(edge_color_func(100) %>%
+                                             suppressWarnings())
+                              })
 
-  } else {
-    color_pal <- rev(colorspace::sequential_hcl(n = 100, palette = "Reds2"))
-    edge_table <- dplyr::mutate(edge_table,
-                                color = color_pal[as.numeric(cut(weight, 100))])
-  }
+        if (length(color_pal) != 100) {
+            stop("`edge_color_func(100)` must return 100 colors:",
+                 "\nℹ Length of return: ", length(color_pal),
+                 call.=FALSE)
+        }
 
-  return(edge_table)
+        tryCatch(are_colors(color_pal),
+                 error = function (e) {
+                     message("Make sure your `edge_color_func` returns valid ",
+                             "colors, the following error occurred when ",
+                             "validating colors: ")
+                     stop(e)
+                 })
+    }
+
+
+    # If negative numbers are found in the weights use a diverging color palette,
+    #   otherwise use a sequential color palette
+    if (min(edge_table$weight) < 0) {
+
+        # If the user didn't provide colors
+        if (is.null(edge_color_func)) {
+            color_pal <- colorspace::diverging_hcl(n = 120, palette = "Blue-Red")
+            # The center colors are barely visible in the graphs, remove them
+            color_pal <- c(color_pal[1:50], color_pal[71:120])
+        }
+
+        # Make seperate groups for positive and negative values
+        neg_idx <- which(edge_table$weight <= 0)
+        pos_idx <- which(edge_table$weight > 0)
+
+        neg_cols <- color_pal[
+            as.numeric(cut(edge_table$weight[neg_idx], 50))]
+        pos_cols <- color_pal[
+            as.numeric(cut(edge_table$weight[pos_idx], 50)) + 50]
+
+        edge_table$color <- ""
+        edge_table$color[neg_idx] <- neg_cols
+        edge_table$color[pos_idx] <- pos_cols
+
+    } else {
+
+        # Or user colors if they are provided
+        if (is.null(edge_color_func)) {
+            color_pal <- rev(colorspace::sequential_hcl(n = 100,
+                                                        palette = "Reds2"))
+        }
+
+        edge_table <- dplyr::mutate(edge_table,
+                                    color = color_pal[
+                                        as.numeric(cut(weight, 100))])
+    }
+
+    return(edge_table)
 }

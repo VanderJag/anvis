@@ -326,3 +326,114 @@ test_that("avg. conn. give error for unequal node sets", {
   expect_error(sort_avg_connectivity(nodes_minus),
                "have the same nodes in node tables")
 })
+
+
+test_that("edge colors change when a function to get colors is provided", {
+    # Load adjacency matrix
+    Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+    # Create edge table
+    edge_table <- adj_matrix_to_edgelist(Mat1)
+
+    colors_before <- weights_to_color(edge_table = edge_table)$color
+
+    # set up color function
+    diverge_col_f <- function (n) pals::brewer.rdbu(n = n)
+
+    colors_after <- weights_to_color(edge_table = edge_table, diverge_col_f)$color
+
+    expect_true(all(colors_before != colors_after))
+})
+
+
+test_that("error occurs when edge_color_func is not a function", {
+    # Load adjacency matrix
+    Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+    # Create edge table
+    edge_table <- adj_matrix_to_edgelist(Mat1)
+
+    # set up color function
+    col_func <- "my_func"
+
+    expect_error(weights_to_color(edge_table = edge_table, col_func),
+                 "Must provide a function to change edge colors")
+})
+
+
+test_that("errors of the edge_color_func are caught and raised with extra message", {
+    # Load adjacency matrix
+    Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+    # Create edge table
+    edge_table <- adj_matrix_to_edgelist(Mat1)
+
+    # set up color function
+    col_func <- function (n) {
+        if (n > 5){
+            stop("I can only give you 5 colors")
+        }
+    }
+
+    # weights_to_color(edge_table = edge_table, col_func)
+    weights_to_color(edge_table = edge_table, col_func) %>%
+        expect_message("While getting 100 colors")  %>%
+        expect_message("Make sure that") %>%
+        expect_error("I can only give you 5 colors")
+})
+
+
+test_that("warnings of the edge_color_func are caught and shown with extra message", {
+    # Load adjacency matrix
+    Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+    # Create edge table
+    edge_table <- adj_matrix_to_edgelist(Mat1)
+
+    # set up color function
+    col_func <- function (n) {
+        if (n > 1){
+            warning("I only give one unique color")
+        }
+
+        return(rep("red", 100))
+    }
+
+    # weights_to_color(edge_table = edge_table, col_func)
+    weights_to_color(edge_table = edge_table, col_func) %>%
+        expect_message("the following warning was raised") %>%
+        expect_warning("I only give one unique")
+})
+
+
+test_that("error when edge_color_func doesn't return 100 values", {
+    # Load adjacency matrix
+    Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+    # Create edge table
+    edge_table <- adj_matrix_to_edgelist(Mat1)
+
+    # set up color function
+    col_func <- function (n) {
+        return(rep("red", n-5))
+    }
+
+    # weights_to_color(edge_table = edge_table, col_func)
+    expect_error(weights_to_color(edge_table = edge_table, col_func),
+                 "must return 100 colors")
+})
+
+
+test_that("error when edge_color_func doesn't return 100 values", {
+    # Load adjacency matrix
+    Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+    # Create edge table
+    edge_table <- adj_matrix_to_edgelist(Mat1)
+
+    # set up color function
+    col_func <- function (n) {
+        return(rep("fakellow", 100))
+    }
+
+    # weights_to_color(edge_table = edge_table, col_func)
+    expect_error(weights_to_color(edge_table = edge_table, col_func),
+                 "valid color names") %>%
+        expect_message("returns valid colors")
+})
+
+
