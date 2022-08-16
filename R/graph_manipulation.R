@@ -435,12 +435,14 @@ percentile_widths <- function(n_edges) {
 #' determined by the weight of an edge. When both positive and negative weights
 #' are found, a blue-red divergent color palette will be used to select colors.
 #' For only positive weights, colors are selected from a white to red color
-#' gradient.
+#' gradient. Optionally, custom color palettes can be used
 #'
 #' Colors are assigned by placing the edge weights into 100 bins, and assigning
 #' 100 colors from the appropriate palette.
 #'
 #' @inheritParams edge_weight_to_widths
+#' @param edge_color_func A function that takes as first argument a number, and
+#'     returns a vector of colors, which matches in length with the input number.
 #'
 #' @return Returns the input `edge_table` with a column called 'color' added
 #' (or overwritten if it was already present).
