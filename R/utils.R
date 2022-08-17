@@ -78,3 +78,9 @@ named_list_check <- function(test_list) {
     return(invisible(all_named))
 }
 
+# To create an example directed network from an undirected one
+lower_tri_remix <- function(matr) {
+    matr[lower.tri(matr)] <- sample(matr[lower.tri(matr)])
+
+    return(matr)
+}
