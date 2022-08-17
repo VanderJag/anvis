@@ -144,6 +144,7 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #'
 #' @export
 adj_matrix_to_network <- function(adj_matrix,
+                                  directed = FALSE,
                                   node_attrs = c("none", "all", "group", "color_group", "size"),
                                   edge_attrs = c("none", "all", "width", "color"),
                                   group_vec = NULL,
@@ -199,7 +200,7 @@ adj_matrix_to_network <- function(adj_matrix,
 
   # adjecency to edgelist ---------------------------------------------------
 
-  edge_table <- adj_matrix_to_edgelist(adj_matrix)
+  edge_table <- adj_matrix_to_edgelist(adj_matrix, directed = directed)
 
   # Convert edge weight to edge width ---------------------------------------
 
