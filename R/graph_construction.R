@@ -1,11 +1,13 @@
 #' Adjacency matrix to edge list
 #'
 #' Converts an adjacency matrix into an weighted edge list. Interactions of nodes
-#' with themselves are removed. Assumes the matrix to be symmetric over the
-#' diagonal, the resulting edges will be undirected.
+#' with themselves are removed. Edges can be directed or undirected.
 #'
 #' @param adj_matrix Data frame or matrix. Square adjacency matrix. Nodes must be
 #'     specified in row names and column names.
+#' @param directed Logical (default `FALSE`), whether edges are directed in the
+#'     network. If `FALSE`, the information in the lower triangle of the
+#'     adjacency matrix will be discarded.
 #' @return Returns data frame representing a network as weighted edge list.
 #'     Columns are source, target, and weight.
 #'
@@ -50,13 +52,12 @@ adj_matrix_to_edgelist <- function(adj_matrix, directed = FALSE) {
                                      t(adj_matrix)[
                                          upper.tri(t(adj_matrix), diag=FALSE)]))
         if(!is_equal) {
-            stop("Must provide adjacency matrix with identical upper ",
-                 "and lower triangle.",
+            warning("Creating undirected edges from an adjacency matrix with ",
+                 "unequal upper and lower triangle. Lower triangle will be ",
+                 "discarded, so information will be lost.",
                  "\nℹ Check your adj. matrix with ",
                  "`all.equal(adj[upper.tri(adj, diag=FALSE)], ",
                  "t(adj)[upper.tri(t(adj), diag=FALSE)])`",
-                 "\n✖ Lower triangle can't be discarded since it",
-                 "doesn't match upper triangle.",
                  call.=FALSE)
         }
 
