@@ -23,6 +23,9 @@
 #'     `edge_table` and `node_table`. Edge attributes 'width' and 'color' and
 #'     vertex attributes 'group', 'size', and 'color', will be used to style the
 #'     visualization.
+#' @param directed A logical (default `FALSE`). When this argument is `TRUE` the
+#'     defaults will be adjusted to visualize directed graphs. Edges will be
+#'     drawn with a curvature and they will be shown as arrows.
 #' @param radial_labs A logical (default `TRUE`) to indicate whether vertex labels
 #'     should be positioned radially around the circular arrangement of vertices.
 #'     If `FALSE`, they will be placed on top of the vertices (as is the default
