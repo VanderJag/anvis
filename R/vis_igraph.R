@@ -63,7 +63,8 @@
 #' @export
 vis_igraph <- function(edge_table = NULL, node_table = NULL,
                        igraph_obj = NULL,
-                       radial_labs = T,
+                       directed = FALSE,
+                       radial_labs = TRUE,
                        rad_lab_opts = list(),
                        scale_width = 3.25,
                        save_name = "network",
@@ -125,7 +126,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
 
     graph <- igraph::graph_from_data_frame(edge_table,
                                            vertices = node_table,
-                                           directed = FALSE)
+                                           directed = directed)
   } else {
     if (!igraph::is_igraph(igraph_obj)) {
       stop("`igraph_obj` parameter must be of class igraph:",
@@ -145,6 +146,9 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
       igraph::edge.attributes(graph)[["width"]]
   edge_color <- plot_params[["edge.color"]] %||%
       igraph::edge.attributes(graph)[["color"]]
+  edge_arrowsize <- plot_params[["edge.arrow.size"]] %||% 0.5
+  edge_curve <- plot_params[["edge.curved"]] %||% 0
+  if (directed)   edge_curve <- plot_params[["edge.curved"]] %||% 0.05
   vertex_color <- plot_params[["vertex.color"]] %||%
       igraph::vertex.attributes(graph)[["color"]]
   vertex_size <- plot_params[["vertex.size"]] %||%
@@ -182,6 +186,8 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
             layout = node_arrangement,
             edge.width = edge_width * scale_width,
             edge.color = edge_color,
+            edge.arrow.size = edge_arrowsize,
+            edge.curved = edge_curve,
             vertex.size = vertex_size,
             vertex.color = vertex_color,
             vertex.label = vertex_label,
@@ -230,7 +236,6 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
 
   invisible(NULL)
 }
-
 
 # Internal function that starts graphical devices for saving.
 start_saving <- function(export_type, export_opts, save_name) {
