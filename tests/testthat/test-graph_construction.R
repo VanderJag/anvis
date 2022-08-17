@@ -263,3 +263,19 @@ test_that("other functions can make use of the adj. matrix created from edgelist
     expect_error(vis_igraph(edge_table, node_table, radial_labs = T, export_type = "print"),
                  NA)
 })
+
+
+test_that("creating an directed edge list gives same as igraph implementation", {
+    dir_mat <- readRDS(testthat::test_path("fixtures", "directed_adj_matrix.rds"))
+
+    diag(dir_mat) <- 0
+
+    g  <- igraph::graph_from_adjacency_matrix(dir_mat, weighted=TRUE, mode = "directed")
+    ctrl_edges <- igraph::as_data_frame(g, "edges")
+    ctrl_edges <- ctrl_edges %>% tibble::as_tibble() %>% dplyr::rename("source" = 1,
+                                                                       "target" = 2)
+
+    test_edges <- adj_matrix_to_edgelist(dir_mat, directed = TRUE)
+
+    expect_equal(test_edges, ctrl_edges)
+})
