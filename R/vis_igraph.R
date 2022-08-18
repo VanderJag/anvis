@@ -149,7 +149,7 @@ vis_igraph <- function(edge_table = NULL, node_table = NULL,
       igraph::edge.attributes(graph)[["width"]]
   edge_color <- plot_params[["edge.color"]] %||%
       igraph::edge.attributes(graph)[["color"]]
-  edge_arrowsize <- plot_params[["edge.arrow.size"]] %||% 0.5
+  edge_arrowsize <- plot_params[["edge.arrow.size"]] %||% 0.3
   edge_curve <- plot_params[["edge.curved"]] %||% 0
   if (directed)   edge_curve <- plot_params[["edge.curved"]] %||% 0.05
   vertex_color <- plot_params[["vertex.color"]] %||%

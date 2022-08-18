@@ -755,3 +755,46 @@ test_that("custom edge color function can be used for positive only data", {
                          edge_color_func = my_cols),
         NA)
 })
+
+
+test_that("igraph visualizes directed networks", {
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+    adj_mats <- lapply(adj_mats, lower_tri_remix)
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    expect_error(
+        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                         width_type = "partcor", vis_save = T, igr_grid = c(2,6),
+                         vis_export_opts = list(width = 6400, height = 2600),
+                         igr_par_opts = list(mar=c(2,4,5,4)),
+                         directed = T,
+                         igr_grid_names = paste("patient", LETTERS[seq_along(adj_mats)])), NA)
+})
+
+
+test_that("cytoscape visualizes directed networks", {
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:2]
+    adj_mats <- lapply(adj_mats, lower_tri_remix)
+
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "cytoscape visualizations need to be checked manually")
+    # Check if cytoscape is active
+    cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+    skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+                message = "this test runs only when cytoscape is active")
+
+
+    expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "cytoscape",
+                                  edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                                  directed = T,
+                                  width_type = "partcor", vis_save = F),
+                 NA)
+})
