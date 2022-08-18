@@ -44,6 +44,7 @@
 #'
 #' @export
 vis_in_cytoscape <- function(node_table, edge_table,
+                             directed = FALSE,
                              radial_labs = TRUE,
                              export_image = TRUE,
                              save_session = TRUE,
@@ -170,12 +171,15 @@ vis_in_cytoscape <- function(node_table, edge_table,
   }
 
   # Optional properties
+
   if ("color" %in% colnames(node_table)) {
     vis_props[["nodecolor"]] <- RCy3::mapVisualProperty("Node Fill Color", "color", "p")
   }
+
   if ("size" %in% colnames(node_table)) {
     vis_props[["nodesize"]] <- RCy3::mapVisualProperty("Node Size", "size", "p")
   }
+
   if (any(c("width", "weight") %in% colnames(edge_table))) {
     # Weights might be outside the desired range for edge widths
     if (is.null(edge_table[["width"]])) {
@@ -186,25 +190,38 @@ vis_in_cytoscape <- function(node_table, edge_table,
                 " avoided by using scaled edge widths.")
       }
     }
-
     vis_props[["edgewidth"]] <- RCy3::mapVisualProperty(
       "Edge Width", "shared name", "d",
       as.vector(edge_table$sharedname),
       edge_table$width %||% edge_table$weight)
   }
+
   if ("color" %in% colnames(edge_table)) {
     vis_props[["edgestroke"]] <- RCy3::mapVisualProperty(
       "Edge Stroke Unselected Paint", "shared name", "d",
       as.vector(edge_table$sharedname), as.vector(edge_table$color))
   }
+
+  if (directed) {
+      vis_props[["arrowshape"]] <- RCy3::mapVisualProperty("EDGE TARGET ARROW SHAPE",
+                              "target", "d", edge_table$target,
+                              rep("ARROW", length(edge_table$target)))
+      if ("color" %in% colnames(edge_table)) {
+          vis_props[["arrowcolor"]] <- RCy3::mapVisualProperty(
+              "Edge Target Arrow Unselected Paint",
+              "shared name", "d", edge_table$sharedname,
+              edge_table$color)
+      }
+  }
+
   # Set visual style
   RCy3::createVisualStyle(style.name = style_name,
                           defaults = defaults,
                           mappings = vis_props)
   RCy3::setVisualStyle(style_name)
+
   # Fit content into window
   RCy3::fitContent(selected.only = FALSE)
-
 
   # Saving and closing ------------------------------------------------------
   if (export_image) {
