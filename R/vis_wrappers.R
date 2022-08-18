@@ -12,6 +12,11 @@
 #' @param adj_mats A square adjacency matrix or data frame or a list of these.
 #'     The data in the matrix is used as edge weights for the network. Row names
 #'     and column names specify interacting nodes, and are required.
+#' @param directed Logical (default `FALSE`), whether edges are directed in the
+#'     network. If `FALSE`, the information in the lower triangle of the
+#'     adjacency matrix will be discarded. If `TRUE` this information will be
+#'     retained and the style of visualizations will be adjusted to feature
+#'     edge curvature and arrows.
 #' @inheritParams adj_matrix_to_network
 #' @param group_vec A vector of character strings that assigns group labels to
 #'     the nodes. The order of this vector should match the order of column and
@@ -124,6 +129,7 @@
 #'
 #' @export
 VisualiseNetwork <- function(adj_mats,
+                             directed = FALSE,
                              node_attrs = c("none", "all", "group", "color_group", "size"),
                              edge_attrs = c("none", "all", "width", "color"),
                              group_vec = NULL,
