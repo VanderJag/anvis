@@ -14,6 +14,8 @@
 #'     Optional are columns: 'width' or 'weight' to determine edge widths in the
 #'     visualization (only when 'width' is not present weight will be used), and
 #'     'color' to determine the color of the edges.
+#' @param directed A logical (default `FALSE`). When this argument is `TRUE`
+#'     edges will be drawn with arrows.
 #' @param export_image Logical (default `TRUE`), should the visualization be saved?
 #' @param save_session Logical (default `TRUE`), specifying whether the cytoscape
 #'     session should be saved (as .cys file).
