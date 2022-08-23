@@ -283,11 +283,40 @@ test_that("creating an directed edge list gives same as igraph implementation", 
 
 test_that("missing values are replaced by 0", {
     Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
-    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
     Mat1[24,25] <- NA
     Mat1[25,24] <- NA
 
     expect_message(adj_matrix_to_edgelist(Mat1), "replaced with 0")
+})
+
+
+test_that("adding or removing self interaction works", {
+    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+
+    edges <- adj_matrix_to_edgelist(Mat1)
+    expect_true(!any(edges$source == edges$target))
+
+    n <- nrow(Mat1)
+
+    edges <- adj_matrix_to_edgelist(Mat1, self_loops = TRUE)
+    expect_true(sum(edges$source == edges$target) == n)
+})
+
+
+test_that("self interaction works for main network creation function", {
+    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+
+    network_list <- adj_matrix_to_network(Mat1, width_type = "partcor")
+    edges <- network_list[["edge_table"]]
+
+    expect_true(!any(edges$source == edges$target))
+
+    n <- nrow(Mat1)
+
+    network_list <- adj_matrix_to_network(Mat1, self_loops = TRUE, width_type = "partcor")
+    edges <- network_list[["edge_table"]]
+
+    expect_true(sum(edges$source == edges$target) == n)
 })
 

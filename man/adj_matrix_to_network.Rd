@@ -7,6 +7,7 @@
 adj_matrix_to_network(
   adj_matrix,
   directed = FALSE,
+  self_loops = FALSE,
   node_attrs = c("none", "all", "group", "color_group", "size"),
   edge_attrs = c("none", "all", "width", "color"),
   group_vec = NULL,
@@ -23,6 +24,9 @@ specified in row names and column names.}
 \item{directed}{Logical (default \code{FALSE}), whether edges are directed in the
 network. If \code{FALSE}, the information in the lower triangle of the
 adjacency matrix will be discarded.}
+
+\item{self_loops}{Logical (default \code{FALSE}). Should the values for interaction
+of nodes with themselves (diagonal of the adjacency matrix) be retained?}
 
 \item{node_attrs}{Character strings, one or multiple of 'none', 'all', 'group',
 'color_group', and 'size'. This argument can be used to choose which

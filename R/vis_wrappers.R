@@ -130,6 +130,7 @@
 #' @export
 VisualiseNetwork <- function(adj_mats,
                              directed = FALSE,
+                             self_loops = FALSE,
                              node_attrs = c("none", "all", "group", "color_group", "size"),
                              edge_attrs = c("none", "all", "width", "color"),
                              group_vec = NULL,
@@ -237,6 +238,7 @@ VisualiseNetwork <- function(adj_mats,
      function(x) {
        adj_matrix_to_network(adj_mats[[x]],
                              directed = directed,
+                             self_loops = self_loops,
                              node_attrs = node_attrs,
                              edge_attrs = edge_attrs,
                              group_vec = group_vec[[

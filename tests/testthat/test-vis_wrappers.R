@@ -817,3 +817,50 @@ test_that("igraph visualizes despite missing values in adj. matrix", {
                          edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
                          width_type = "partcor", vis_save = F), NA)
 })
+
+
+test_that("igraph shows self loops for directed and undirected networks", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[[1]]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    expect_error(
+        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                         self_loops = TRUE,
+                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                         width_type = "partcor", vis_save = F), NA)
+    expect_error(
+        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                         self_loops = TRUE, directed = TRUE,
+                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                         width_type = "partcor", vis_save = F), NA)
+})
+
+
+test_that("cytoscape visualizes self loops for directed and undirected networks", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "cytoscape visualizations need to be checked manually")
+    # Check if cytoscape is active
+    cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+    skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+                message = "this test runs only when cytoscape is active")
+
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
+
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "cytoscape",
+                                  edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                                  directed = F, self_loops = T,
+                                  width_type = "partcor", vis_save = F),
+                 NA)
+    expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "cytoscape",
+                                  edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                                  directed = T, self_loops = T,
+                                  width_type = "partcor", vis_save = F),
+                 NA)
+})

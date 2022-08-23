@@ -7,6 +7,7 @@
 VisualiseNetwork(
   adj_mats,
   directed = FALSE,
+  self_loops = FALSE,
   node_attrs = c("none", "all", "group", "color_group", "size"),
   edge_attrs = c("none", "all", "width", "color"),
   group_vec = NULL,
@@ -45,6 +46,9 @@ network. If \code{FALSE}, the information in the lower triangle of the
 adjacency matrix will be discarded. If \code{TRUE} this information will be
 retained and the style of visualizations will be adjusted to feature
 edge curvature and arrows.}
+
+\item{self_loops}{Logical (default \code{FALSE}). Should the values for interaction
+of nodes with themselves (diagonal of the adjacency matrix) be retained?}
 
 \item{node_attrs}{Character strings, one or multiple of 'none', 'all', 'group',
 'color_group', and 'size'. This argument can be used to choose which

@@ -4,7 +4,7 @@
 \alias{adj_matrix_to_edgelist}
 \title{Adjacency matrix to edge list}
 \usage{
-adj_matrix_to_edgelist(adj_matrix, directed = FALSE)
+adj_matrix_to_edgelist(adj_matrix, directed = FALSE, self_loops = FALSE)
 }
 \arguments{
 \item{adj_matrix}{Data frame or matrix. Square adjacency matrix. Nodes must be
@@ -13,6 +13,9 @@ specified in row names and column names.}
 \item{directed}{Logical (default \code{FALSE}), whether edges are directed in the
 network. If \code{FALSE}, the information in the lower triangle of the
 adjacency matrix will be discarded.}
+
+\item{self_loops}{Logical (default \code{FALSE}). Should the values for interaction
+of nodes with themselves (diagonal of the adjacency matrix) be retained?}
 }
 \value{
 Returns data frame representing a network as weighted edge list.

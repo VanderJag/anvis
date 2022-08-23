@@ -8,9 +8,11 @@
 #' @param directed Logical (default `FALSE`), whether edges are directed in the
 #'     network. If `FALSE`, the information in the lower triangle of the
 #'     adjacency matrix will be discarded.
+#' @param self_loops Logical (default `FALSE`). Should the values for interaction
+#'     of nodes with themselves (diagonal of the adjacency matrix) be retained?
 #' @return Returns data frame representing a network as weighted edge list.
 #'     Columns are source, target, and weight.
-adj_matrix_to_edgelist <- function(adj_matrix, directed = FALSE) {
+adj_matrix_to_edgelist <- function(adj_matrix, directed = FALSE, self_loops = FALSE) {
 
     # If the number and column of the adjacency matrix is not equal there may be
     #   missing info and an error with the data input
@@ -46,8 +48,8 @@ adj_matrix_to_edgelist <- function(adj_matrix, directed = FALSE) {
         message("Missing values (`NA`) for edge weights have been replaced with 0.")
     }
 
-    # It is assumed that there is no interest in self interaction
-    diag(adj_matrix) <- 0
+    # Remove self interaction
+    if (!self_loops) diag(adj_matrix) <- 0
 
     if (isFALSE(directed)) {
         # If the upper and lower diagonal are not the same we would be
@@ -67,7 +69,7 @@ adj_matrix_to_edgelist <- function(adj_matrix, directed = FALSE) {
 
         # Since the information of the upper and lower triangles of the adjacency
         #     matrix are identical, the lower triangle can be discarded
-        adj_matrix[lower.tri(adj_matrix, diag=TRUE)] <- 0
+        adj_matrix[lower.tri(adj_matrix, diag=FALSE)] <- 0
     }
 
     # Prepare to convert to long format by making the rownames a column of their own
@@ -147,6 +149,7 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #' @export
 adj_matrix_to_network <- function(adj_matrix,
                                   directed = FALSE,
+                                  self_loops = FALSE,
                                   node_attrs = c("none", "all", "group", "color_group", "size"),
                                   edge_attrs = c("none", "all", "width", "color"),
                                   group_vec = NULL,
@@ -202,7 +205,7 @@ adj_matrix_to_network <- function(adj_matrix,
 
   # adjecency to edgelist ---------------------------------------------------
 
-  edge_table <- adj_matrix_to_edgelist(adj_matrix, directed = directed)
+  edge_table <- adj_matrix_to_edgelist(adj_matrix, directed = directed, self_loops = self_loops)
 
   # Convert edge weight to edge width ---------------------------------------
 
