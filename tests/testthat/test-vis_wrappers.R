@@ -730,6 +730,7 @@ test_that("custom edge color function can be used for pos. + neg. data", {
                          edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
                          width_type = "partcor", vis_save = F, igr_grid = c(2,3),
                          igr_par_opts = list(mar=c(2,4,5,4)),
+                         # reversing the below color would make more sense
                          edge_color_func = pals::brewer.piyg),
         NA)
 })
