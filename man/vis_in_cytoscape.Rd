@@ -7,6 +7,7 @@
 vis_in_cytoscape(
   node_table,
   edge_table,
+  directed = FALSE,
   radial_labs = TRUE,
   export_image = TRUE,
   save_session = TRUE,
@@ -30,6 +31,9 @@ added to the node table in cytoscape.}
 Optional are columns: 'width' or 'weight' to determine edge widths in the
 visualization (only when 'width' is not present weight will be used), and
 'color' to determine the color of the edges.}
+
+\item{directed}{A logical (default \code{FALSE}). When this argument is \code{TRUE}
+edges will be drawn with arrows.}
 
 \item{export_image}{Logical (default \code{TRUE}), should the visualization be saved?}
 

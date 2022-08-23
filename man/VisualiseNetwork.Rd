@@ -6,10 +6,13 @@
 \usage{
 VisualiseNetwork(
   adj_mats,
+  directed = FALSE,
   node_attrs = c("none", "all", "group", "color_group", "size"),
   edge_attrs = c("none", "all", "width", "color"),
   group_vec = NULL,
   group_colors = NULL,
+  edge_color_func = NULL,
+  colorblind = FALSE,
   width_type = NULL,
   edge_factor = NULL,
   arrange_co = FALSE,
@@ -36,6 +39,12 @@ VisualiseNetwork(
 \item{adj_mats}{A square adjacency matrix or data frame or a list of these.
 The data in the matrix is used as edge weights for the network. Row names
 and column names specify interacting nodes, and are required.}
+
+\item{directed}{Logical (default \code{FALSE}), whether edges are directed in the
+network. If \code{FALSE}, the information in the lower triangle of the
+adjacency matrix will be discarded. If \code{TRUE} this information will be
+retained and the style of visualizations will be adjusted to feature
+edge curvature and arrows.}
 
 \item{node_attrs}{Character strings, one or multiple of 'none', 'all', 'group',
 'color_group', and 'size'. This argument can be used to choose which
@@ -64,6 +73,15 @@ must be 'group' or 'all'.}
 \item{group_colors}{Optional (default: \code{NULL}), vector of character strings
 representing colors, with a color for each node group. Colors may be
 provided either as color names, e.g. 'green', or as hex, e.g. "#00FF00".}
+
+\item{edge_color_func}{A function that takes as first argument a number, and
+returns a vector of colors, the length of which equals the input number.
+The first colors in this vector will be used for low values, the last
+colors will be assigned to high values. This argument is optional
+(default \code{NULL}).}
+
+\item{colorblind}{Logical (default \code{FALSE}), determining if the default colors
+should be exchanged for colorblind accessible colors.}
 
 \item{width_type}{Argument used to convert edge weights into widths for
 visualizations that are more easy to interpret. Find a description of the

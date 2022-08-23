@@ -6,17 +6,23 @@
 \usage{
 adj_matrix_to_network(
   adj_matrix,
+  directed = FALSE,
   node_attrs = c("none", "all", "group", "color_group", "size"),
   edge_attrs = c("none", "all", "width", "color"),
   group_vec = NULL,
   group_colors = NULL,
   size_type = NULL,
-  width_type = NULL
+  width_type = NULL,
+  edge_color_func = NULL
 )
 }
 \arguments{
-\item{adj_matrix}{Data frame or matrix. Square adjacency matrix. Nodes must be specified
-in row names and column names.}
+\item{adj_matrix}{Data frame or matrix. Square adjacency matrix. Nodes must be
+specified in row names and column names.}
+
+\item{directed}{Logical (default \code{FALSE}), whether edges are directed in the
+network. If \code{FALSE}, the information in the lower triangle of the
+adjacency matrix will be discarded.}
 
 \item{node_attrs}{Character strings, one or multiple of 'none', 'all', 'group',
 'color_group', and 'size'. This argument can be used to choose which
@@ -60,6 +66,12 @@ scale them with a sigmoid. \code{"percentile"} will chose a set of fixed widths
 determined by the percentile of a weight value. The highest percentiles will
 be assigned the largest width, but they are the smallest group, vice versa
 for the lowest percentiles. This argument can be abbreviated.}
+
+\item{edge_color_func}{A function that takes as first argument a number, and
+returns a vector of colors, the length of which equals the input number.
+The first colors in this vector will be used for low values, the last
+colors will be assigned to high values. This argument is optional
+(default \code{NULL}).}
 }
 \value{
 Will return a list with two data frames, named 'edge_table' and

@@ -4,18 +4,21 @@
 \alias{adj_matrix_to_edgelist}
 \title{Adjacency matrix to edge list}
 \usage{
-adj_matrix_to_edgelist(adj_matrix)
+adj_matrix_to_edgelist(adj_matrix, directed = FALSE)
 }
 \arguments{
-\item{adj_matrix}{Data frame or matrix. Square adjacency matrix. Nodes must be specified
-in row names and column names.}
+\item{adj_matrix}{Data frame or matrix. Square adjacency matrix. Nodes must be
+specified in row names and column names.}
+
+\item{directed}{Logical (default \code{FALSE}), whether edges are directed in the
+network. If \code{FALSE}, the information in the lower triangle of the
+adjacency matrix will be discarded.}
 }
 \value{
-Returns data frame representing a network as weighted edge list. Columns are
-source, target, and weight.
+Returns data frame representing a network as weighted edge list.
+Columns are source, target, and weight.
 }
 \description{
 Converts an adjacency matrix into an weighted edge list. Interactions of nodes
-with themselves are removed. Assumes the matrix to be symmetric over the
-diagonal, the resulting edges will be undirected.
+with themselves are removed. Edges can be directed or undirected.
 }

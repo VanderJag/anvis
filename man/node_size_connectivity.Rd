@@ -16,8 +16,8 @@ column (names of nodes), must be the same as the row names
 of \code{adj_matrix}. Having nodes in the same order in \code{node_table} and the
 matrix not required.}
 
-\item{adj_matrix}{Data frame or matrix. Square adjacency matrix. Nodes must be specified
-in row names and column names.}
+\item{adj_matrix}{Data frame or matrix. Square adjacency matrix. Nodes must be
+specified in row names and column names.}
 
 \item{size_type}{One of "igraph" (default), "cytoscape", or "scaled_only".
 This argument determines a factor for linear scaling of node size. Factors

@@ -8,7 +8,8 @@ vis_igraph(
   edge_table = NULL,
   node_table = NULL,
   igraph_obj = NULL,
-  radial_labs = T,
+  directed = FALSE,
+  radial_labs = TRUE,
   rad_lab_opts = list(),
   scale_width = 3.25,
   save_name = "network",
@@ -34,6 +35,10 @@ to adjust the corresponding features of the vertices.}
 \code{edge_table} and \code{node_table}. Edge attributes 'width' and 'color' and
 vertex attributes 'group', 'size', and 'color', will be used to style the
 visualization.}
+
+\item{directed}{A logical (default \code{FALSE}). When this argument is \code{TRUE} the
+defaults will be adjusted to visualize directed graphs. Edges will be
+drawn with a curvature and they will be shown as arrows.}
 
 \item{radial_labs}{A logical (default \code{TRUE}) to indicate whether vertex labels
 should be positioned radially around the circular arrangement of vertices.

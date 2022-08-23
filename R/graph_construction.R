@@ -10,8 +10,6 @@
 #'     adjacency matrix will be discarded.
 #' @return Returns data frame representing a network as weighted edge list.
 #'     Columns are source, target, and weight.
-#'
-#' @export
 adj_matrix_to_edgelist <- function(adj_matrix, directed = FALSE) {
 
     # If the number and column of the adjacency matrix is not equal there may be
@@ -89,8 +87,6 @@ adj_matrix_to_edgelist <- function(adj_matrix, directed = FALSE) {
 #'   names.
 #' @return Returns a data frame with a single column: 'node', which holds the
 #'   names of the network's nodes.
-#'
-#' @export
 adj_matrix_to_nodetable <- function(adj_matrix) {
 
   data.frame("node" = colnames(adj_matrix))

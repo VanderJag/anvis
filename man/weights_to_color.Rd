@@ -4,11 +4,17 @@
 \alias{weights_to_color}
 \title{Color edges based on weight}
 \usage{
-weights_to_color(edge_table)
+weights_to_color(edge_table, edge_color_func = NULL)
 }
 \arguments{
 \item{edge_table}{A data frame with a column called "weight" containing
 numeric values.}
+
+\item{edge_color_func}{A function that takes as first argument a number, and
+returns a vector of colors, the length of which equals the input number.
+The first colors in this vector will be used for low values, the last
+colors will be assigned to high values. This argument is optional
+(default \code{NULL}).}
 }
 \value{
 Returns the input \code{edge_table} with a column called 'color' added
@@ -19,7 +25,7 @@ This function adds a column of hex colors to and edge table. The colors are
 determined by the weight of an edge. When both positive and negative weights
 are found, a blue-red divergent color palette will be used to select colors.
 For only positive weights, colors are selected from a white to red color
-gradient.
+gradient. Optionally, custom color palettes can be used
 }
 \details{
 Colors are assigned by placing the edge weights into 100 bins, and assigning
