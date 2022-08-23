@@ -444,3 +444,32 @@ test_that("igraph visualizes directed graphs even when the matrix is symmetric",
                             export_type = "print", directed = TRUE),
                  NA)
 })
+
+
+test_that("visualizations in Rstudio stay present even after graphical device is started", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    network_list <- adj_matrix_to_network(Mat1,
+                                          directed = F,
+                                          node_attrs = "all",
+                                          edge_attrs = "all",
+                                          group_vec = group_vec,
+                                          width_type = "partcor")
+    edge_table <- network_list[["edge_table"]]
+    node_table <- network_list[["node_table"]]
+
+
+    expect_error(vis_igraph(edge_table, node_table,
+                            export_type = "print", directed = FALSE),
+                 NA)
+    Sys.sleep(4)
+    expect_error(vis_igraph(edge_table, node_table,
+                            export_type = "png", directed = FALSE),
+                 NA)
+})
