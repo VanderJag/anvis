@@ -40,6 +40,12 @@ adj_matrix_to_edgelist <- function(adj_matrix, directed = FALSE) {
         row.names(adj_matrix) <- colnames(adj_matrix)
     }
 
+    # Check if there are missing values in the matrix, replace with 0
+    if (sum(is.na(adj_matrix)) > 0) {
+        adj_matrix[is.na(adj_matrix)] <- 0
+        message("Missing values (`NA`) for edge weights have been replaced with 0.")
+    }
+
     # It is assumed that there is no interest in self interaction
     diag(adj_matrix) <- 0
 

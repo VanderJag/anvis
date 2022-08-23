@@ -279,3 +279,15 @@ test_that("creating an directed edge list gives same as igraph implementation", 
 
     expect_equal(test_edges, ctrl_edges)
 })
+
+
+test_that("missing values are replaced by 0", {
+    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    Mat1[24,25] <- NA
+    Mat1[25,24] <- NA
+
+    expect_message(adj_matrix_to_edgelist(Mat1), "replaced with 0")
+})
+

@@ -799,3 +799,21 @@ test_that("cytoscape visualizes directed networks", {
                                   width_type = "partcor", vis_save = F),
                  NA)
 })
+
+
+test_that("igraph visualizes despite missing values in adj. matrix", {
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[[1]]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    adj_mats[24,25] <- NA
+    adj_mats[25,24] <- NA
+
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    expect_error(
+        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                         width_type = "partcor", vis_save = F), NA)
+})

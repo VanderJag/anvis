@@ -148,7 +148,7 @@ node_size_connectivity <- function(node_table,
   # Connections to self are omitted in this function
   diag(adj_matrix) <- 0
 
-  connectivity <- rowSums(abs(adj_matrix))
+  connectivity <- rowSums(abs(adj_matrix), na.rm = TRUE)
 
   # Scale to range 0 to 1, required for sigmoid
   scale_conn <- connectivity / max(connectivity)
