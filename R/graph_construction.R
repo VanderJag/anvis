@@ -61,9 +61,7 @@ adj_matrix_to_edgelist <- function(adj_matrix, directed = FALSE, self_loops = FA
             warning("Creating undirected edges from an adjacency matrix with ",
                  "unequal upper and lower triangle. Lower triangle will be ",
                  "discarded, so information will be lost.",
-                 "\nℹ Check your adj. matrix with ",
-                 "`all.equal(adj[upper.tri(adj, diag=FALSE)], ",
-                 "t(adj)[upper.tri(t(adj), diag=FALSE)])`",
+                 "\nℹ To retain all information a directed network can be created.",
                  call.=FALSE)
         }
 
