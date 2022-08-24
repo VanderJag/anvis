@@ -11,18 +11,20 @@ file_sequence <- function(name_base, ext) {
   }
 }
 
-# Works like file sequence but will check if the base name exists with either of
-#     two file extensions.
-file_pair_seq <- function(name_base, ext1, ext2) {
-  if (!file.exists(paste0(name_base, ext1)) &&
-      !file.exists(paste0(name_base, ext2))) return(name_base)
-  i = 2
-  repeat {
-    seq_next = paste0(name_base, "_", i)
-    if (!file.exists(paste0(seq_next, ext1)) &&
-        !file.exists(paste0(seq_next, ext2))) return(seq_next)
-    i = i + 1
-  }
+
+# Will check whether the file name exist with either of two extensions and will
+#   also check whether a network in cytoscape already has the same name.
+cyto_file_seq <- function (name_base, ext1, ext2) {
+    if (!file.exists(paste0(name_base, ext1)) &&
+        !file.exists(paste0(name_base, ext2))) return(name_base)
+    i = 2
+    repeat {
+        seq_next = paste0(name_base, "_", i)
+        if (!file.exists(paste0(seq_next, ext1)) &&
+            !file.exists(paste0(seq_next, ext2)) &&
+            !(seq_next %in% RCy3::getNetworkList())) return(seq_next)
+        i = i + 1
+    }
 }
 
 # Defaults for NULL values

@@ -69,6 +69,11 @@ test_that("Cytoscape visualizations are made for each network in the list", {
     expect_setequal(list.files(pattern = "network"),
                     c("network.png", paste0("network_", 2:3, ".png")))
   })
+
+  # VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "cyto",
+  #                  edge_attrs = "all", node_attrs = "all", arrange_co = T,
+  #                  width_type = "partcor", cyto_save_session = F,
+  #                  cyto_close_session = F, vis_save = F)
 })
 
 

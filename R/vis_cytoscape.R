@@ -100,7 +100,7 @@ vis_in_cytoscape <- function(node_table, edge_table,
   # store original name for series
   save_name0 <- save_name
   # Check suffix numbers to avoid duplicate names, always checks for both image and cys file
-  save_name <- file_pair_seq(save_name,
+  save_name <- cyto_file_seq(save_name,
                              ext1 = paste0(".", (export_opts[["type"]] %||% "PNG")),
                              ext2 = ".cys")
 
