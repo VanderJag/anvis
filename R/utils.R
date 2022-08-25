@@ -16,7 +16,8 @@ file_sequence <- function(name_base, ext) {
 #   also check whether a network in cytoscape already has the same name.
 cyto_file_seq <- function (name_base, ext1, ext2) {
     if (!file.exists(paste0(name_base, ext1)) &&
-        !file.exists(paste0(name_base, ext2))) return(name_base)
+        !file.exists(paste0(name_base, ext2)) &&
+        !(name_base %in% RCy3::getNetworkList())) return(name_base)
     i = 2
     repeat {
         seq_next = paste0(name_base, "_", i)
