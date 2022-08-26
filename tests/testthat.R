@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/reference/test_package.html#special-files
 
 library(testthat)
-library(netvis)
+library(anvis)
 
-test_check("netvis")
+test_check("anvis")

@@ -132,17 +132,17 @@ vis_in_cytoscape <- function(node_table, edge_table,
   # Having the same style name for multiple networks causes issues with
   #   visualizations, avoiding this by checking which visual styles already exist
   prev_styles <- RCy3::getVisualStyleNames() %>%
-    stringr::str_subset("^netvis_style")
+    stringr::str_subset("^anvis_style")
 
   if (length(prev_styles) == 0) {
-    style_name <- "netvis_style_1"
+    style_name <- "anvis_style_1"
   } else {
     # add one to the highest number found in the styles
     style_i <- prev_styles %>%
       stringr::str_extract(pattern = "\\d+") %>%
       as.numeric() %>%
       max() + 1
-    style_name <- paste0("netvis_style_", style_i)
+    style_name <- paste0("anvis_style_", style_i)
   }
 
   # Create Cytoscape network
