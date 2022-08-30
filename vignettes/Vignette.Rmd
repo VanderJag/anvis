@@ -42,7 +42,8 @@ if (!requireNamespace("BiocManager", quietly=TRUE))
 BiocManager::install("anvis")
 ```
 
-# How to use
+
+# How to use - Basic example
 
 Here we will give some demonstrations. Start by loading the package.
 
@@ -50,16 +51,64 @@ Here we will give some demonstrations. Start by loading the package.
 library(anvis)
 ```
 
-## Basic example
+## Brief introduction of example data
 
-### Brief introduction of example data
+# Options for adding attributes 
 
-## Options for adding attributes 
+## Changing edge colors with custom color function
 
-## Visualizing with igraph
+* `Rcoloramp` can be used to convert colors to a spectrum. 
+* demonstrate how to flip color spectra: 
 
-## Visualizing cytoscape
+```{r color_func}
+# when the colors are opposite of what you expect
+my_cols <- function (n) rev(pals::magma(n))
+```
 
+* Colors go from low to high values
+* for positive and negative weights the colors are split into two halves, to be assigned to either sign
+
+# Data preparation
+
+* adjacency matrix
+* edgelist can be used, by converting to to adjacency 
+
+# Visualizing with igraph
+
+## Changing the layout of the nodes
+
+* Explain how alternative layouts can be used, and how the node order can be maintained
+
+## Visualization of multiple networks
+
+* Options to visualize side by side
+* manually adjust the layout of the grid
+* add titles to the grid elements
+
+## Further customization
+
+* give some examples, to demonstrate that the full set of options of igraph is still available
+
+## Directionality
+
+* Arrows, self loops
+* Recommend to use cytoscape instead of igraph since it looks neater
+
+# Visualizing cytoscape
+
+## Visualization of multiple networks
+
+* Multiple networks can be visualized, but they are either show in the session or saved seperately. No option to show side by side. 
+* One option to show graphs side by side: - [arrange network windows](http://manual.cytoscape.org/en/stable/Quick_Tour_of_Cytoscape.html#:~:text=Arrange%20Network%20Windows)
+* for easiest comparison we recommend igraph
+
+## Directionality
+
+* Arrows, self loops
+
+## Using `r Biocpkg("RCy3")` for further customization
+
+* Show at least one example to change some visual features of the network. 
 
 # Session info
 
