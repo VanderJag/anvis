@@ -53,9 +53,58 @@ library(anvis)
 
 ## Brief introduction of example data
 
-# Options for adding attributes 
 
-## Changing edge colors with custom color function
+
+
+# Data preparation
+
+* adjacency matrix
+* edgelist can be used, by converting to to adjacency 
+
+
+
+
+# Creating networks & Options for adding attributes 
+
+These attributes can all be added in a single step. To demonstrate the available options and their effect we list them below.
+
+* Explanation of criteria for in input:
+    + Square matrix with names
+    + List of matrices, names can be used in grid
+  
+    
+## Creating basic networks
+
+* Adding edge directionality or self loops
+    
+    
+## Node grouping
+
+* group vector either one for all networks or one for each
+* color of groups can be changed
+* colorblind accessible option is available
+
+
+## Node size
+
+* How is connectivity calculated
+* nodes can be arranged by size (connectivity)
+
+
+## Edge width
+
+* Explain the different types of methods that are available to calculate edge width
+* there is an option available to rescale these edge widths
+* The argument in the wrapper is vectorized
+   
+   
+## Edge colors
+
+### Available color spectra
+
+* Diverging and sequential
+    
+### Changing edge colors with custom color function
 
 * `Rcoloramp` can be used to convert colors to a spectrum. 
 * demonstrate how to flip color spectra: 
@@ -68,33 +117,53 @@ my_cols <- function (n) rev(pals::magma(n))
 * Colors go from low to high values
 * for positive and negative weights the colors are split into two halves, to be assigned to either sign
 
-# Data preparation
-
-* adjacency matrix
-* edgelist can be used, by converting to to adjacency 
 
 # Visualizing with igraph
+
 
 ## Changing the layout of the nodes
 
 * Explain how alternative layouts can be used, and how the node order can be maintained
 
+
 ## Visualization of multiple networks
 
 * Options to visualize side by side
 * manually adjust the layout of the grid
-* add titles to the grid elements
+* add titles to the grid elements, either by hand or from the names of the list
+* Point out that it can be helpful to change the margins
+
+##  saving of the visualizations
+
+* export types
+* further export options
+
 
 ## Further customization
 
 * give some examples, to demonstrate that the full set of options of igraph is still available
+    + Change graphical parameter options with `par()` 
+    + Various options because of the flexibility of igraph
+    + radial labels have their own options to be adjusted
 
 ## Directionality
 
 * Arrows, self loops
 * Recommend to use cytoscape instead of igraph since it looks neater
 
+
+
 # Visualizing cytoscape
+
+
+## Options for showing the visualizations
+
+* Save image
+    + export types
+    + further export options
+* Saving session
+* Close session
+
 
 ## Visualization of multiple networks
 
@@ -102,13 +171,27 @@ my_cols <- function (n) rev(pals::magma(n))
 * One option to show graphs side by side: - [arrange network windows](http://manual.cytoscape.org/en/stable/Quick_Tour_of_Cytoscape.html#:~:text=Arrange%20Network%20Windows)
 * for easiest comparison we recommend igraph
 
+
 ## Directionality
 
 * Arrows, self loops
 
+
+## Customization 
+
+* Setting more node space
+
+
 ## Using `r Biocpkg("RCy3")` for further customization
 
-* Show at least one example to change some visual features of the network. 
+* Show at least one example to change some visual features of the network.
+
+
+# Exporting the networks
+
+* make a note on how the exports can include the columns that have info for visual styling
+* Example with xgmml and another type
+* file save name and xgmml title
 
 # Session info
 
