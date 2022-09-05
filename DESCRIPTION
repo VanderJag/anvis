@@ -23,6 +23,7 @@ Imports:
     BioNet,
     colorspace,
     dplyr,
+    graph,
     igraph,
     magrittr,
     RCy3,
