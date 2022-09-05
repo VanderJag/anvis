@@ -28,6 +28,7 @@ cyto_file_seq <- function (name_base, ext1, ext2) {
     }
 }
 
+
 # Defaults for NULL values
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
@@ -41,6 +42,7 @@ col2hex <- function(cname)
     blue=colMat[3,]/255
   )
 }
+
 
 # Check if something is a color
 are_colors <- function(x) {
@@ -59,6 +61,7 @@ are_colors <- function(x) {
 
   invisible(is_color)
 }
+
 
 # Check if all list elements are named
 named_list_check <- function(test_list) {
@@ -81,9 +84,44 @@ named_list_check <- function(test_list) {
     return(invisible(all_named))
 }
 
+
 # To create an example directed network from an undirected one
 lower_tri_remix <- function(matr) {
     matr[lower.tri(matr)] <- sample(matr[lower.tri(matr)])
 
     return(matr)
+}
+
+
+# To create graphNEL from edge and node table
+graphNEL_from_dfs <- function(edge_table, node_table, directed) {
+    igraph_obj <- igraph::graph_from_data_frame(edge_table,
+                                                vertices = node_table,
+                                                directed = directed)
+    nel <- igraph::as_graphnel(igraph_obj)
+
+    return(nel)
+}
+
+
+# To create edge and node table from graphNEL
+dfs_from_graphNEL <- function(gr_nel) {
+    igraph_obj <- igraph::graph_from_graphnel(gr_nel)
+
+    dfs <- dfs_from_igraph(igraph_obj = igraph_obj)
+
+    return(dfs)
+}
+
+dfs_from_igraph <- function(igraph_obj) {
+    dfs <- igraph::as_data_frame(igraph_obj, what = "both")
+
+    names(dfs$vertices) <- names(dfs$vertices) %>%
+        stringr::str_replace_all("^name$", "node")
+
+    names(dfs$edges) <- names(dfs$edges) %>%
+        stringr::str_replace_all("^from$", "source") %>%
+        stringr::str_replace_all("^to$", "target")
+
+    return(dfs)
 }
