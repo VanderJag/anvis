@@ -35,7 +35,7 @@ test_that("creating edgelist throws error when adj. matrix is not symmetrical", 
   row.names(mat1) <- colnames(mat1) <- c("A", "B", "C")
 
   # Check if error occurs
-  expect_error(adj_matrix_to_edgelist(mat1), "identical upper and lower")
+  expect_warning(adj_matrix_to_edgelist(mat1), "unequal upper and lower")
 })
 
 
