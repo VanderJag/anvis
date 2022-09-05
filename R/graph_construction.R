@@ -168,11 +168,81 @@ adjToNetwork <- function(adj_matrix,
              "rows and columns", call. = FALSE)
     }
 
-    # Node table with group info ----------------------------------------------
 
+    # node table from adjacency
     node_table <- adj_matrix_to_nodetable(adj_matrix)
 
-    # Adding grouping information ---------------------------------------------
+    # adjacency to edgelist
+    edge_table <- adj_matrix_to_edgelist(adj_matrix,
+                                         directed = directed,
+                                         self_loops = self_loops)
+
+    # Optionally, add additional attributes for visualizations
+    if (!"none" %in% node_attrs || !"none" %in% edge_attrs) {
+        network <- list("vertices" = node_table, "edges" = edge_table)
+        network <- addVisAttrs(network = network,
+                               node_attrs = node_attrs,
+                               edge_attrs = edge_attrs,
+                               group_vec = group_vec,
+                               group_colors = group_colors,
+                               size_type = size_type,
+                               width_type = width_type,
+                               edge_color_func = edge_color_func)
+        node_table <- network$vertices
+        edge_table <- network$edges
+    }
+
+    # Return will be graphNEL, use igraph for conversion
+    nel <- graphNEL_from_dfs(edge_table = edge_table,
+                             node_table = node_table,
+                             directed = directed)
+
+    return(nel)
+}
+
+# TODO make these tests
+# does both node_attrs and edge_attrs as none
+# are graph attributes maintained when Vis attrs are added? both for igraph and graphNEL
+# When group attribute is already present it is overwritten and warning is raised -> group_nodes function
+
+
+addVisAttrs <- function(network,
+                        node_attrs = c("none", "all", "group",
+                                       "color_group", "size"),
+                        edge_attrs = c("none", "all", "width", "color"),
+                        group_vec = NULL,
+                        group_colors = NULL,
+                        size_type = NULL,
+                        width_type = NULL,
+                        edge_color_func = NULL) {
+
+    # Distinguish between three types of networks
+    #     and retain original info
+    if (is(network, "graphNEL")) {
+        graph_attrs <- network@graphData
+        directed <- graph::edgemode(network) == "directed"
+        network <- dfs_from_graphNEL(gr_nel = network)
+        network_type <- "graphNEL"
+
+    } else if (is(network, "igraph")) {
+        directed <- igraph::is_directed(network)
+        graph_attrs <- igraph::graph_attr(network)
+        network <- dfs_from_igraph(igraph_obj = network)
+        network_type <- "igraph"
+
+    } else if (!all(c("vertices", "edges") %in% names(network))) {
+        stop("Input network must be graphNEL, igraph, or list of data ",
+        "frames named 'vertices' and 'edges'. \nℹ Class of your network: ",
+        class(network), call.=FALSE)
+    } else {
+        network_type <- "lists"
+    }
+
+    edge_table <- network$edges
+    node_table <- network$vertices
+
+
+    # Adding grouping information
 
     if ((!"none" %in% node_attrs) &
         ("all" %in% node_attrs | "group" %in% node_attrs)) {
@@ -185,7 +255,7 @@ adjToNetwork <- function(adj_matrix,
         node_table <- group_nodes(node_table, group_vec = group_vec)
     }
 
-    # Add colors for the groups -----------------------------------------------
+    # Add colors for the groups
 
     if ((!"none" %in% node_attrs) &
         ("all" %in% node_attrs | "color_group" %in% node_attrs)) {
@@ -193,7 +263,7 @@ adjToNetwork <- function(adj_matrix,
     }
 
 
-    # Add node size -----------------------------------------------------------
+    # Add node size
 
     if ((!"none" %in% node_attrs) &
         ("all" %in% node_attrs | "size" %in% node_attrs)) {
@@ -202,21 +272,14 @@ adjToNetwork <- function(adj_matrix,
                                              size_type = size_type)
     }
 
-
-    # adjecency to edgelist ---------------------------------------------------
-
-    edge_table <- adj_matrix_to_edgelist(adj_matrix,
-                                         directed = directed,
-                                         self_loops = self_loops)
-
-    # Convert edge weight to edge width ---------------------------------------
+    # Convert edge weight to edge width
 
     if ((!"none" %in% edge_attrs) &
         ("all" %in% edge_attrs | "width" %in% edge_attrs)) {
         edge_table <- edge_weight_to_widths(edge_table, width_type = width_type)
     }
 
-    # Add colour column to edge table -----------------------------------------
+    # Add colour column to edge table
 
     if ((!"none" %in% edge_attrs) &
         ("all" %in% edge_attrs | "color" %in% edge_attrs)) {
@@ -224,8 +287,33 @@ adjToNetwork <- function(adj_matrix,
                                        edge_color_func = edge_color_func)
     }
 
-    return(list("edge_table" = edge_table,
-                "node_table" = node_table))
+
+    # Convert output into the same class as input
+    if (network_type == "igraph") {
+
+        igraph_obj <- igraph::graph_from_data_frame(edge_table,
+                                      vertices = node_table,
+                                      directed = directed)
+
+        igraph::graph_attr(igraph_obj) <- graph_attrs
+
+        return(igraph_obj)
+
+    } else if (network_type == "graphNEL") {
+        nel <- graphNEL_from_dfs(edge_table = edge_table,
+                                 node_table = node_table,
+                                 directed = directed)
+        nel@graphData <- graph_attrs
+
+        return(nel)
+
+    } else if (network_type == "lists") {
+
+        return(list("vertices" = node_table, "edges" = edge_table))
+        # TODO currently other functions expect other names
+    }
+
+
 }
 
 
