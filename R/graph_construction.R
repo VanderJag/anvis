@@ -140,87 +140,92 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #' @inheritParams weights_to_color
 #'
 #' @return Will return a list with two data frames, named 'edge_table' and
-#' 'node_table'. The 'node_table' data frame has a 'node' column and other columns
-#' for the additional attributes that were added. The 'edge_table' has columns
-#' 'source' and 'target', and more columns for the added attributes.
+#' 'node_table'. The 'node_table' data frame has a 'node' column and other
+#' columns for the additional attributes that were added. The 'edge_table' has
+#' columns 'source' and 'target', and more columns for the added attributes.
 #'
 #' @export
-adj_matrix_to_network <- function(adj_matrix,
-                                  directed = FALSE,
-                                  self_loops = FALSE,
-                                  node_attrs = c("none", "all", "group", "color_group", "size"),
-                                  edge_attrs = c("none", "all", "width", "color"),
-                                  group_vec = NULL,
-                                  group_colors = NULL,
-                                  size_type = NULL,
-                                  width_type = NULL,
-                                  edge_color_func = NULL) {
+adjToNetwork <- function(adj_matrix,
+                         directed = FALSE,
+                         self_loops = FALSE,
+                         node_attrs = c("none", "all", "group",
+                                        "color_group", "size"),
+                         edge_attrs = c("none", "all", "width", "color"),
+                         group_vec = NULL,
+                         group_colors = NULL,
+                         size_type = NULL,
+                         width_type = NULL,
+                         edge_color_func = NULL) {
 
-  # Check which attributes should be added
-  node_attrs <- match.arg(node_attrs, several.ok = TRUE)
-  edge_attrs <- match.arg(edge_attrs, several.ok = TRUE)
+    # Check which attributes should be added
+    node_attrs <- match.arg(node_attrs, several.ok = TRUE)
+    edge_attrs <- match.arg(edge_attrs, several.ok = TRUE)
 
-  # If the number and column of the adjacency matrix is not equal there may be
-  #   missing info and an error with the data input
-  if (ncol(adj_matrix) != nrow(adj_matrix)) {
-    stop("Adjacency matrix should be a square matrix with equal number of rows ",
-         "and columns", call. = FALSE)
-  }
-
-  # Node table with group info ----------------------------------------------
-
-  node_table <- adj_matrix_to_nodetable(adj_matrix)
-
-  # Adding grouping information ---------------------------------------------
-
-  if ((!"none" %in% node_attrs) &
-      ("all" %in% node_attrs | "group" %in% node_attrs)) {
-    if (is.null(group_vec)) {
-      stop("Must provide grouping vector:",
-           "\n✖ `group_vec` should not be NULL when `node_attrs` is 'all' or 'group'.",
-           call.=FALSE)
+    # If the number and column of the adjacency matrix is not equal there may be
+    #   missing info and an error with the data input
+    if (ncol(adj_matrix) != nrow(adj_matrix)) {
+        stop("Adjacency matrix should be a square matrix with equal number of ",
+             "rows and columns", call. = FALSE)
     }
-    node_table <- group_nodes(node_table, group_vec = group_vec)
-  }
 
-  # Add colors for the groups -----------------------------------------------
+    # Node table with group info ----------------------------------------------
 
-  if ((!"none" %in% node_attrs) &
-      ("all" %in% node_attrs | "color_group" %in% node_attrs)) {
-    node_table <- add_colors(node_table, group_colors = group_colors)
-  }
+    node_table <- adj_matrix_to_nodetable(adj_matrix)
+
+    # Adding grouping information ---------------------------------------------
+
+    if ((!"none" %in% node_attrs) &
+        ("all" %in% node_attrs | "group" %in% node_attrs)) {
+        if (is.null(group_vec)) {
+            stop("Must provide grouping vector:",
+                 "\n✖ `group_vec` should not be NULL when `node_attrs` is ",
+                 "'all' or 'group'.",
+                 call.=FALSE)
+        }
+        node_table <- group_nodes(node_table, group_vec = group_vec)
+    }
+
+    # Add colors for the groups -----------------------------------------------
+
+    if ((!"none" %in% node_attrs) &
+        ("all" %in% node_attrs | "color_group" %in% node_attrs)) {
+        node_table <- add_colors(node_table, group_colors = group_colors)
+    }
 
 
-  # Add node size -----------------------------------------------------------
+    # Add node size -----------------------------------------------------------
 
-  if ((!"none" %in% node_attrs) &
-      ("all" %in% node_attrs | "size" %in% node_attrs)) {
-    node_table <- node_size_connectivity(node_table = node_table,
-                                         adj_matrix = adj_matrix,
-                                         size_type = size_type)
-  }
+    if ((!"none" %in% node_attrs) &
+        ("all" %in% node_attrs | "size" %in% node_attrs)) {
+        node_table <- node_size_connectivity(node_table = node_table,
+                                             adj_matrix = adj_matrix,
+                                             size_type = size_type)
+    }
 
 
-  # adjecency to edgelist ---------------------------------------------------
+    # adjecency to edgelist ---------------------------------------------------
 
-  edge_table <- adj_matrix_to_edgelist(adj_matrix, directed = directed, self_loops = self_loops)
+    edge_table <- adj_matrix_to_edgelist(adj_matrix,
+                                         directed = directed,
+                                         self_loops = self_loops)
 
-  # Convert edge weight to edge width ---------------------------------------
+    # Convert edge weight to edge width ---------------------------------------
 
-  if ((!"none" %in% edge_attrs) &
-      ("all" %in% edge_attrs | "width" %in% edge_attrs)) {
-    edge_table <- edge_weight_to_widths(edge_table, width_type = width_type)
-  }
+    if ((!"none" %in% edge_attrs) &
+        ("all" %in% edge_attrs | "width" %in% edge_attrs)) {
+        edge_table <- edge_weight_to_widths(edge_table, width_type = width_type)
+    }
 
-  # Add colour column to edge table -----------------------------------------
+    # Add colour column to edge table -----------------------------------------
 
-  if ((!"none" %in% edge_attrs) &
-      ("all" %in% edge_attrs | "color" %in% edge_attrs)) {
-    edge_table <- weights_to_color(edge_table, edge_color_func = edge_color_func)
-  }
+    if ((!"none" %in% edge_attrs) &
+        ("all" %in% edge_attrs | "color" %in% edge_attrs)) {
+        edge_table <- weights_to_color(edge_table,
+                                       edge_color_func = edge_color_func)
+    }
 
-  return(list("edge_table" = edge_table,
-              "node_table" = node_table))
+    return(list("edge_table" = edge_table,
+                "node_table" = node_table))
 }
 
 
@@ -252,7 +257,9 @@ edgelist_to_adj <- function(edge_list, weight_col = "weight") {
     graph <- igraph::graph_from_data_frame(edge_list,
                                            directed = FALSE)
 
-    adj <- igraph::as_adjacency_matrix(graph = graph, type = "both", attr = weight_col,
+    adj <- igraph::as_adjacency_matrix(graph = graph,
+                                       type = "both",
+                                       attr = weight_col,
                                        sparse = F)
 
     return(adj)

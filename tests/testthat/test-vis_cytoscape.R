@@ -2,7 +2,7 @@ test_that("basic visualization works",{
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -30,7 +30,7 @@ test_that("error when node names cannot be found", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -50,7 +50,7 @@ test_that("error when edge source or target cannot be found", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -76,7 +76,7 @@ test_that("Cytoscape saves session", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -105,7 +105,7 @@ test_that("Cytoscape exports image with name", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -141,7 +141,7 @@ test_that("cytoscape saves image when no name is provided", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -169,7 +169,7 @@ test_that("image saving without name works while a previous save is present", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -203,7 +203,7 @@ test_that("image saving file name sequence works with non default names", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -237,7 +237,7 @@ test_that("session saving without name works while a previous save is present", 
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -271,7 +271,7 @@ test_that("image saving file name sequence works with non default names", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -305,7 +305,7 @@ test_that("image and session save number will be matching (default names)", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -351,7 +351,7 @@ test_that("image and session save number will be matching (non default names)", 
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -398,7 +398,7 @@ test_that("no error when node or edge attributes are missing", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -428,7 +428,7 @@ test_that("radial labels work when nodes are arranged by connectivity",{
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -457,7 +457,7 @@ test_that("variation of edge width works",{
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -486,7 +486,7 @@ test_that("visualization of directed networks works",{
     dir_mat <- readRDS(testthat::test_path("fixtures", "directed_adj_matrix.rds"))
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    network_list <- adj_matrix_to_network(dir_mat,
+    network_list <- adjToNetwork(dir_mat,
                                           node_attrs = "all",
                                           edge_attrs = "all",
                                           directed = T,
@@ -516,7 +516,7 @@ test_that("visualization of directed networks works even for undirected networks
     Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    network_list <- adj_matrix_to_network(Mat1,
+    network_list <- adjToNetwork(Mat1,
                                           node_attrs = "all",
                                           edge_attrs = "all",
                                           directed = T,

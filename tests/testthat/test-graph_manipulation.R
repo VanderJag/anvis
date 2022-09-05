@@ -154,7 +154,7 @@ test_that("connectivity throws error when adj_matrix and node_table have differe
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         group_vec = group_vec,
                                         width_type = "partcor")
   node_table <- network_list[["node_table"]]
@@ -173,7 +173,7 @@ test_that("connectivity rowSums matches one determined based on edge weights", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         group_vec = group_vec,
                                         width_type = "partcor")
   edge_table <- network_list[["edge_table"]]
@@ -199,7 +199,7 @@ test_that("avg conn. shows warning when not all node tables have size column", {
   networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
-                       adj_matrix_to_network(adj_mats[[x]],
+                       adjToNetwork(adj_mats[[x]],
                                              node_attrs = "all",
                                              edge_attrs = "all",
                                              group_vec = group_vec[[
@@ -233,7 +233,7 @@ test_that("avg conn. gives the same result for reordered node tables", {
   networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
-                       adj_matrix_to_network(adj_mats[[x]],
+                       adjToNetwork(adj_mats[[x]],
                                              node_attrs = "all",
                                              edge_attrs = "all",
                                              group_vec = group_vec[[
@@ -257,7 +257,7 @@ test_that("avg. conn. is calculated when some some node tables miss size attribu
   networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
-                       adj_matrix_to_network(adj_mats[[x]],
+                       adjToNetwork(adj_mats[[x]],
                                              node_attrs = "all",
                                              edge_attrs = "all",
                                              group_vec = group_vec[[
@@ -286,7 +286,7 @@ test_that("avg. conn. give error for missing node column", {
   networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
-                       adj_matrix_to_network(adj_mats[[x]],
+                       adjToNetwork(adj_mats[[x]],
                                              node_attrs = "all",
                                              edge_attrs = "all",
                                              group_vec = group_vec[[
@@ -311,7 +311,7 @@ test_that("avg. conn. give error for unequal node sets", {
   networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
-                       adj_matrix_to_network(adj_mats[[x]],
+                       adjToNetwork(adj_mats[[x]],
                                              node_attrs = "all",
                                              edge_attrs = "all",
                                              group_vec = group_vec[[

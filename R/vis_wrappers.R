@@ -17,7 +17,7 @@
 #'     adjacency matrix will be discarded. If `TRUE` this information will be
 #'     retained and the style of visualizations will be adjusted to feature
 #'     edge curvature and arrows.
-#' @inheritParams adj_matrix_to_network
+#' @inheritParams adjToNetwork
 #' @param group_vec A vector of character strings that assigns group labels to
 #'     the nodes. The order of this vector should match the order of column and
 #'     rownames of the input adjacency matrices. If `adj_mats` is a list, a single
@@ -118,7 +118,7 @@
 #'     the `save_names` as a network title, a single string, to give all networks
 #'     the same title, or a vector of strings matching the length of input
 #'     networks, to provide each networks its own title.
-#' @inheritParams adj_matrix_to_network
+#' @inheritParams adjToNetwork
 #'
 #' @return The main purpose of this function is to create visualizations or
 #' export networks. In addition, this function returns a list of two lists,
@@ -236,7 +236,7 @@ VisualiseNetwork <- function(adj_mats,
   # Convert all adjacency matrices into edge and node tables
   networks <- lapply(seq_along(adj_mats),
      function(x) {
-       adj_matrix_to_network(adj_mats[[x]],
+         adjToNetwork(adj_mats[[x]],
                              directed = directed,
                              self_loops = self_loops,
                              node_attrs = node_attrs,

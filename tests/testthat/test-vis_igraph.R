@@ -32,7 +32,7 @@ test_that("igraph basic visualization runs without error",{
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -49,7 +49,7 @@ test_that("igraph scales widths", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -71,7 +71,7 @@ test_that("igraph visualizates with additional parameters",{
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -97,7 +97,7 @@ test_that("igraph vis. leaves visual styling out when it is not an attribute",{
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -125,7 +125,7 @@ test_that("igraph vis. doesn't complain when overwriting args. for text()",{
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -150,7 +150,7 @@ test_that("igraph vis. shows vertex sizes",{
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -172,7 +172,7 @@ test_that("igraph vis. shows no vertex sizes when its not in node table",{
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -197,7 +197,7 @@ test_that("igraph vis. allows user to overwrite vertex sizes",{
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -220,7 +220,7 @@ test_that("igraph plot saving works in multiple formats", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -246,7 +246,7 @@ test_that("igraph plot saving creates name series", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -269,7 +269,7 @@ test_that("igraph plot saving works with custom names", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -290,7 +290,7 @@ test_that("igraph plot print option doesn't save additional files", {
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -311,7 +311,7 @@ test_that("igraph vis. saves plots with changed margins",{
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adj_matrix_to_network(Mat1,
+  network_list <- adjToNetwork(Mat1,
                                         node_attrs = "all",
                                         edge_attrs = "all",
                                         group_vec = group_vec,
@@ -337,7 +337,7 @@ test_that("igraph vis names list check works",{
     Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    network_list <- adj_matrix_to_network(Mat1,
+    network_list <- adjToNetwork(Mat1,
                                           node_attrs = "all",
                                           edge_attrs = "all",
                                           group_vec = group_vec,
@@ -355,7 +355,7 @@ test_that("igraph vis save_name input validation works",{
     Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    network_list <- adj_matrix_to_network(Mat1,
+    network_list <- adjToNetwork(Mat1,
                                           node_attrs = "all",
                                           edge_attrs = "all",
                                           group_vec = group_vec,
@@ -379,7 +379,7 @@ test_that("igraph vis scale_width input validation works",{
     Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    network_list <- adj_matrix_to_network(Mat1,
+    network_list <- adjToNetwork(Mat1,
                                           node_attrs = "all",
                                           edge_attrs = "all",
                                           group_vec = group_vec,
@@ -405,7 +405,7 @@ test_that("igraph visualizes directed graphs", {
 
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    network_list <- adj_matrix_to_network(dir_mat,
+    network_list <- adjToNetwork(dir_mat,
                                           directed = T,
                                           node_attrs = "all",
                                           edge_attrs = "all",
@@ -430,7 +430,7 @@ test_that("igraph visualizes directed graphs even when the matrix is symmetric",
 
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    network_list <- adj_matrix_to_network(Mat1,
+    network_list <- adjToNetwork(Mat1,
                                           directed = T,
                                           node_attrs = "all",
                                           edge_attrs = "all",
@@ -455,7 +455,7 @@ test_that("visualizations in Rstudio stay present even after graphical device is
 
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    network_list <- adj_matrix_to_network(Mat1,
+    network_list <- adjToNetwork(Mat1,
                                           directed = F,
                                           node_attrs = "all",
                                           edge_attrs = "all",
