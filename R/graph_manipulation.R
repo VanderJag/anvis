@@ -21,6 +21,12 @@ group_nodes <- function(node_table, group_vec) {
     call.=FALSE)
   }
 
+  # If the column to be added is already present
+  if ("group" %in% colnames(node_table)) {
+      warning("Node attributes already include 'group', this attribute will ",
+              "be overwritten.")
+  }
+
   # Add grouping vector as column and sort the rows
   node_table$group <- group_vec
   node_table <- node_table[order(node_table$group),]
@@ -102,6 +108,12 @@ add_colors <- function(node_table, group_colors = NULL) {
 
   # index which group is assigned to which row
   idx <- match(node_table$group, groups)
+
+  # If the column to be added is already present
+  if ("color" %in% colnames(node_table)) {
+      warning("Node attributes already include 'color', this attribute will ",
+              "be overwritten.")
+  }
 
   # Use group index to select correct colors for each row
   node_table$color <- colors[idx]
