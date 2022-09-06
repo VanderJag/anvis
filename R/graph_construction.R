@@ -268,7 +268,7 @@ addVisAttrs <- function(network,
     if ((!"none" %in% node_attrs) &
         ("all" %in% node_attrs | "size" %in% node_attrs)) {
         node_table <- node_size_connectivity(node_table = node_table,
-                                             adj_matrix = adj_matrix,
+                                             edge_table = edge_table,
                                              size_type = size_type)
     }
 
