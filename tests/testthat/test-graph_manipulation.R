@@ -169,6 +169,27 @@ test_that("connectivity based on edge weights matches one determined by rowSums"
 })
 
 
+test_that("connectivity can be determined when a node has no edges", {
+  # Load adjacency matrix
+  Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+
+  network <- adjToNetwork(Mat1, directed = F, self_loops = F)
+  network <- dfs_from_graphNEL(network)
+  edge_table <- network[["edges"]]
+  edge_table <- edge_table %>% dplyr::rowwise() %>%
+      dplyr::filter(source != "C5C5a" && target != "C5C5a")
+  node_table <- network[["vertices"]]
+  node_table <- node_size_connectivity(node_table = node_table,
+                                       edge_table = edge_table,
+                                       size_type = "scaled_only")
+
+  # Check if the removed edge has size 0
+  rm_nodesize <- node_table %>% dplyr::filter(node == "C5C5a") %>% dplyr::pull(size)
+
+  expect_equal(rm_nodesize, 0)
+})
+
+
 test_that("avg conn. shows warning when not all node tables have size column", {
   adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
 
