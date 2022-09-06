@@ -64,7 +64,7 @@
 #'     graphical device.
 #'
 #' @export
-vis_igraph <- function(edge_table = NULL, node_table = NULL,
+visIgraph <- function(edge_table = NULL, node_table = NULL,
                        igraph_obj = NULL,
                        directed = FALSE,
                        radial_labs = TRUE,

@@ -20,7 +20,7 @@ test_that("basic visualization works",{
   skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
               message = "this test runs only when cytoscape is active")
 
-  expect_error(vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+  expect_error(visCytoscape(edge_table = edge_table, node_table = node_table,
                                 save_session = FALSE),
                NA)
 })
@@ -41,7 +41,7 @@ test_that("error when node names cannot be found", {
 
   node_table <- node_table %>% dplyr::select(-node)
 
-  expect_error(vis_in_cytoscape(edge_table = edge_table, node_table = node_table, save_session = FALSE),
+  expect_error(visCytoscape(edge_table = edge_table, node_table = node_table, save_session = FALSE),
                "must contain column named 'node'")
 })
 
@@ -61,13 +61,13 @@ test_that("error when edge source or target cannot be found", {
 
 
   edge_table00 <- edge_table %>% dplyr::select(-source)
-  expect_error(vis_in_cytoscape(edge_table = edge_table00, node_table = node_table, save_session = FALSE),
+  expect_error(visCytoscape(edge_table = edge_table00, node_table = node_table, save_session = FALSE),
                "must contain columns 'source' and 'target'")
   edge_table00 <- edge_table %>% dplyr::select(-target)
-  expect_error(vis_in_cytoscape(edge_table = edge_table00, node_table = node_table, save_session = FALSE),
+  expect_error(visCytoscape(edge_table = edge_table00, node_table = node_table, save_session = FALSE),
                "must contain columns 'source' and 'target'")
   edge_table00 <- edge_table %>% dplyr::select(-c(source, target))
-  expect_error(vis_in_cytoscape(edge_table = edge_table00, node_table = node_table, save_session = FALSE),
+  expect_error(visCytoscape(edge_table = edge_table00, node_table = node_table, save_session = FALSE),
                "must contain columns 'source' and 'target'")
 })
 
@@ -91,7 +91,7 @@ test_that("Cytoscape saves session", {
               message = "this test runs only when cytoscape is active")
 
   withr::with_file("temp_network.cys", {
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      export_image = FALSE,
                      save_session = TRUE, save_name = "temp_network")
 
@@ -121,7 +121,7 @@ test_that("Cytoscape exports image with name", {
 
   # perform save and check
   withr::with_file("temp_network.png", {
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = FALSE, export_image = TRUE,
                      save_name = "temp_network")
 
@@ -129,7 +129,7 @@ test_that("Cytoscape exports image with name", {
   })
   # don't save and check
   withr::with_file("temp_network.png", {
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = FALSE, export_image = FALSE,
                      save_name = "temp_network");
     expect_equal(list.files(pattern = "temp_network"), character(0))
@@ -157,7 +157,7 @@ test_that("cytoscape saves image when no name is provided", {
 
   # perform save and check
   withr::with_file("network.png", {
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = FALSE, export_image = TRUE)
 
     expect_equal(list.files(pattern = "network"), "network.png")
@@ -185,11 +185,11 @@ test_that("image saving without name works while a previous save is present", {
 
   # perform save and check
   withr::with_file(list("network.png", "network_2.png", "network_3.png"), {
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = FALSE, export_image = TRUE)
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = FALSE, export_image = TRUE)
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = FALSE, export_image = TRUE)
 
     expect_equal(list.files(pattern = "network"), c("network.png",
@@ -219,11 +219,11 @@ test_that("image saving file name sequence works with non default names", {
 
   # perform save and check
   withr::with_file(list("temp_network.png", "temp_network_2.png", "temp_network_3.png"), {
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = FALSE, export_image = TRUE, save_name = "temp_network")
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = FALSE, export_image = TRUE, save_name = "temp_network")
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = FALSE, export_image = TRUE, save_name = "temp_network")
 
     expect_equal(list.files(pattern = "temp_network"), c("temp_network.png",
@@ -253,11 +253,11 @@ test_that("session saving without name works while a previous save is present", 
 
   # perform save and check
   withr::with_file(list("network.cys", "network_2.cys", "network_3.cys"), {
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = TRUE, export_image = FALSE)
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = TRUE, export_image = FALSE)
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = TRUE, export_image = FALSE)
 
     expect_equal(list.files(pattern = "network"), c("network.cys",
@@ -287,11 +287,11 @@ test_that("image saving file name sequence works with non default names", {
 
   # perform save and check
   withr::with_file(list("temp_network.cys", "temp_network_2.cys", "temp_network_3.cys"), {
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = TRUE, export_image = FALSE, save_name = "temp_network")
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = TRUE, export_image = FALSE, save_name = "temp_network")
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = TRUE, export_image = FALSE, save_name = "temp_network")
 
     expect_equal(list.files(pattern = "temp_network"), c("temp_network.cys",
@@ -322,11 +322,11 @@ test_that("image and session save number will be matching (default names)", {
   # Check if image adjusts to session names
   withr::with_file(list("network.cys", "network_2.cys",
                         "network_3.cys", "network_3.png"), {
-                          vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                          visCytoscape(edge_table = edge_table, node_table = node_table,
                                            save_session = TRUE, export_image = FALSE)
-                          vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                          visCytoscape(edge_table = edge_table, node_table = node_table,
                                            save_session = TRUE, export_image = FALSE)
-                          vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                          visCytoscape(edge_table = edge_table, node_table = node_table,
                                            save_session = TRUE, export_image = TRUE)
 
                           expect_true(all(c("network_3.png", "network_3.cys") %in% list.files()))
@@ -335,11 +335,11 @@ test_that("image and session save number will be matching (default names)", {
   # Check if session adjusts to image names
   withr::with_file(list("network.png", "network_2.png",
                         "network_3.png", "network_3.cys"), {
-                          vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                          visCytoscape(edge_table = edge_table, node_table = node_table,
                                            save_session = FALSE, export_image = TRUE)
-                          vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                          visCytoscape(edge_table = edge_table, node_table = node_table,
                                            save_session = FALSE, export_image = TRUE)
-                          vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+                          visCytoscape(edge_table = edge_table, node_table = node_table,
                                            save_session = TRUE, export_image = TRUE)
 
                           expect_true(all(c("network_3.png", "network_3.cys") %in% list.files()))
@@ -368,11 +368,11 @@ test_that("image and session save number will be matching (non default names)", 
   # Check if image adjusts to session names
   withr::with_file(list("temp_network.cys", "temp_network_2.cys",
                         "temp_network_3.cys", "temp_network_3.png"), {
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = TRUE, export_image = FALSE, save_name = "temp_network")
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = TRUE, export_image = FALSE, save_name = "temp_network")
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = TRUE, export_image = TRUE, save_name = "temp_network")
 
     expect_true(all(c("temp_network_3.png", "temp_network_3.cys") %in% list.files()))
@@ -381,11 +381,11 @@ test_that("image and session save number will be matching (non default names)", 
     # Check if session adjusts to image names
   withr::with_file(list("temp_network.png", "temp_network_2.png",
                         "temp_network_3.png", "temp_network_3.cys"), {
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = FALSE, export_image = TRUE, save_name = "temp_network")
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = FALSE, export_image = TRUE, save_name = "temp_network")
-    vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    visCytoscape(edge_table = edge_table, node_table = node_table,
                      save_session = TRUE, export_image = TRUE, save_name = "temp_network")
 
     expect_true(all(c("temp_network_3.png", "temp_network_3.cys") %in% list.files()))
@@ -415,10 +415,10 @@ test_that("no error when node or edge attributes are missing", {
   skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
               message = "this test runs only when cytoscape is active")
 
-  expect_error(vis_in_cytoscape(edge_table = edge_table, node_table = node_table00,
+  expect_error(visCytoscape(edge_table = edge_table, node_table = node_table00,
                                 save_session = FALSE, export_image = FALSE),
                NA)
-  expect_error(vis_in_cytoscape(edge_table = edge_table00, node_table = node_table,
+  expect_error(visCytoscape(edge_table = edge_table00, node_table = node_table,
                                 save_session = FALSE, export_image = FALSE),
                NA)
 })
@@ -447,7 +447,7 @@ test_that("radial labels work when nodes are arranged by connectivity",{
   skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
               message = "this test runs only when cytoscape is active")
 
-  expect_error(vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+  expect_error(visCytoscape(edge_table = edge_table, node_table = node_table,
                                 save_session = FALSE),
                NA)
 })
@@ -475,7 +475,7 @@ test_that("variation of edge width works",{
   skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
               message = "this test runs only when cytoscape is active")
 
-  expect_error(vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+  expect_error(visCytoscape(edge_table = edge_table, node_table = node_table,
                                 save_session = FALSE, export_image = F, close_session = F,
                                 scale_width = 8),
                NA)
@@ -505,7 +505,7 @@ test_that("visualization of directed networks works",{
     skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
                 message = "this test runs only when cytoscape is active")
 
-    expect_error(vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    expect_error(visCytoscape(edge_table = edge_table, node_table = node_table,
                                   save_session = FALSE, scale_width = 3, close_session = F,
                                   export_image = F, directed = T),
                  NA)
@@ -535,7 +535,7 @@ test_that("visualization of directed networks works even for undirected networks
     skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
                 message = "this test runs only when cytoscape is active")
 
-    expect_error(vis_in_cytoscape(edge_table = edge_table, node_table = node_table,
+    expect_error(visCytoscape(edge_table = edge_table, node_table = node_table,
                                   save_session = FALSE, close_session = F,
                                   export_image = F, scale_width = 3, directed = T),
                  NA)

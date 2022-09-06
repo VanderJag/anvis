@@ -259,7 +259,7 @@ test_that("other functions can make use of the adj. matrix created from edgelist
     edge_table <- network_list[["edges"]]
     node_table <- network_list[["vertices"]]
 
-    expect_error(vis_igraph(edge_table, node_table, radial_labs = T, export_type = "print"),
+    expect_error(visIgraph(edge_table, node_table, radial_labs = T, export_type = "print"),
                  NA)
 
     # use matrix for visualization
@@ -276,7 +276,7 @@ test_that("other functions can make use of the adj. matrix created from edgelist
 
     node_table <- sort_avg_connectivity(node_table)
 
-    expect_error(vis_igraph(edge_table, node_table, radial_labs = T, export_type = "print"),
+    expect_error(visIgraph(edge_table, node_table, radial_labs = T, export_type = "print"),
                  NA)
 })
 

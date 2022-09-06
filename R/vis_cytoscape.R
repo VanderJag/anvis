@@ -45,7 +45,7 @@
 #'     visualization may not show.
 #'
 #' @export
-vis_in_cytoscape <- function(node_table, edge_table,
+visCytoscape <- function(node_table, edge_table,
                              directed = FALSE,
                              radial_labs = TRUE,
                              export_image = TRUE,

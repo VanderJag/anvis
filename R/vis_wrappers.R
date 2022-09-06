@@ -324,7 +324,7 @@ VisualiseNetwork <- function(adj_mats,
           igr_plot_opts[["main"]] <- igr_grid_names[i]
       }
 
-      do.call(vis_igraph,
+      do.call(visIgraph,
               c(list(edge_table = edges[[i]],
                  node_table = nodes[[i]],
                  directed = directed,
@@ -347,7 +347,7 @@ VisualiseNetwork <- function(adj_mats,
   } else if (output_type == "cytoscape") {
     # If plots are not saved keep igraph session open
     for (i in seq_along(edges)) {
-      vis_in_cytoscape(edge_table = edges[[i]],
+        visCytoscape(edge_table = edges[[i]],
                        node_table = nodes[[i]],
                        directed = directed,
                        save_name = save_names[[if (names_match) i else 1]],
