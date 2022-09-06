@@ -231,7 +231,7 @@ addVisAttrs <- function(network,
         network_type <- "igraph"
 
     } else if (!all(c("vertices", "edges") %in% names(network))) {
-        stop("Input network must be graphNEL, igraph, or list of data ",
+        stop("Input network must be graphNEL, igraph, or list containing data ",
         "frames named 'vertices' and 'edges'. \nℹ Class of your network: ",
         class(network), call.=FALSE)
     } else {
