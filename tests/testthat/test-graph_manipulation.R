@@ -196,7 +196,6 @@ test_that("avg conn. shows warning when not all node tables have size column", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
   group_vec <- list(group_vec)
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
                        adjToNetwork(adj_mats[[x]],
@@ -204,9 +203,11 @@ test_that("avg conn. shows warning when not all node tables have size column", {
                                              edge_attrs = "all",
                                              group_vec = group_vec[[
                                                if (length(group_vec) == length(adj_mats)) x else 1]],
-                                             width_type = "partcor")})
+                                             width_type = "partcor") %>%
+                             dfs_from_graphNEL()})
+
   nodes <- lapply(seq_along(adj_mats),
-                  function(x) networks[[x]]$node_table)
+                  function(x) networks[[x]]$vertices)
   Network = list(adjacencies = adj_mats, nodes = nodes)
 
   expect_error(sort_avg_connectivity(Network$nodes), NA)
@@ -230,7 +231,6 @@ test_that("avg conn. gives the same result for reordered node tables", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
   group_vec <- list(group_vec)
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
                        adjToNetwork(adj_mats[[x]],
@@ -238,11 +238,14 @@ test_that("avg conn. gives the same result for reordered node tables", {
                                              edge_attrs = "all",
                                              group_vec = group_vec[[
                                                if (length(group_vec) == length(adj_mats)) x else 1]],
-                                             width_type = "partcor")})
+                                             width_type = "partcor") %>%
+                             dfs_from_graphNEL()})
+
   nodes <- lapply(seq_along(adj_mats),
-                  function(x) networks[[x]]$node_table)
+                  function(x) networks[[x]]$vertices)
   nodes_reorder <- lapply(seq_along(adj_mats),
-                          function(x) networks[[x]]$node_table %>% {.[sample(1:nrow(.)),]})
+                          function(x) networks[[x]]$vertices %>%
+                              {.[sample(1:nrow(.)),]})
 
   expect_equal(sort_avg_connectivity(nodes), sort_avg_connectivity(nodes_reorder))
 })
@@ -254,7 +257,6 @@ test_that("avg. conn. is calculated when some some node tables miss size attribu
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
   group_vec <- list(group_vec)
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
                        adjToNetwork(adj_mats[[x]],
@@ -262,9 +264,10 @@ test_that("avg. conn. is calculated when some some node tables miss size attribu
                                              edge_attrs = "all",
                                              group_vec = group_vec[[
                                                if (length(group_vec) == length(adj_mats)) x else 1]],
-                                             width_type = "partcor")})
+                                             width_type = "partcor") %>%
+                             dfs_from_graphNEL()})
   nodes <- lapply(seq_along(adj_mats),
-                  function(x) networks[[x]]$node_table)
+                  function(x) networks[[x]]$vertices)
   nodes_minus <- nodes
   nodes_minus[[12]]$size <- NULL
 
@@ -283,7 +286,6 @@ test_that("avg. conn. give error for missing node column", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
   group_vec <- list(group_vec)
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
                        adjToNetwork(adj_mats[[x]],
@@ -291,9 +293,10 @@ test_that("avg. conn. give error for missing node column", {
                                              edge_attrs = "all",
                                              group_vec = group_vec[[
                                                if (length(group_vec) == length(adj_mats)) x else 1]],
-                                             width_type = "partcor")})
+                                             width_type = "partcor") %>%
+                             dfs_from_graphNEL()})
   nodes <- lapply(seq_along(adj_mats),
-                  function(x) networks[[x]]$node_table)
+                  function(x) networks[[x]]$vertices)
   nodes_minus <- nodes
   nodes_minus[[12]]$node <- NULL
 
@@ -308,7 +311,6 @@ test_that("avg. conn. give error for unequal node sets", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
   group_vec <- list(group_vec)
 
-  networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only")
   networks <- lapply(seq_along(adj_mats),
                      function(x, ...) {
                        adjToNetwork(adj_mats[[x]],
@@ -316,9 +318,10 @@ test_that("avg. conn. give error for unequal node sets", {
                                              edge_attrs = "all",
                                              group_vec = group_vec[[
                                                if (length(group_vec) == length(adj_mats)) x else 1]],
-                                             width_type = "partcor")})
+                                             width_type = "partcor") %>%
+                             dfs_from_graphNEL()})
   nodes <- lapply(seq_along(adj_mats),
-                  function(x) networks[[x]]$node_table)
+                  function(x) networks[[x]]$vertices)
   nodes_minus <- nodes
   nodes_minus[[12]]$node <- stringr::str_replace_all(nodes_minus[[12]]$node, "MMP8", "MMP80000")
   nodes_minus[[3]]$node <- stringr::str_replace_all(nodes_minus[[3]]$node, "MMP8", "BAD_NODE")
