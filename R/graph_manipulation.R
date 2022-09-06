@@ -24,7 +24,7 @@ group_nodes <- function(node_table, group_vec) {
   # If the column to be added is already present
   if ("group" %in% colnames(node_table)) {
       warning("Node attributes already include 'group', this attribute will ",
-              "be overwritten.")
+              "be overwritten.", call. = F)
   }
 
   # Add grouping vector as column and sort the rows
@@ -112,7 +112,7 @@ add_colors <- function(node_table, group_colors = NULL) {
   # If the column to be added is already present
   if ("color" %in% colnames(node_table)) {
       warning("Node attributes already include 'color', this attribute will ",
-              "be overwritten.")
+              "be overwritten.", call. = F)
   }
 
   # Use group index to select correct colors for each row
@@ -165,6 +165,12 @@ node_size_connectivity <- function(node_table,
 
   # Make sure we can add the node size in correct order
   match_idx <- match(node_table$node, names(scale_conn))
+
+  # If the column to be added is already present
+  if ("size" %in% colnames(node_table)) {
+      warning("Node attributes already include 'size', this attribute will ",
+              "be overwritten.", call. = F)
+  }
 
   # Add to node table
   node_table$size <- scale_conn[match_idx]
@@ -346,10 +352,11 @@ edge_weight_to_widths <- function(edge_table,
             "Unexpected results may be returned for edge widths.")
   }
 
-  # Warning for overwriting data
+  # If the column to be added is already present
   if ("width" %in% colnames(edge_table)) {
-    warning("A column with the name 'width' is already found in `edge_table`,",
-            "this column will be overwritten.", call. = F)
+      warning("Edge attributes already include 'width', this attribute will ",
+              "be overwritten.", call. = F)
+      edge_table <- edge_table %>% dplyr::select(-width)
   }
 
   # number of edges is used in some calculations of edge width
@@ -489,6 +496,11 @@ weights_to_color <- function(edge_table, edge_color_func = NULL) {
                  })
     }
 
+    # If the column to be added is already present
+    if ("color" %in% colnames(edge_table)) {
+        warning("Edge attributes already include 'color', this attribute will ",
+                "be overwritten.", call. = F)
+    }
 
     # If negative numbers are found in the weights use a diverging color palette,
     #   otherwise use a sequential color palette
