@@ -66,7 +66,8 @@ test_that("group column is added to node table when 'group' is selected", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adjToNetwork(adj_matrix = Mat1, node_attrs = "group",
-                        edge_attrs = "none", group_vec = group_vec)[['node_table']],
+                        edge_attrs = "none", group_vec = group_vec) %>%
+                   {dfs_from_graphNEL(.)[['vertices']]},
                c("node", "group"), ignore.order = TRUE)
 })
 
@@ -85,7 +86,8 @@ test_that("group color column is added to node table when 'group' and 'color' is
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adjToNetwork(adj_matrix = Mat1, node_attrs = c("group", "color"),
-                        edge_attrs = "none", group_vec = group_vec)[['node_table']],
+                        edge_attrs = "none", group_vec = group_vec) %>%
+                   {dfs_from_graphNEL(.)[['vertices']]},
                c("node", "group", "color"), ignore.order = TRUE)
 })
 
@@ -95,7 +97,8 @@ test_that("group column is added to node table when 'group' is selected", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adjToNetwork(adj_matrix = Mat1, node_attrs = "group",
-                        edge_attrs = "none", group_vec = group_vec)[['node_table']],
+                        edge_attrs = "none", group_vec = group_vec) %>%
+                   {dfs_from_graphNEL(.)[['vertices']]},
                c("node", "group"), ignore.order = TRUE)
 })
 
@@ -105,7 +108,8 @@ test_that("size column is added to node table when 'size' is selected", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adjToNetwork(adj_matrix = Mat1, node_attrs = "size",
-                        edge_attrs = "none", group_vec = group_vec)[['node_table']],
+                        edge_attrs = "none", group_vec = group_vec) %>%
+                   {dfs_from_graphNEL(.)[['vertices']]},
                c("node", "size"), ignore.order = TRUE)
 })
 
@@ -115,7 +119,8 @@ test_that("size, group, color is added to node table when 'all' is selected", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adjToNetwork(adj_matrix = Mat1, node_attrs = "all",
-                                     edge_attrs = "none", group_vec = group_vec)[['node_table']],
+                                     edge_attrs = "none", group_vec = group_vec) %>%
+                   {dfs_from_graphNEL(.)[['vertices']]},
                c("node", "group", "color", "size"), ignore.order = TRUE)
 })
 
@@ -125,7 +130,8 @@ test_that("no additional column is added to node table when 'none' is selected",
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adjToNetwork(adj_matrix = Mat1, node_attrs = "none",
-                                     edge_attrs = "none", group_vec = group_vec)[['node_table']],
+                                     edge_attrs = "none", group_vec = group_vec) %>%
+                   {dfs_from_graphNEL(.)[['vertices']]},
                c("node"), ignore.order = TRUE)
 })
 
@@ -135,7 +141,8 @@ test_that("no additional column is added to node table when node_attrs is blank"
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adjToNetwork(adj_matrix = Mat1,
-                                     edge_attrs = "none")[['node_table']],
+                                     edge_attrs = "none") %>%
+                   {dfs_from_graphNEL(.)[['vertices']]},
                c("node"), ignore.order = TRUE)
 })
 
@@ -145,7 +152,8 @@ test_that("width column is added to edge table when 'width' is selected", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adjToNetwork(adj_matrix = Mat1,
-                                     edge_attrs = "width")[['edge_table']],
+                                     edge_attrs = "width") %>%
+                   {dfs_from_graphNEL(.)[['edges']]},
                c("source", "target", "weight", "width"), ignore.order = TRUE)
 })
 
@@ -155,7 +163,8 @@ test_that("color column is added to edge table when 'color' is selected", {
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adjToNetwork(adj_matrix = Mat1,
-                                     edge_attrs = "color")[['edge_table']],
+                                     edge_attrs = "color") %>%
+                   {dfs_from_graphNEL(.)[['edges']]},
                c("source", "target", "weight", "color"), ignore.order = TRUE)
 })
 
@@ -165,7 +174,8 @@ test_that("color and width column is added to edge table when 'all' is selected"
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adjToNetwork(adj_matrix = Mat1,
-                                     edge_attrs = "all")[['edge_table']],
+                                     edge_attrs = "all") %>%
+                   {dfs_from_graphNEL(.)[['edges']]},
                c("source", "target", "weight", "width", "color"), ignore.order = TRUE)
 })
 
@@ -175,7 +185,8 @@ test_that("no additional column is added to edge table when 'none' is selected",
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adjToNetwork(adj_matrix = Mat1,
-                                     edge_attrs = "none")[['edge_table']],
+                                     edge_attrs = "none") %>%
+                   {dfs_from_graphNEL(.)[['edges']]},
                c("source", "target", "weight"), ignore.order = TRUE)
 })
 
@@ -184,7 +195,8 @@ test_that("no additional column is added to edge table when edge_attrs is left b
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  expect_named(adjToNetwork(adj_matrix = Mat1)[['edge_table']],
+  expect_named(adjToNetwork(adj_matrix = Mat1) %>%
+                   {dfs_from_graphNEL(.)[['edges']]},
                c("source", "target", "weight"), ignore.order = TRUE)
 })
 
@@ -199,9 +211,10 @@ test_that("creating adj matrix from edgelist creates original matrix",{
                                           node_attrs = "all",
                                           edge_attrs = "all",
                                           group_vec = group_vec,
-                                          width_type = "partcor")
-    edge_table <- network_list[["edge_table"]]
-    node_table <- network_list[["node_table"]]
+                                          width_type = "partcor")  %>%
+        dfs_from_graphNEL()
+    edge_table <- network_list[["edges"]]
+    node_table <- network_list[["vertices"]]
 
     new_adj <- edgelist_to_adj(edge_table) %>% as.matrix()
     new_adj <- new_adj[names_order,names_order]
@@ -214,8 +227,9 @@ test_that("error is shown by edge to adj when to weight column is not found", {
     Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
     network_list <- adjToNetwork(Mat1, width_type = "partcor",
-                                          edge_attrs = "width")
-    edge_table <- network_list[["edge_table"]]
+                                          edge_attrs = "width") %>%
+        dfs_from_graphNEL()
+    edge_table <- network_list[["edges"]]
     edge_table2 <- edge_table %>% dplyr::select(-weight)
 
     expect_error(edgelist_to_adj(edge_table2, weight_col = "weight"),
@@ -240,9 +254,10 @@ test_that("other functions can make use of the adj. matrix created from edgelist
                                           node_attrs = "all",
                                           edge_attrs = "all",
                                           group_vec = group_vec,
-                                          width_type = "partcor")
-    edge_table <- network_list[["edge_table"]]
-    node_table <- network_list[["node_table"]]
+                                          width_type = "partcor")  %>%
+        dfs_from_graphNEL()
+    edge_table <- network_list[["edges"]]
+    node_table <- network_list[["vertices"]]
 
     expect_error(vis_igraph(edge_table, node_table, radial_labs = T, export_type = "print"),
                  NA)
@@ -254,9 +269,10 @@ test_that("other functions can make use of the adj. matrix created from edgelist
                                           node_attrs = "all",
                                           edge_attrs = "all",
                                           group_vec = group_vec,
-                                          width_type = "partcor")
-    edge_table <- network_list[["edge_table"]]
-    node_table <- network_list[["node_table"]]
+                                          width_type = "partcor")  %>%
+        dfs_from_graphNEL()
+    edge_table <- network_list[["edges"]]
+    node_table <- network_list[["vertices"]]
 
     node_table <- sort_avg_connectivity(node_table)
 
@@ -307,15 +323,18 @@ test_that("adding or removing self interaction works", {
 test_that("self interaction works for main network creation function", {
     Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
 
-    network_list <- adjToNetwork(Mat1, width_type = "partcor")
-    edges <- network_list[["edge_table"]]
+    network_list <- adjToNetwork(Mat1, width_type = "partcor") %>%
+        dfs_from_graphNEL()
+    edges <- network_list[["edges"]]
 
     expect_true(!any(edges$source == edges$target))
 
     n <- nrow(Mat1)
 
-    network_list <- adjToNetwork(Mat1, self_loops = TRUE, width_type = "partcor")
-    edges <- network_list[["edge_table"]]
+    network_list <- adjToNetwork(Mat1, self_loops = TRUE,
+                                 directed = TRUE, width_type = "partcor")  %>%
+        dfs_from_graphNEL()
+    edges <- network_list[["edges"]]
 
     expect_true(sum(edges$source == edges$target) == n)
 })
