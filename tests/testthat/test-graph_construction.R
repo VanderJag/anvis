@@ -320,3 +320,19 @@ test_that("self interaction works for main network creation function", {
     expect_true(sum(edges$source == edges$target) == n)
 })
 
+
+test_that("no additional attributes are added when both edge and node attrs are none", {
+    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+
+    nel <- adjToNetwork(Mat1,
+                 directed = FALSE,
+                 self_loops = FALSE,
+                 node_attrs = "none",
+                 edge_attrs = "none")
+
+    dfs <- dfs_from_graphNEL(nel)
+
+    df_names <- c(names(dfs$vertices), names(dfs$edges))
+
+    expect_setequal(df_names, c("node", "source", "target", "weight"))
+})
