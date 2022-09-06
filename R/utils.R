@@ -125,3 +125,20 @@ dfs_from_igraph <- function(igraph_obj) {
 
     return(dfs)
 }
+
+is_network_list <- function(obj) {
+    if (!inherits(obj, "list")) {
+        return(FALSE)
+    }
+
+    if (!all(c("vertices", "edges") %in% names(network))) {
+        return(FALSE)
+    }
+
+    if (!(inherits(obj$vertices, "data.frame") &&
+          inherits(obj$edges, "data.frame"))) {
+        return(FALSE)
+    }
+
+    return(TRUE)
+}

@@ -64,18 +64,23 @@
 #'     graphical device.
 #'
 #' @export
-visIgraph <- function(edge_table = NULL, node_table = NULL,
-                       igraph_obj = NULL,
-                       directed = FALSE,
-                       radial_labs = TRUE,
-                       rad_lab_opts = list(),
-                       scale_width = 3.25,
-                       save_name = "network",
-                       export_type = c("png", "print", "pdf", "svg", "jpeg",
-                                       "tiff", "bmp", "ps"),
-                       export_opts = list(),
-                       par_opts = list(),
-                       ...) {
+visIgraph <- function(network,
+                      directed = if (is(network, "graphNEL")) {
+                          graph::edgemode(network) == "directed"
+                      } else if (is(network, "igraph")) {
+                          igraph::is_directed(network)
+                      } else {
+                          FALSE
+                      }
+                      radial_labs = TRUE,
+                      rad_lab_opts = list(),
+                      scale_width = 3.25,
+                      save_name = "network",
+                      export_type = c("png", "print", "pdf", "svg", "jpeg",
+                                      "tiff", "bmp", "ps"),
+                      export_opts = list(),
+                      par_opts = list(),
+                      ...) {
     # input validation
     named_list_check(rad_lab_opts)
     named_list_check(export_opts)
@@ -106,6 +111,23 @@ visIgraph <- function(edge_table = NULL, node_table = NULL,
     }
 
     # Validate network parameters ---------------------------------------------
+
+    if (is(network, "graphNEL")) {
+        network <- dfs_from_graphNEL(gr_nel = network)
+        network_type <- "graphNEL"
+
+    } else if (is(network, "igraph")) {
+        network <- dfs_from_igraph(igraph_obj = network)
+        network_type <- "igraph"
+
+    } else if (!all(c("vertices", "edges") %in% names(network))) {
+        stop("Input network must be graphNEL, igraph, or list containing data ",
+             "frames named 'vertices' and 'edges'. \nℹ Class of your network: ",
+             class(network), call.=FALSE)
+    } else {
+        network_type <- "lists"
+    }
+
 
     # error for when all network input is missing
     if (is.null(edge_table) & is.null(node_table) & is.null(igraph_obj)) {
