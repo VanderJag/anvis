@@ -149,44 +149,23 @@ test_that("order of edges gets maintained after adding widths column", {
 })
 
 
-test_that("connectivity throws error when adj_matrix and node_table have different nodes", {
+test_that("connectivity based on edge weights matches one determined by rowSums", {
   # Load adjacency matrix
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
-  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-  network_list <- adjToNetwork(Mat1,
-                                        group_vec = group_vec,
-                                        width_type = "partcor")
-  node_table <- network_list[["node_table"]]
-
-  # Remove elements
-  Mat1 <- Mat1[,-2]
-  node_table <- node_table %>% dplyr::filter(node != "ESelectin")
-
-  expect_error(node_size_connectivity(node_table = node_table, Mat1, size_type = NULL),
-               "Must provide node_table and adj_matrix with the same nodes")
-})
-
-
-test_that("connectivity rowSums matches one determined based on edge weights", {
-  # Load adjacency matrix
-  Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
-  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-
-  network_list <- adjToNetwork(Mat1,
-                                        group_vec = group_vec,
-                                        width_type = "partcor")
-  edge_table <- network_list[["edge_table"]]
-  node_table <- network_list[["node_table"]]
-  node_table <- node_size_connectivity(node_table = node_table, Mat1, size_type = "scaled_only")
+  network <- adjToNetwork(Mat1, directed = T, self_loops = T)
+  network <- dfs_from_graphNEL(network)
+  edge_table <- network[["edges"]]
+  node_table <- network[["vertices"]]
+  node_table <- node_size_connectivity(node_table = node_table,
+                                       edge_table = edge_table,
+                                       size_type = "scaled_only")
 
   # Calculate by alternative means
-  conns2 <- sapply(node_table$node,
-                   function (x) sum(abs(c(edge_table[edge_table$source == x,]$weight,
-                                           edge_table[edge_table$target == x,]$weight))))
-  conns2 <- (conns2 / max(conns2)) %>% sigmoid_xB(3) %>% unname()
+  conn2 <- rowSums(abs(Mat1), na.rm = TRUE)
+  conn2 <- (conn2 / max(conn2)) %>% sigmoid_xB(3) %>% unname()
 
-  expect_equal(node_table$size, conns2)
+  expect_equal(node_table$size, conn2)
 })
 
 
