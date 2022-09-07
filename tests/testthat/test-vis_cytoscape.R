@@ -546,3 +546,88 @@ test_that("visualization of directed networks works even for undirected networks
                               export_image = F, scale_width = 3, directed = T),
                  NA)
 })
+
+
+test_that("visualization works with igraph input",{
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "cytoscape visualizations need to be checked manually")
+
+    # Test for presence of cytoscape
+    cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+    skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+                message = "this test runs only when cytoscape is active")
+
+    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    network <- adjToNetwork(Mat1,
+                            node_attrs = "all",
+                            edge_attrs = "all",
+                            group_vec = group_vec,
+                            width_type = "partcor",
+                            size_type = "cytoscape")
+
+    network <- igraph::graph_from_graphnel(network)
+
+    expect_error(visCytoscape(network = network,
+                              save_session = FALSE, close_session = F,
+                              export_image = F),
+                 NA)
+})
+
+
+test_that("visualization works with list data frames input",{
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "cytoscape visualizations need to be checked manually")
+
+    # Test for presence of cytoscape
+    cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+    skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+                message = "this test runs only when cytoscape is active")
+
+    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    network <- adjToNetwork(Mat1,
+                            node_attrs = "all",
+                            edge_attrs = "all",
+                            group_vec = group_vec,
+                            width_type = "partcor",
+                            size_type = "cytoscape")
+
+    network <- network %>% dfs_from_graphNEL()
+
+    expect_error(visCytoscape(network = network,
+                              save_session = FALSE, close_session = F,
+                              export_image = F),
+                 NA)
+})
+
+
+test_that("visualization works with graphNEL input",{
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "cytoscape visualizations need to be checked manually")
+
+    # Test for presence of cytoscape
+    cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+    skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+                message = "this test runs only when cytoscape is active")
+
+    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    network <- adjToNetwork(Mat1,
+                            node_attrs = "all",
+                            edge_attrs = "all",
+                            group_vec = group_vec,
+                            width_type = "partcor",
+                            size_type = "cytoscape")
+
+    expect_error(visCytoscape(network = network,
+                              save_session = FALSE, close_session = F,
+                              export_image = F),
+                 NA)
+})
