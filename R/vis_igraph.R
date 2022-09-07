@@ -175,7 +175,8 @@ visIgraph <- function(network,
         on.exit(if (names(dev.cur()) == dev_name) dev.off())
     }
 
-    # Change graphical parameters here, so they will affect the newly active device
+    # Change graphical parameters here,
+    #     so they will affect the newly active device
     if (length(par_opts) != 0) old_par <- do.call(par, par_opts)
 
     # Visualize the basic graph
@@ -200,12 +201,18 @@ visIgraph <- function(network,
         y = node_arrangement[,2]
 
         # Check if user wants to overwrite one of the default arguments
-        txt_x <- if ("x" %in% names(rad_lab_opts)) rad_lab_opts[["x"]] else x * 1.1
-        txt_y <- if ("y" %in% names(rad_lab_opts)) rad_lab_opts[["y"]] else y * 1.1
-        txt_labels <- if ("labels" %in% names(rad_lab_opts)) rad_lab_opts[["labels"]] else vertex_label0
-        txt_adj <- if ("adj" %in% names(rad_lab_opts)) rad_lab_opts[["adj"]] else ifelse(x<=0, 1, 0)
-        txt_cex <- if ("cex" %in% names(rad_lab_opts)) rad_lab_opts[["cex"]] else 0.85
-        # Remove the used arguments from list as to pass them twice, prevents error
+        txt_x <- if ("x" %in% names(rad_lab_opts))
+            rad_lab_opts[["x"]] else x * 1.1
+        txt_y <- if ("y" %in% names(rad_lab_opts))
+            rad_lab_opts[["y"]] else y * 1.1
+        txt_labels <- if ("labels" %in% names(rad_lab_opts))
+            rad_lab_opts[["labels"]] else vertex_label0
+        txt_adj <- if ("adj" %in% names(rad_lab_opts))
+            rad_lab_opts[["adj"]] else ifelse(x<=0, 1, 0)
+        txt_cex <- if ("cex" %in% names(rad_lab_opts))
+            rad_lab_opts[["cex"]] else 0.85
+        # Remove the used arguments from list to prevent errors
+        #   by making sure the plot function only receives them once
         rad_lab_opts[c("x","y","labels","adj","cex")] <- NULL
 
         angle = radial_angle(x, y)
