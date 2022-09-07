@@ -2,6 +2,6 @@
 
 export(VisualiseNetwork)
 export(adjToNetwork)
-export(vis_igraph)
-export(vis_in_cytoscape)
+export(visCytoscape)
+export(visIgraph)
 importFrom(magrittr,"%>%")
