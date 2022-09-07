@@ -579,15 +579,15 @@ VisualiseNetwork <- function(adj_mats,
     if (output_type == "cytoscape") edge_factor <- edge_factor %||% 2
 
     # TODO Adjust this so it works with the other types of networks
-    # Since this function uses a for loop to iterate over the visualizations that
-    #   are created, the input needs to be converted into a list.
-    if(inherits(adj_mats, "data.frame") == TRUE |
-       inherits(adj_mats, "matrix") == TRUE) {
-        adj_mats <- list(adj_mats)
-    } else if (!inherits(adj_mats, "list")) {
-        stop("Must provide data.frame, matrix, or list of these as input \n",
-             "You provided: ", class(adj_mats), call. = FALSE)
-    }
+                                        # Since this function uses a for loop to iterate over the visualizations that
+                                        #   are created, the input needs to be converted into a list.
+                                        if(inherits(adj_mats, "data.frame") == TRUE |
+                                           inherits(adj_mats, "matrix") == TRUE) {
+                                            adj_mats <- list(adj_mats)
+                                        } else if (!inherits(adj_mats, "list")) {
+                                            stop("Must provide data.frame, matrix, or list of these as input \n",
+                                                 "You provided: ", class(adj_mats), call. = FALSE)
+                                        }
 
     # Check number of matrices for later tests
     n_mats <- length(adj_mats)

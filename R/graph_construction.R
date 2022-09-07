@@ -144,23 +144,7 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #' columns for the additional attributes that were added. The 'edge_table' has
 #' columns 'source' and 'target', and more columns for the added attributes.
 #'
-#' @export
-adjToNetwork <- function(adj_matrix,
-                         directed = FALSE,
-                         self_loops = FALSE,
-                         node_attrs = c("none", "all", "group",
-                                        "color_group", "size"),
-                         edge_attrs = c("none", "all", "width", "color"),
-                         group_vec = NULL,
-                         group_colors = NULL,
-                         size_type = NULL,
-                         width_type = NULL,
-                         edge_color_func = NULL) {
-
-    # Check which attributes should be added
-    node_attrs <- match.arg(node_attrs, several.ok = TRUE)
-    edge_attrs <- match.arg(edge_attrs, several.ok = TRUE)
-
+oneAdjToNetwork <- function(...) {
     # If the number and column of the adjacency matrix is not equal there may be
     #   missing info and an error with the data input
     if (ncol(adj_matrix) != nrow(adj_matrix)) {
@@ -200,10 +184,90 @@ adjToNetwork <- function(adj_matrix,
     return(nel)
 }
 
-# TODO make these tests
-# does both node_attrs and edge_attrs as none
-# are graph attributes maintained when Vis attrs are added? both for igraph and graphNEL
-# When group attribute is already present it is overwritten and warning is raised -> group_nodes function
+
+
+#' @export
+adjToNetwork <- function(adj_mats,
+                         directed = FALSE,
+                         self_loops = FALSE,
+                         node_attrs = c("none", "all", "group",
+                                        "color_group", "size"),
+                         edge_attrs = c("none", "all", "width", "color"),
+                         group_vec = NULL,
+                         group_colors = NULL,
+                         size_type = c("igraph", "cytoscape", "scaled_only"),
+                         width_type = c("default_scaling", "MI", "cor",
+                                        "partcor", "ranked", "percentile"),
+                         colorblind = FALSE,
+                         edge_color_func = NULL) {
+
+    # Check which attributes should be added
+    node_attrs <- match.arg(node_attrs, several.ok = TRUE)
+    edge_attrs <- match.arg(edge_attrs, several.ok = TRUE)
+
+    # Check if input is adjacency matrix or a list of adj matrices
+    if(inherits(adj_mats, "data.frame") == TRUE |
+       inherits(adj_mats, "matrix") == TRUE) {
+        adj_mats <- list(adj_mats)
+    } else if (!inherits(adj_mats, "list")) {
+        stop("Must provide data.frame, matrix, or list of these as input \n",
+             "You provided: ", class(adj_mats), call. = FALSE)
+    }
+
+    # Check number of matrices for later tests
+    n_mats <- length(adj_mats)
+
+    # Check if grouping vector is list, if not, turn into list
+    if (!is.null(group_vec)) {
+        if (!is.list(group_vec)) {
+            group_vec <- list(group_vec)
+        } else {
+            if (!length(group_vec) == n_mats && !length(group_vec) == 1) {
+                stop("Grouping vector list must be of equal length as adj_mats, or length 1",
+                     "\nℹ Length of `group_vec` = ", length(group_vec),
+                     ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
+            }
+        }
+    }
+
+    if (!is.null(width_type)){
+        if (!(length(width_type) == n_mats || length(width_type) == 1)) {
+            stop("Length of width type must be 1 or matching with number of matrices: ",
+                 "\nℹ Length of `width_type` = ", length(width_type),
+                 ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
+        }
+    }
+
+    # See if colorblind accessible colors should be used
+    if (colorblind) {
+        # Manually chosed colors overrule colorblind option
+        if (!is.null(group_colors)) {
+            warning("Colors provided with `group_colors` will be used instead of ",
+                    "colorblind accessible colors. To prevent this use ",
+                    "`group_colors = NULL`.")
+        }
+
+        group_colors <- group_colors %||% palette.colors(palette = "Okabe-Ito")
+    }
+
+    # Convert all adjacency matrices into edge and node tables
+    networks <- lapply(seq_along(adj_mats),
+                       function(x) {
+                           oneAdjToNetwork(adj_matrix = adj_mats[[x]],
+                                        directed = directed,
+                                        self_loops = self_loops,
+                                        node_attrs = node_attrs,
+                                        edge_attrs = edge_attrs,
+                                        group_vec = group_vec[[
+                                            if (length(group_vec) == n_mats) x else 1]],
+                                        width_type = width_type[[
+                                            if (length(width_type) == n_mats) x else 1]],
+                                        size_type = size_type,
+                                        group_colors = group_colors,
+                                        edge_color_func = edge_color_func)})
+
+    return(networks)
+}
 
 
 addVisAttrs <- function(network,
