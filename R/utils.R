@@ -131,7 +131,7 @@ is_network_list <- function(obj) {
         return(FALSE)
     }
 
-    if (!all(c("vertices", "edges") %in% names(network))) {
+    if (!all(c("vertices", "edges") %in% names(obj))) {
         return(FALSE)
     }
 
