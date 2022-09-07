@@ -431,3 +431,65 @@ test_that("visualizations in Rstudio stay present even after graphical device is
                            export_type = "png", directed = FALSE),
                  NA)
 })
+
+
+test_that("basic visualization works for graphNEL input",{
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    network <- adjToNetwork(Mat1,
+                            node_attrs = "all",
+                            edge_attrs = "all",
+                            group_vec = group_vec,
+                            width_type = "partcor")
+
+    expect_error(visIgraph(network, radial_labs = T, export_type = "print"),
+                 NA)
+})
+
+
+test_that("basic visualization works for igraph input",{
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    network <- adjToNetwork(Mat1,
+                            node_attrs = "all",
+                            edge_attrs = "all",
+                            group_vec = group_vec,
+                            width_type = "partcor")
+
+    network <- igraph::graph_from_graphnel(network)
+
+    expect_error(visIgraph(network, radial_labs = T, export_type = "print"),
+                 NA)
+})
+
+
+test_that("basic visualization works for list of dataframes input",{
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    network <- adjToNetwork(Mat1,
+                            node_attrs = "all",
+                            edge_attrs = "all",
+                            group_vec = group_vec,
+                            width_type = "partcor")
+
+    network <- dfs_from_graphNEL(network)
+
+    expect_error(visIgraph(network, radial_labs = T, export_type = "print"),
+                 NA)
+})
+
