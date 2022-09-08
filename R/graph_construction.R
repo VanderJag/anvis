@@ -143,8 +143,19 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #' 'node_table'. The 'node_table' data frame has a 'node' column and other
 #' columns for the additional attributes that were added. The 'edge_table' has
 #' columns 'source' and 'target', and more columns for the added attributes.
-#'
-oneAdjToNetwork <- function(...) {
+oneAdjToNetwork <- function(adj_matrix,
+                            directed = FALSE,
+                            self_loops = FALSE,
+                            node_attrs = c("none", "all", "group",
+                                           "color_group", "size"),
+                            edge_attrs = c("none", "all", "width", "color"),
+                            group_vec = NULL,
+                            group_colors = NULL,
+                            size_type = c("igraph", "cytoscape", "scaled_only"),
+                            width_type = c("default_scaling", "MI", "cor",
+                                           "partcor", "ranked", "percentile"),
+                            edge_color_func = NULL) {
+
     # If the number and column of the adjacency matrix is not equal there may be
     #   missing info and an error with the data input
     if (ncol(adj_matrix) != nrow(adj_matrix)) {
@@ -277,33 +288,105 @@ addVisAttrs <- function(network,
                         group_vec = NULL,
                         group_colors = NULL,
                         size_type = NULL,
+                        arrange_co = FALSE,
+
                         width_type = NULL,
                         edge_color_func = NULL) {
 
-    # Distinguish between three types of networks
-    #     and retain original info
-    if (is(network, "graphNEL")) {
-        graph_attrs <- network@graphData
-        directed <- graph::edgemode(network) == "directed"
-        network <- dfs_from_graphNEL(gr_nel = network)
-        network_type <- "graphNEL"
+    # TODO implement a check to see what the type of the input is
 
-    } else if (is(network, "igraph")) {
-        directed <- igraph::is_directed(network)
-        graph_attrs <- igraph::graph_attr(network)
-        network <- dfs_from_igraph(igraph_obj = network)
-        network_type <- "igraph"
+    network_type_list <- lapply(network, function (net) {
+        if (is(net, "graphNEL")) "graphNEL"
+        else if (is(net, "igraph")) "igraph"
+        else if (is_network_list(net)) "lists"
+        else stop("Input network must be graphNEL, igraph, or list containing data ",
+                  "frames named 'vertices' and 'edges'. \nℹ Class of your network: ",
+                  class(network), call.=FALSE)
+    })
 
-    } else if (!is_network_list(network)) {
-        stop("Input network must be graphNEL, igraph, or list containing data ",
-        "frames named 'vertices' and 'edges'. \nℹ Class of your network: ",
-        class(network), call.=FALSE)
-    } else {
-        network_type <- "lists"
+    directed_list <- lapply(network, function (net) {
+        if (is(net, "graphNEL")) graph::edgemode(net) == "directed"
+        else if (is(net, "igraph")) igraph::is_directed(net)
+        else if (is_network_list(net)) NA
+    })
+
+    graph_attrs_list <- lapply(network, function (net) {
+        if (is(net, "graphNEL")) net@graphData
+        else if (is(net, "igraph")) igraph::graph_attr(net)
+        else if (is_network_list(net)) NA
+    })
+
+    network_dfs <- lapply(network, function (net) {
+        if (is(net, "graphNEL")) dfs_from_graphNEL(gr_nel = net)
+        else if (is(net, "igraph")) dfs_from_igraph(igraph_obj = network)
+        else if (is_network_list(net)) net
+    })
+
+    # TODO add tests to the length of group_vec
+
+    # Add attributes to the networks
+    network_dfs <- lapply(network_dfs, function(net) {
+        edge_table <- net$edges
+        node_table <- net$vertices
+
+        oneAddVisAttrs(edge_table = edge_table,
+                       node_table = node_table,
+                       node_attrs = node_attrs,
+                       edge_attrs = edge_attrs,
+                       group_vec = group_vec[[
+                           if (length(group_vec) == n_mats) x else 1]],
+                       group_colors = group_colors,
+                       size_type = size_type,
+                       width_type = width_type[[
+                           if (length(width_type) == n_mats) x else 1]],
+                       edge_color_func = edge_color_func)
+    })
+
+
+
+
+
+    # Get the attributes added
+
+    # TODO if there is only one network return it directly, not as list
+
+    # Convert output into the same class as input
+    if (network_type == "igraph") {
+
+        igraph_obj <- igraph::graph_from_data_frame(edge_table,
+                                                    vertices = node_table,
+                                                    directed = directed)
+
+        igraph::graph_attr(igraph_obj) <- graph_attrs
+
+        return(igraph_obj)
+
+    } else if (network_type == "graphNEL") {
+        nel <- graphNEL_from_dfs(edge_table = edge_table,
+                                 node_table = node_table,
+                                 directed = directed)
+        nel@graphData <- graph_attrs
+
+        return(nel)
+
+    } else if (network_type == "lists") {
+
+        return(list("vertices" = node_table, "edges" = edge_table))
+        # TODO currently other functions expect other names
     }
 
-    edge_table <- network$edges
-    node_table <- network$vertices
+}
+
+oneAddVisAttrs <- function(edge_table,
+                           node_table,
+                        node_attrs = c("none", "all", "group",
+                                       "color_group", "size"),
+                        edge_attrs = c("none", "all", "width", "color"),
+                        group_vec = NULL,
+                        group_colors = NULL,
+                        size_type = NULL,
+                        width_type = NULL,
+                        edge_color_func = NULL) {
 
 
     # Adding grouping information
@@ -351,33 +434,7 @@ addVisAttrs <- function(network,
                                        edge_color_func = edge_color_func)
     }
 
-
-    # Convert output into the same class as input
-    if (network_type == "igraph") {
-
-        igraph_obj <- igraph::graph_from_data_frame(edge_table,
-                                      vertices = node_table,
-                                      directed = directed)
-
-        igraph::graph_attr(igraph_obj) <- graph_attrs
-
-        return(igraph_obj)
-
-    } else if (network_type == "graphNEL") {
-        nel <- graphNEL_from_dfs(edge_table = edge_table,
-                                 node_table = node_table,
-                                 directed = directed)
-        nel@graphData <- graph_attrs
-
-        return(nel)
-
-    } else if (network_type == "lists") {
-
-        return(list("vertices" = node_table, "edges" = edge_table))
-        # TODO currently other functions expect other names
-    }
-
-
+    return(list("vertices" = node_table, "edges" = edge_table))
 }
 
 

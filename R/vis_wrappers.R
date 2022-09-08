@@ -528,28 +528,24 @@ VisualiseNetwork <- function(adj_mats,
 #' return is invisible, so it will not print when not assigned.
 #'
 #' @export
-
-anvisAdj
-
 anvis <- function(network,
-                             arrange_co = FALSE,
-                             save_names = "network",
-                             output_type = c("igraph", "cytoscape", "network", "return_only"),
-                             vis_radial_labs = T,
-                             vis_save = FALSE,
-                             vis_export_type = c("png", "jpeg", "pdf", "svg", "ps"),
-                             vis_export_opts = list(),
-                             igr_rad_lab_opts = list(),
-                             igr_plot_opts = list(),
-                             igr_par_opts = list(),
-                             igr_grid = FALSE,
-                             igr_grid_names = FALSE,
-                             cyto3.8_check = TRUE,
-                             cyto_save_session = FALSE,
-                             cyto_close_session = vis_save,
-                             cyto_node_space = 1.2,
-                             netw_ext = c("XGMML", "table", "sif", "tab", "tgf", "net"),
-                             netw_xgmml_title = NULL
+                  save_names = "network",
+                  output_type = c("igraph", "cytoscape", "network", "return_only"),
+                  vis_radial_labs = T,
+                  vis_save = FALSE,
+                  vis_export_type = c("png", "jpeg", "pdf", "svg", "ps"),
+                  vis_export_opts = list(),
+                  igr_rad_lab_opts = list(),
+                  igr_plot_opts = list(),
+                  igr_par_opts = list(),
+                  igr_grid = FALSE,
+                  igr_grid_names = FALSE,
+                  cyto3.8_check = TRUE,
+                  cyto_save_session = FALSE,
+                  cyto_close_session = vis_save,
+                  cyto_node_space = 1.2,
+                  netw_ext = c("XGMML", "table", "sif", "tab", "tgf", "net"),
+                  netw_xgmml_title = NULL
 ) {
 
     # Check if arguments are list with named elements
@@ -584,68 +580,6 @@ anvis <- function(network,
 
     # Check number of matrices for later tests
     n_mats <- length(adj_mats)
-
-
-                                        # Get size type from output type
-                                        if (output_type %in% c("igraph", "cytoscape")) {
-                                            size_type <- output_type
-                                        } else {
-                                            size_type <- "scaled_only"
-                                        }
-
-                                        # Check if grouping vector is list, if not, turn into list
-                                        if (!is.null(group_vec)) {
-                                            if (!is.list(group_vec)) {
-                                                group_vec <- list(group_vec)
-                                            } else {
-                                                if (!length(group_vec) == n_mats && !length(group_vec) == 1) {
-                                                    stop("Grouping vector list must be of equal length as adj_mats, or length 1",
-                                                         "\nℹ Length of `group_vec` = ", length(group_vec),
-                                                         ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
-
-                                                }
-                                            }
-                                        }
-
-                                        if (!is.null(width_type)){
-                                            if (!(length(width_type) == n_mats || length(width_type) == 1)) {
-                                                stop("Length of width type must be 1 or matching with number of matrices: ",
-                                                     "\nℹ Length of `width_type` = ", length(width_type),
-                                                     ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
-                                            }
-                                        }
-
-                                        # See if colorblind accessible colors should be used
-                                        if (colorblind) {
-                                            # Manually chosed colors overrule colorblind option
-                                            if (!is.null(group_colors)) {
-                                                warning("Colors provided with `group_colors` will be used instead of ",
-                                                        "colorblind accessible colors. To prevent this use ",
-                                                        "`group_colors = NULL`.")
-                                            }
-
-                                            group_colors <- group_colors %||% palette.colors(palette = "Okabe-Ito")
-                                        }
-
-                                        # Convert all adjacency matrices into edge and node tables
-                                        networks <- lapply(seq_along(adj_mats),
-                                                           function(x) {
-                                                               adjToNetwork(adj_mats[[x]],
-                                                                            directed = directed,
-                                                                            self_loops = self_loops,
-                                                                            node_attrs = node_attrs,
-                                                                            edge_attrs = edge_attrs,
-                                                                            group_vec = group_vec[[
-                                                                                if (length(group_vec) == n_mats) x else 1]],
-                                                                            width_type = width_type[[
-                                                                                if (length(width_type) == n_mats) x else 1]],
-                                                                            size_type = size_type,
-                                                                            group_colors = group_colors,
-                                                                            edge_color_func = edge_color_func)})
-                                        nodes <- lapply(seq_along(adj_mats),
-                                                        function(x) networks[[x]]$node_table)
-                                        edges <- lapply(seq_along(adj_mats),
-                                                        function(x) networks[[x]]$edge_table)
 
     # Node ordering by average connectivity
     if (arrange_co) {
