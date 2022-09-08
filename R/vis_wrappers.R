@@ -528,17 +528,10 @@ VisualiseNetwork <- function(adj_mats,
 #' return is invisible, so it will not print when not assigned.
 #'
 #' @export
-VisualiseNetwork <- function(adj_mats,
-                             directed = FALSE,
-                             self_loops = FALSE,
-                             node_attrs = c("none", "all", "group", "color_group", "size"),
-                             edge_attrs = c("none", "all", "width", "color"),
-                             group_vec = NULL,
-                             group_colors = NULL,
-                             edge_color_func = NULL,
-                             colorblind = FALSE,
-                             width_type = NULL,
-                             edge_factor = NULL,
+
+anvisAdj
+
+anvis <- function(network,
                              arrange_co = FALSE,
                              save_names = "network",
                              output_type = c("igraph", "cytoscape", "network", "return_only"),
