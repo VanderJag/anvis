@@ -237,7 +237,7 @@ addVisAttrs <- function(network,
                         edge_color_func = NULL) {
 
     # TODO implement a check to see what the type of the input is, make sure to convert to list
-    # TODO width type is vectorized, see if that is still working, so some input check
+    # TODO width type is vectorized, see if that is still working, so some input check, check can be found below?
 
     # Check number of matrices for later tests
     n_mats <- length(network)
@@ -323,6 +323,19 @@ addVisAttrs <- function(network,
                            if (length(width_type) == n_mats) x else 1]],
                        edge_color_func = edge_color_func)
     })
+
+    # TODO implement check to see if this part of code is working
+    # Node ordering by average connectivity
+    if (arrange_co) {
+        nodes <- lapply(seq_along(network_dfs),
+                        function(x) network_dfs[[x]]$vertices)
+
+        nodes <- sort_avg_connectivity(nodes_list = nodes)
+
+        for (i in seq_along(network_dfs)) {
+            network_dfs[[i]]$vertices <- nodes[[i]]
+        }
+    }
 
     # TODO if there is only one network return it directly, not as list
 

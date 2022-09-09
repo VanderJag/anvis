@@ -962,3 +962,26 @@ test_that("cytoscape visualizes self loops for directed and undirected networks"
 #     dev.off()
 # })
 
+
+# Functional seperation ---------------------------------------------------
+
+test_that("igraph grid visualization allows adding titles to plots", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    network <- adjToNetwork(adj_mats = adj_mats,
+                       node_attrs = "all",
+                       edge_attrs = "all", width_type = "partcor",
+                       group_vec = group_vec)
+
+
+    expect_error(
+        anvis(network, output_type = "igraph", vis_save = T, igr_grid = c(2,6),
+                         vis_export_opts = list(width = 6400, height = 2600),
+                         igr_par_opts = list(mar=c(2,4,5,4)),
+                         igr_grid_names = paste("patient", LETTERS[seq_along(adj_mats)])), NA)
+})
