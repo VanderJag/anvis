@@ -355,3 +355,28 @@ test_that("no additional attributes are added when both edge and node attrs are 
 
     expect_setequal(df_names, c("node", "source", "target", "weight"))
 })
+
+
+test_that("vectorized version of create network creates list of networks with no additional attributes", {
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    print(adjToNetwork(adj_mats = adj_mats,
+                 node_attrs = "none",
+                 edge_attrs = "none") %>%
+              lapply(function(x) dfs_from_graphNEL(x)))
+
+})
+
+test_that("vectorized version of create network creates list of networks with all attributes", {
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    print(adjToNetwork(adj_mats = adj_mats,
+                 node_attrs = "all",
+                 edge_attrs = "all", width_type = "partcor",
+                 group_vec = group_vec,
+                 ) %>%
+              lapply(function(x) dfs_from_graphNEL(x)))
+
+})
