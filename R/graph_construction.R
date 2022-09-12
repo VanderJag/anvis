@@ -156,16 +156,21 @@ adjToNetwork <- function(adj_mats,
                          width_type = NULL,
                          colorblind = FALSE,
                          edge_color_func = NULL) {
+# TODO width type is vectorized with these options
 
     # Check which attributes should be added
     node_attrs <- match.arg(node_attrs, several.ok = TRUE)
     edge_attrs <- match.arg(edge_attrs, several.ok = TRUE)
-    # todo width type is vectorized with these options
 
     # Check if input is adjacency matrix or a list of adj matrices
     if(inherits(adj_mats, "data.frame") == TRUE |
        inherits(adj_mats, "matrix") == TRUE) {
         adj_mats <- list(adj_mats)
+        # TODO complete the below thing
+    # } else if (inherits(adj_mats, "list")) {
+    #     df_mat_yn <- inherits(adj_mats, "data.frame") == TRUE || inherits(adj_mats, "matrix")
+    #     stop("Must provide data.frame, matrix, or list of these as input \n",
+    #          "You provided: ", class(adj_mats), call. = FALSE)
     } else if (!inherits(adj_mats, "list")) {
         stop("Must provide data.frame, matrix, or list of these as input \n",
              "You provided: ", class(adj_mats), call. = FALSE)
