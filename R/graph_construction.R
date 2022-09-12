@@ -213,6 +213,11 @@ adjToNetwork <- function(adj_mats,
                                edge_color_func = edge_color_func)
     }
 
+    ## For a single network the addVisAttrs will remove it from list
+    if (!inherits(networks, "list") || is_network_list(networks)) {
+        networks <- list(networks)
+    }
+
     graphNELs <- lapply(networks, function(network) {
         node_table <- network$vertices
         edge_table <- network$edges
@@ -222,7 +227,11 @@ adjToNetwork <- function(adj_mats,
                           directed = directed)
     })
 
-    # TODO if it was one item don't return as list
+    ## To match user input better, unlist the network when there is only one
+    ##    in the list
+    if (inherits(graphNELs, "list") && length(graphNELs) == 1) {
+        graphNELs <- graphNELs[[1]]
+    }
 
     return(graphNELs)
 }
@@ -312,7 +321,8 @@ addVisAttrs <- function(network,
 
 
     # Add attributes to the networks
-    network_dfs <- lapply(network_dfs, function(net) {
+    network_dfs <- lapply(seq_along(network_dfs), function(i) {
+        net <- network_dfs[[i]]
         edge_table <- net$edges
         node_table <- net$vertices
 
@@ -321,11 +331,11 @@ addVisAttrs <- function(network,
                        node_attrs = node_attrs,
                        edge_attrs = edge_attrs,
                        group_vec = group_vec[[
-                           if (length(group_vec) == n_mats) x else 1]],
+                           if (length(group_vec) == n_mats) i else 1]],
                        group_colors = group_colors,
                        size_type = size_type,
                        width_type = width_type[[
-                           if (length(width_type) == n_mats) x else 1]],
+                           if (length(width_type) == n_mats) i else 1]],
                        edge_color_func = edge_color_func)
     })
 
@@ -342,10 +352,8 @@ addVisAttrs <- function(network,
         }
     }
 
-    # TODO if there is only one network return it directly, not as list
-
     # Convert output into the same class as input
-    fin_nets <- lapply(seq_along(network_dfs), function(x) {
+    final_nets <- lapply(seq_along(network_dfs), function(x) {
         network_type <- network_type_list[[x]]
         edge_table <- network_dfs[[x]]$edges
         node_table <- network_dfs[[x]]$vertices
@@ -371,7 +379,13 @@ addVisAttrs <- function(network,
         }
     })
 
-    return(fin_nets)
+    ## To match user input better, unlist the network when there is only one
+    ##    in the list
+    if (inherits(final_nets, "list") && length(final_nets) == 1) {
+        final_nets <- final_nets[[1]]
+    }
+
+    return(final_nets)
 
 }
 
