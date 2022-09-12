@@ -106,9 +106,16 @@ graphNEL_from_dfs <- function(edge_table, node_table, directed) {
 
 # To create edge and node table from graphNEL
 dfs_from_graphNEL <- function(gr_nel) {
-    igraph_obj <- igraph::graph_from_graphnel(gr_nel)
+    if (inherits(gr_nel, "list")) {
+        dfs <- lapply(gr_nel, function(graph) {
+            igraph_obj <- igraph::graph_from_graphnel(graph)
+            dfs_from_igraph(igraph_obj = igraph_obj)
+        })
+    } else {
+        igraph_obj <- igraph::graph_from_graphnel(gr_nel)
+        dfs <- dfs_from_igraph(igraph_obj = igraph_obj)
+    }
 
-    dfs <- dfs_from_igraph(igraph_obj = igraph_obj)
 
     return(dfs)
 }

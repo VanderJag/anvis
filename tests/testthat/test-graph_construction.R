@@ -410,47 +410,48 @@ test_that("vectorized version of create network creates list of networks with al
 })
 
 
-# TODO still need to adapt tests
 test_that("group vec list and adj mat list are checked for equal size", {
-    mat0 <- matrix(rep(1, 4), ncol = 2)
-    mat_list <- list(mat1 = mat0, mat2 = mat0, mat3 = mat0)
-    groupings <- c("a", "b")
-    group_vec <- list(group1 = groupings, group2 = groupings, group3 = groupings)
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    group_vec <- list(group1 = group_vec, group2 = group_vec, group3 = group_vec)
 
     group_vec <- group_vec[-2]
-    expect_error(VisualiseNetwork(adj_mats = mat_list, group_vec = group_vec),
+    expect_error(adjToNetwork(adj_mats = adj_mats, group_vec = group_vec,
+                              node_attrs = "group"),
                  "must be of equal length")
 })
 
 
 test_that("grouping vector of length 1 or same as data works", {
-    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
 
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    networks <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only",
-                                 edge_attrs = "all", node_attrs = "all")
+    networks <- adjToNetwork(adj_mats, group_vec = group_vec,
+                                 edge_attrs = "all", node_attrs = "all") %>%
+        dfs_from_graphNEL()
 
-    all_equal <- all(vapply(seq_along(networks$nodes),
-                            function (x) all(networks$nodes[[1]]$group == networks$nodes[[x]]$group),
-                            FUN.VALUE = T))
+    all_equal <- all(sapply(seq_along(networks), function (x) {
+        all(networks[[1]]$vertices$group == networks[[x]]$vertices$group)
+    }))
 
     expect_true(all_equal)
 
     grouping_list <- replicate(length(adj_mats), sample(group_vec), simplify = FALSE)
 
-    networks <- VisualiseNetwork(adj_mats, group_vec = grouping_list, output_type = "return_only",
-                                 edge_attrs = "all", node_attrs = "all")
+    networks <- adjToNetwork(adj_mats, group_vec = grouping_list,
+                                 edge_attrs = "all", node_attrs = "all")  %>%
+        dfs_from_graphNEL()
 
-    expect_equal(lapply(seq_along(networks$nodes),
+    expect_equal(lapply(seq_along(networks),
                         function (x) {
                             # resort to original order
-                            tmp_idx <- networks$nodes[[x]]$node %>%
+                            tmp_idx <- networks[[x]]$vertices$node %>%
                                 {match(colnames(adj_mats[[x]]), .)}
                             # Get original order group names
-                            networks$nodes[[x]][tmp_idx,]$group}),
+                            networks[[x]]$vertices[tmp_idx,]$group}),
                  grouping_list)
-
 })
 
 
@@ -459,22 +460,29 @@ test_that("user supplied colors are used", {
 
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    test_call <- deparse(sys.calls()[[1]][1])
-    skip_if_not(test_call == "test_that()",
-                message = "igraph visualizations need to be checked manually")
+    colors0 <- c("midnightblue", "black", "red", "#b99055") %>%
+        col2hex()
 
-    colors0 <- c("midnightblue", "black", "red", "#b99055")
+    res_nets <- adjToNetwork(adj_mats, group_vec = group_vec,
+                              edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                              width_type = "partcor", group_colors = colors0)
+    cols_out <- res_nets %>% dfs_from_graphNEL() %>%
+        lapply(function (x) {unique(x$vertices$color)}) %>%
+        unlist() %>% unique()
 
-    expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
-                                  edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                                  width_type = "partcor", vis_save = F, group_colors = colors0),
-                 NA)
-    colors0 <- c("midnightblue", "red", "#b99055")
+    expect_true(all(c(all(cols_out %in% colors0), all(colors0 %in% cols_out))))
 
-    expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
-                                  edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                                  width_type = "partcor", vis_save = F, group_colors = colors0),
-                 NA)
+    colors0 <- c("midnightblue", "red", "#b99055") %>%
+        col2hex()
+
+    res_nets <- adjToNetwork(adj_mats, group_vec = group_vec,
+                             edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                             width_type = "partcor", group_colors = colors0)
+    cols_out <- res_nets %>% dfs_from_graphNEL() %>%
+        lapply(function (x) {unique(x$vertices$color)}) %>%
+        unlist() %>% unique()
+
+    expect_true(all(c(all(cols_out %in% colors0), all(colors0 %in% cols_out))))
 })
 
 
@@ -483,26 +491,35 @@ test_that("error is thrown when length of width type doesn't match", {
 
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+    expect_error(adjToNetwork(adj_mats, group_vec = group_vec,
                                   edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                                  width_type = c("partcor", "MI"), vis_save = F, ),
+                                  width_type = c("partcor", "MI")),
                  "width type must be 1 or matching with")
 })
 
 
 test_that("width types can be provided as vector", {
-    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[[1]] %>%
+        {replicate(3, ., simplify = F)}
 
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    test_call <- deparse(sys.calls()[[1]][1])
-    skip_if_not(test_call == "test_that()",
-                message = "igraph visualizations need to be checked manually")
+    nets <- adjToNetwork(adj_mats, group_vec = group_vec,
+                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                         width_type = c("partcor", "partcor", "default")) %>%
+        dfs_from_graphNEL()
 
-    expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
-                                  edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                                  width_type = c("partcor", "partcor", "default"), vis_save = F),
-                 NA)
+    # GEt the widths for all edges
+    widths <- lapply(nets, function(x) {
+        x$edges$width
+    })
+
+    # Are the widths of the networks the same, only the third should be FALSE
+    widths_equal <- lapply(widths, function(wid) {
+        all(widths[[1]] == wid)
+    })
+
+    expect_equal(unlist(widths_equal), c(T, T, F))
 })
 
 
@@ -510,12 +527,12 @@ test_that("colorblind accessible colors can be used", {
     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    netw <- VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only",
-                             edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                             width_type = "partcor", vis_save = F, igr_grid = c(1,2),
-                             igr_par_opts = list(mar=c(2,4,5,4)), colorblind = T)
+    netw <- adjToNetwork(adj_mats, group_vec = group_vec,
+                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                         width_type = "partcor", colorblind = T) %>%
+        dfs_from_graphNEL()
 
-    colours <- netw$nodes[[1]]$color %>% unique()
+    colours <- netw$vertices$color %>% unique()
 
     expect_true(all(colours %in% palette.colors(palette = "Okabe-Ito")))
 })
@@ -526,51 +543,44 @@ test_that("warning occurs is colorblind colors are overwritten by manually selec
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
     expect_warning(
-        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "return_only",
+        adjToNetwork(adj_mats, group_vec = group_vec,
                          edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                         width_type = "partcor", vis_save = F, igr_grid = c(1,2),
-                         igr_par_opts = list(mar=c(2,4,5,4)), colorblind = T,
+                         width_type = "partcor", colorblind = T,
                          group_colors = c("red", "green", "blue", "yellow")),
         "instead of colorblind accessible colors")
 })
 
 
 test_that("custom edge color function can be used for pos. + neg. data", {
-    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:6]
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    test_call <- deparse(sys.calls()[[1]][1])
-    skip_if_not(test_call == "test_that()",
-                message = "igraph visualizations need to be checked manually")
-
-    expect_error(
-        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+    net <- adjToNetwork(adj_mats, group_vec = group_vec,
                          edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                         width_type = "partcor", vis_save = F, igr_grid = c(2,3),
-                         igr_par_opts = list(mar=c(2,4,5,4)),
+                         width_type = "partcor",
                          # reversing the below color would make more sense
-                         edge_color_func = pals::brewer.piyg),
-        NA)
+                         edge_color_func = pals::brewer.piyg) %>%
+        dfs_from_graphNEL()
+
+    edge_colors <- net$edges$color
+
+    expect_true(all(edge_colors %in% pals::brewer.piyg(100)))
 })
 
 
 test_that("custom edge color function can be used for positive only data", {
-    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:6]
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
     adj_mats <- lapply(adj_mats, abs)
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    test_call <- deparse(sys.calls()[[1]][1])
-    skip_if_not(test_call == "test_that()",
-                message = "igraph visualizations need to be checked manually")
-
-    my_cols <- function (n) rev(pals::magma(n))
     my_cols <- function (n) rev(pals::kovesi.linear_grey_10_95_c0(n))
 
-    expect_error(
-        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
+    net <- adjToNetwork(adj_mats, group_vec = group_vec,
                          edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                         width_type = "partcor", vis_save = F, igr_grid = c(2,3),
-                         igr_par_opts = list(mar=c(2,4,5,4)),
-                         edge_color_func = my_cols),
-        NA)
+                         width_type = "partcor", edge_color_func = my_cols) %>%
+        dfs_from_graphNEL()
+
+    edge_colors <- net$edges$color
+
+    expect_true(all(edge_colors %in% pals::kovesi.linear_grey_10_95_c0(100)))
 })

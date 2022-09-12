@@ -153,6 +153,7 @@ adjToNetwork <- function(adj_mats,
                          group_vec = NULL,
                          group_colors = NULL,
                          size_type = c("igraph", "cytoscape", "scaled_only"),
+                         arrange_co = FALSE,
                          width_type = NULL,
                          colorblind = FALSE,
                          edge_color_func = NULL) {
@@ -209,7 +210,9 @@ adjToNetwork <- function(adj_mats,
                                group_vec = group_vec,
                                group_colors = group_colors,
                                size_type = size_type,
+                               arrange_co = arrange_co,
                                width_type = width_type,
+                               colorblind = colorblind,
                                edge_color_func = edge_color_func)
     }
 
@@ -245,7 +248,6 @@ addVisAttrs <- function(network,
                         group_colors = NULL,
                         size_type = NULL,
                         arrange_co = FALSE,
-
                         width_type = NULL,
                         colorblind = FALSE,
                         edge_color_func = NULL) {
