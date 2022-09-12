@@ -584,3 +584,13 @@ test_that("custom edge color function can be used for positive only data", {
 
     expect_true(all(edge_colors %in% pals::kovesi.linear_grey_10_95_c0(100)))
 })
+
+test_that("For list input each element is checked seperately", {
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
+    class(adj_mats[[3]]) <- "graphNEL"
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    expect_error(adjToNetwork(adj_mats, group_vec = group_vec,
+                 edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                 width_type = "partcor"), "3 of your list is of class: graphNEL")
+})

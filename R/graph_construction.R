@@ -157,7 +157,6 @@ adjToNetwork <- function(adj_mats,
                          width_type = NULL,
                          colorblind = FALSE,
                          edge_color_func = NULL) {
-# TODO width type is vectorized with these options
 
     # Check which attributes should be added
     node_attrs <- match.arg(node_attrs, several.ok = TRUE)
@@ -167,17 +166,26 @@ adjToNetwork <- function(adj_mats,
     if(inherits(adj_mats, "data.frame") == TRUE |
        inherits(adj_mats, "matrix") == TRUE) {
         adj_mats <- list(adj_mats)
-        # TODO complete the below thing
-    # } else if (inherits(adj_mats, "list")) {
-    #     df_mat_yn <- inherits(adj_mats, "data.frame") == TRUE || inherits(adj_mats, "matrix")
-    #     stop("Must provide data.frame, matrix, or list of these as input \n",
-    #          "You provided: ", class(adj_mats), call. = FALSE)
+
+    } else if (inherits(adj_mats, "list")) {
+
+        for (i in seq_along(adj_mats)) {
+
+            if (!inherits(adj_mats[[i]], "data.frame") &&
+                !inherits(adj_mats[[i]], "matrix")) {
+
+                stop("Must provide data.frame, matrix, or list of these as input. \n",
+                     "ℹ Element ", i, " of your list is of class: ",
+                     class(adj_mats[[i]]),
+                     "\n✖ All list elements must be data.frame or matrix.",
+                     call. = FALSE)
+                }
+        }
+
     } else if (!inherits(adj_mats, "list")) {
         stop("Must provide data.frame, matrix, or list of these as input \n",
              "You provided: ", class(adj_mats), call. = FALSE)
     }
-
-
 
 
     # Create networks
@@ -202,7 +210,7 @@ adjToNetwork <- function(adj_mats,
         return(list("vertices" = node_table, "edges" = edge_table))
     })
 
-    # Optionally, add additional attributes for visualizations
+    ## Optionally, add additional attributes for visualizations
     if (!"none" %in% node_attrs || !"none" %in% edge_attrs) {
         networks <- addVisAttrs(network = networks,
                                node_attrs = node_attrs,
@@ -216,7 +224,8 @@ adjToNetwork <- function(adj_mats,
                                edge_color_func = edge_color_func)
     }
 
-    ## For a single network the addVisAttrs will remove it from list
+    ## For a single network the addVisAttrs will remove it from list, the next
+    ##    step requires list input
     if (!inherits(networks, "list") || is_network_list(networks)) {
         networks <- list(networks)
     }
@@ -253,7 +262,6 @@ addVisAttrs <- function(network,
                         edge_color_func = NULL) {
 
     # TODO implement a check to see what the type of the input is, make sure to convert to list
-    # TODO width type is vectorized, see if that is still working, so some input check, check can be found below?
 
     # Check number of matrices for later tests
     n_mats <- length(network)
@@ -287,7 +295,6 @@ addVisAttrs <- function(network,
         else if (is_network_list(net)) net
     })
 
-    # TODO add tests to the length of group_vec
     # Check if grouping vector is list, if not, turn into list
     if (!is.null(group_vec)) {
         if (!is.list(group_vec)) {
@@ -388,7 +395,6 @@ addVisAttrs <- function(network,
     }
 
     return(final_nets)
-
 }
 
 addVisAttrsCore <- function(edge_table,
