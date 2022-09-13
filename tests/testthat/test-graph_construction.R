@@ -455,6 +455,23 @@ test_that("grouping vector of length 1 or same as data works", {
 })
 
 
+test_that("grouping vector as list of length 1 works", {
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
+
+    group_vec0 <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+    group_vec <- list(group_vec0)
+
+    networks0 <- adjToNetwork(adj_mats, group_vec = group_vec0,
+                             edge_attrs = "all", node_attrs = "all")  %>%
+        dfs_from_graphNEL()
+    networks <- adjToNetwork(adj_mats, group_vec = group_vec,
+                             edge_attrs = "all", node_attrs = "all")  %>%
+        dfs_from_graphNEL()
+
+    expect_equal(networks$vertices$group, networks0$vertices$group)
+})
+
+
 test_that("user supplied colors are used", {
     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:2]
 
