@@ -531,7 +531,7 @@
 anvis <- function(network,
                   directed = NULL,
                   save_names = "network",
-                  output_type = c("igraph", "cytoscape", "network", "return_only"),
+                  output_type = c("igraph", "cytoscape", "network"),
                   vis_edge_factor = NULL,
                   vis_radial_labs = T,
                   vis_save = FALSE,
@@ -751,12 +751,5 @@ anvis <- function(network,
                                 type = netw_ext)
         }
     }
-
-    # TODO remove return and instead add at the bottom of each option a message that the action was succesful,
-    #   also do the same for visualizations made with igraph or cytoscape
-    # TODO this means the return only option for this function needs to be removed
-    # Network = list(nodes = nodes, edges = edges)
-    #
-    # return(invisible(Network))
 }
 
