@@ -261,18 +261,20 @@ addVisAttrs <- function(network,
                         colorblind = FALSE,
                         edge_color_func = NULL) {
 
-    # TODO implement a check to see what the type of the input is, make sure to convert to list
+    # Due to vectorization of this function we need to ensure the input is list
+    if (!inherits(networks, "list") || is_network_list(networks)) {
+        networks <- list(networks)
+    }
 
     # Check number of matrices for later tests
     n_mats <- length(network)
 
-    network_type_list <- lapply(network, function (net) {
-        # TODO iterate over i and do net <- network[[i]], so i can be used to
-        #     tell in the error message where it went wrong
+    network_type_list <- lapply(seq_along(network), function (i) {
+        net <- network[[i]]
         if (is(net, "graphNEL")) "graphNEL"
         else if (is(net, "igraph")) "igraph"
         else if (is_network_list(net)) "lists"
-        else stop("Input network must be graphNEL, igraph, or list containing data ",
+        else stop("Input network must be (a list of) graphNEL, igraph, or list containing data ",
                   "frames named 'vertices' and 'edges'. \nℹ Class of your network: ",
                   class(network), call.=FALSE)
     })
@@ -348,7 +350,6 @@ addVisAttrs <- function(network,
                        edge_color_func = edge_color_func)
     })
 
-    # TODO implement check to see if this part of code is working
     # Node ordering by average connectivity
     if (arrange_co) {
         nodes <- lapply(seq_along(network_dfs),
