@@ -594,3 +594,33 @@ test_that("For list input each element is checked seperately", {
                  edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
                  width_type = "partcor"), "3 of your list is of class: graphNEL")
 })
+
+
+test_that("sorting by connectivity works for a single network", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    expect_error(adjToNetwork(adj_mats[1], group_vec = group_vec,
+                 edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                 width_type = "partcor") %>% visIgraph(export_type = "print"),
+                 NA)
+})
+
+
+test_that("sorting by connectivity works for a multiple networks", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    expect_error(adjToNetwork(adj_mats[1:3], group_vec = group_vec,
+                 edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                 width_type = "partcor") %>% anvis(igr_grid = c(1,3)),
+                 NA)
+})
