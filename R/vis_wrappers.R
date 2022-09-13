@@ -569,9 +569,8 @@ anvis <- function(network,
     if (output_type == "igraph") vis_edge_factor <- vis_edge_factor %||% 3.25
     if (output_type == "cytoscape") vis_edge_factor <- vis_edge_factor %||% 2
 
-    # TODO Adjust this so it works with the other types of networks
-    # TODO check if this works by a test
-    if (!inherits(network, "list")) {
+    # For the other steps we need a list in which each element is a single network
+    if (!inherits(network, "list") || is_network_list(network)) {
         network <- list(network)
     }
 
@@ -734,7 +733,9 @@ anvis <- function(network,
             }
         })
 
-        for (netw in network) {
+        for (i in seq_along(network)) {
+            netw <- network[[i]]
+
             # Avoid overwriting by appending number
             save_name <- file_sequence(name_base = save_names[[if (names_match) i else 1]],
                                        ext = paste0(".", netw_ext))
