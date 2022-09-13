@@ -262,8 +262,8 @@ addVisAttrs <- function(network,
                         edge_color_func = NULL) {
 
     # Due to vectorization of this function we need to ensure the input is list
-    if (!inherits(networks, "list") || is_network_list(networks)) {
-        networks <- list(networks)
+    if (!inherits(network, "list") || is_network_list(network)) {
+        network <- list(network)
     }
 
     # Check number of matrices for later tests
