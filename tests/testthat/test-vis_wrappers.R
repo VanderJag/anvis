@@ -1,22 +1,20 @@
-# TODO change this test to use new functions
-# TODO check which objects function with the different options, are all 3 network
-#     types valid options
-# TODO fix this test: test_that("igraph grid titles can be drawn from names of adj_mats list", {
-
 test_that("when cytoscape is not available RCy3 will give error", {
-  # Load adjacency matrix
-  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
-
-  # Some grouping based on column names
-  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-
-  # Presence of cytoscape test, not currently working because
+  # Presence of cytoscape test
   cytosc <- RCy3::cytoscapePing() %>% capture_condition()
   skip_if(cytosc$message == "You are connected to Cytoscape!\n",
           message = "this test runs only when cytoscape is inactive")
 
+  # Load adjacency matrix
+  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
+  group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+  # Create network
+  net <- adjToNetwork(Mat1, group_vec = group_vec,
+                      edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                      width_type = "partcor")
+
   # Visualize the network
-  expect_message(VisualiseNetwork(Mat1, group_vec = group_vec, output_type = "cyto"),
+  expect_message(anvis(net, output_type = "cyto"),
                  "Please check that Cytoscape is running") %>%
   expect_error("object 'res' not found|Failed to connect to") %>%
   expect_error("object 'res' not found|argument is of length zero")
@@ -579,7 +577,6 @@ test_that("igraph visualizes directed networks", {
 })
 
 
-# TODO
 test_that("cytoscape visualizes directed networks", {
     test_call <- deparse(sys.calls()[[1]][1])
     skip_if_not(test_call == "test_that()",
@@ -594,30 +591,32 @@ test_that("cytoscape visualizes directed networks", {
 
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
+    nets <- adjToNetwork(adj_mats = adj_mats, group_vec = group_vec,
+                         edge_attrs = "all", node_attrs = "all",
+                         arrange_co = TRUE, width_type = "partcor", directed = T)
 
-    expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "cytoscape",
-                                  edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                                  directed = T,
-                                  width_type = "partcor", vis_save = F),
+    expect_error(anvis(nets, output_type = "cytoscape",
+                       vis_save = F),
                  NA)
 })
 
 
 test_that("igraph visualizes despite missing values in adj. matrix", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[[1]]
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
     adj_mats[24,25] <- NA
     adj_mats[25,24] <- NA
 
-    test_call <- deparse(sys.calls()[[1]][1])
-    skip_if_not(test_call == "test_that()",
-                message = "igraph visualizations need to be checked manually")
+    nets <- adjToNetwork(adj_mats = adj_mats, group_vec = group_vec,
+                         edge_attrs = "all", node_attrs = "all",
+                         arrange_co = TRUE, width_type = "partcor")
 
-    expect_error(
-        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
-                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                         width_type = "partcor", vis_save = F), NA)
+    expect_error(anvis(nets, output_type = "igraph", vis_save = F), NA)
 })
 
 
@@ -629,16 +628,18 @@ test_that("igraph shows self loops for directed and undirected networks", {
     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[[1]]
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    expect_error(
-        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
-                         self_loops = TRUE,
-                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                         width_type = "partcor", vis_save = F), NA)
-    expect_error(
-        VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
-                         self_loops = TRUE, directed = TRUE,
-                         edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                         width_type = "partcor", vis_save = F), NA)
+    nets <- adjToNetwork(adj_mats = adj_mats, group_vec = group_vec,
+                         edge_attrs = "all", node_attrs = "all",
+                         arrange_co = TRUE, width_type = "partcor", self_loops = TRUE)
+
+    expect_error(anvis(nets, output_type = "igraph", vis_save = F), NA)
+
+    nets <- adjToNetwork(adj_mats = adj_mats, group_vec = group_vec,
+                         edge_attrs = "all", node_attrs = "all",
+                         arrange_co = TRUE, width_type = "partcor", directed = T,
+                         self_loops = TRUE)
+
+    expect_error(anvis(nets, output_type = "igraph", vis_save = F), NA)
 })
 
 
@@ -646,137 +647,26 @@ test_that("cytoscape visualizes self loops for directed and undirected networks"
     test_call <- deparse(sys.calls()[[1]][1])
     skip_if_not(test_call == "test_that()",
                 message = "cytoscape visualizations need to be checked manually")
+
     # Check if cytoscape is active
     cytosc <- RCy3::cytoscapePing() %>% capture_condition()
     skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
                 message = "this test runs only when cytoscape is active")
 
     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
-
     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
-    expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "cytoscape",
-                                  edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                                  directed = F, self_loops = T,
-                                  width_type = "partcor", vis_save = F),
-                 NA)
-    expect_error(VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "cytoscape",
-                                  edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-                                  directed = T, self_loops = T,
-                                  width_type = "partcor", vis_save = F),
-                 NA)
-})
+    nets <- adjToNetwork(adj_mats = adj_mats, group_vec = group_vec,
+                         edge_attrs = "all", node_attrs = "all",
+                         arrange_co = TRUE, width_type = "partcor", directed = F,
+                         self_loops = TRUE)
 
+    expect_error(anvis(nets, output_type = "cytoscape", vis_save = F), NA)
 
-# Example visualization output --------------------------------------------
+    nets <- adjToNetwork(adj_mats = adj_mats, group_vec = group_vec,
+                         edge_attrs = "all", node_attrs = "all",
+                         arrange_co = TRUE, width_type = "partcor", directed = T,
+                         self_loops = TRUE)
 
-# test_that("example visualization of 10 networks", {
-#     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:10]
-#     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-#
-#     test_call <- deparse(sys.calls()[[1]][1])
-#     skip_if_not(test_call == "test_that()",
-#                 message = "igraph visualizations need to be checked manually")
-#
-#     expect_error(
-#         VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
-#                          edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-#                          width_type = "partcor", vis_save = T, igr_grid = c(2,5),
-#                          vis_export_opts = list(width = 6100, height = 2600),
-#                          igr_par_opts = list(mar=c(2,3,5,5)),
-#                          igr_grid_names = paste("Case", LETTERS[seq_along(adj_mats)])), NA)
-# })
-#
-#
-# test_that("example visualization of 20 networks", {
-#     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:12]
-#
-#     more_mats <- adj_mats[1:8]
-#
-#     scramble_mats <- function(mats) {
-#         mats_seq <- seq_along(as.vector(mats))
-#         sapply(mats_seq, function (i) as.vector(adj_mats[[sample(1:12, 1)]])[i])
-#     }
-#
-#     more_mats <- lapply(more_mats, function (x) {
-#         df <- as.data.frame(scramble_mats(x))
-#         row.names(df) <- colnames(df)
-#         df
-#         })
-#
-#     # 20 matrices
-#     adj_mats <- append(adj_mats, more_mats)
-#
-#     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-#
-#     test_call <- deparse(sys.calls()[[1]][1])
-#     skip_if_not(test_call == "test_that()",
-#                 message = "igraph visualizations need to be checked manually")
-#
-#     expect_error(
-#         VisualiseNetwork(adj_mats, group_vec = group_vec, output_type = "igraph",
-#                          edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
-#                          width_type = "partcor", vis_save = T, igr_grid = c(5,4),
-#                          vis_export_opts = list(width = 4500, height = 6400),
-#                          igr_par_opts = list(mar=c(2,3,5,5)),
-#                          igr_grid_names = paste("Case", LETTERS[seq_along(adj_mats)])), NA)
-# })
-
-
-# test_that("example visualization of a directed network", {
-#     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
-#     adj_mats <- lapply(adj_mats, lower_tri_remix)
-#     nms <- colnames(adj_mats[[1]])
-#
-#     set.seed(2)
-#     adj_mats <- matrix(sapply(seq_along(unlist(adj_mats[[1]])),
-#            function (i) sample(c(0, rep(unlist(adj_mats[[1]])[i],2)), 1)), nrow = 36)
-#
-#     row.names(adj_mats) <- nms
-#     colnames(adj_mats) <- nms
-#
-#     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-#
-#     test_call <- deparse(sys.calls()[[1]][1])
-#     skip_if_not(test_call == "test_that()",
-#                 message = "cytoscape visualizations need to be checked manually")
-#     # Check if cytoscape is active
-#     cytosc <- RCy3::cytoscapePing() %>% capture_condition()
-#     skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
-#                 message = "this test runs only when cytoscape is active")
-#
-#
-#     VisualiseNetwork(adj_mats,
-#                      group_vec = group_vec,
-#                      output_type = "cytoscape",
-#                      edge_attrs = "all", node_attrs = "all",
-#                      width_type = "partcor",
-#                      arrange_co = T, directed = T, vis_save = T)
-#
-#     png(width = 900, height = 900)
-#     graph <- igraph::graph_from_adjacency_matrix(adj_mats, weighted = T)
-#     igraph::plot.igraph(graph)
-#     dev.off()
-# })
-
-
-test_that("igraph grid visualization allows adding titles to plots", {
-    test_call <- deparse(sys.calls()[[1]][1])
-    skip_if_not(test_call == "test_that()",
-                message = "igraph visualizations need to be checked manually")
-
-    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))
-    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-
-    network <- adjToNetwork(adj_mats = adj_mats,
-                       node_attrs = "all",
-                       edge_attrs = "all", width_type = "partcor",
-                       group_vec = group_vec)
-
-
-    expect_error(
-        anvis(network, output_type = "igraph", vis_save = T, igr_grid = c(2,6),
-                         vis_export_opts = list(width = 6400, height = 2600),
-                         igr_par_opts = list(mar=c(2,4,5,4)),
-                         igr_grid_names = paste("patient", LETTERS[seq_along(adj_mats)])), NA)
+    expect_error(anvis(nets, output_type = "cytoscape", vis_save = F),NA)
 })
