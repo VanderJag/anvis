@@ -9,36 +9,15 @@
 #' Note: When using this function to create visualizations with cytoscape, the
 #' cytoscape software needs to be running in the background already.
 #'
-#' @param network
+#' @param network Input network.
 #' @param directed Logical (default `FALSE`), whether edges are directed in the
 #'     network. If `FALSE`, the information in the lower triangle of the
 #'     adjacency matrix will be discarded. If `TRUE` this information will be
 #'     retained and the style of visualizations will be adjusted to feature
 #'     edge curvature and arrows.
-#' @inheritParams adjToNetwork
-#' @param group_vec A vector of character strings that assigns group labels to
-#'     the nodes. The order of this vector should match the order of column and
-#'     rownames of the input adjacency matrices. If `adj_mats` is a list, a single
-#'     group vector can be used if it matches all adjacency matrices.
-#'     Alternatively, provide a list of group vectors with one vector for each
-#'     adj. matrix in the list. For this information to be added, `node_attrs`
-#'     must be 'group' or 'all'.
-#' @inheritParams weights_to_color
-#' @param colorblind Logical (default `FALSE`), determining if the default colors
-#'     should be exchanged for colorblind accessible colors.
 #' @param vis_edge_factor Numeric, a number that will be multiplied with the edge
 #'     widths, scaling the edge widths linearly. When this argument is `NULL`,
 #'     default values will be used (3.25 for igraph and 2 for cytoscape).
-#' @param width_type Argument used to convert edge weights into widths for
-#'     visualizations that are more easy to interpret. Find a description of the
-#'     options in [edge_weight_to_widths]. This argument can be a single type,
-#'     that will be used for all networks, or a vector of types that matches the
-#'     number of networks.
-#' @param arrange_co Logical (default `FALSE`), should nodes be reordered based on
-#'     their average connectivity in multiple networks? Requires
-#'     the same names nodes to be present in all networks. Also requires 'size'
-#'     column to be present in node tables, so `node_attrs` should be 'all' or
-#'     include 'size'.
 #' @param save_names Base name for the files that are saved by this function
 #'     (default: 'network'). If a single name is provided for multiple networks,
 #'     numbers will be appended to the base name while saving. Alternatively,
@@ -116,7 +95,6 @@
 #'     the `save_names` as a network title, a single string, to give all networks
 #'     the same title, or a vector of strings matching the length of input
 #'     networks, to provide each networks its own title.
-#' @inheritParams adjToNetwork
 #'
 #' @return The main purpose of this function is to create visualizations or
 #' export networks. In addition, this function returns a list of two lists,

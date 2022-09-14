@@ -5,13 +5,20 @@
 \title{Visualize in Cytoscape}
 \usage{
 visCytoscape(
-  node_table,
-  edge_table,
-  directed = FALSE,
+  network,
+  directed = if (is(network, "graphNEL")) {
+     graph::edgemode(network) ==
+    "directed"
+ } else if (is(network, "igraph")) {
+     igraph::is_directed(network)
+ }
+    else {
+     FALSE
+ },
   radial_labs = TRUE,
   export_image = TRUE,
   save_session = TRUE,
-  close_session = TRUE,
+  close_session = export_image,
   save_name = "network",
   export_type = c("PNG", "JPEG", "PDF", "SVG", "PS"),
   export_opts = list(),
@@ -21,17 +28,6 @@ visCytoscape(
 )
 }
 \arguments{
-\item{node_table}{Data frame with required column 'node'. Optional are columns
-'color' and 'size': when present, these will be used to determine the
-respective visual properties of the visualization. Other columns with
-node attributes will not be used in the visualization, but they will be
-added to the node table in cytoscape.}
-
-\item{edge_table}{Data frame with required columns 'source' and 'target'.
-Optional are columns: 'width' or 'weight' to determine edge widths in the
-visualization (only when 'width' is not present weight will be used), and
-'color' to determine the color of the edges.}
-
 \item{directed}{A logical (default \code{FALSE}). When this argument is \code{TRUE}
 edges will be drawn with arrows.}
 
@@ -70,6 +66,17 @@ space around a node will be twice the (maximum) node size.}
 Cytoscape version 3.8.x is detected? \code{FALSE} to skip this test.
 Cytoscape version 3.8.x has problems interacting with \code{RCy3}, first
 visualization may not show.}
+
+\item{node_table}{Data frame with required column 'node'. Optional are columns
+'color' and 'size': when present, these will be used to determine the
+respective visual properties of the visualization. Other columns with
+node attributes will not be used in the visualization, but they will be
+added to the node table in cytoscape.}
+
+\item{edge_table}{Data frame with required columns 'source' and 'target'.
+Optional are columns: 'width' or 'weight' to determine edge widths in the
+visualization (only when 'width' is not present weight will be used), and
+'color' to determine the color of the edges.}
 }
 \description{
 Uses RCy3 to communicate to your running cytoscape software. Visualizes your

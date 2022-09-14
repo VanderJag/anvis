@@ -99,10 +99,14 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 }
 
 
-#' Create edge and node table from adjacency matrix
+#' Create network from adjacency matrix
 #'
-#' Creates edge and node tables with various optional attributes.
+#' Creates a graphNEL network from an adjacency matrix, with the option to add
+#' various attributes for nodes and edges that are helpful for making neat visualizations.
+#' A list of adjacency matrices can be provided as input, to obtain a list of
+#' graphNEL networks as return.
 #'
+#' @section Details:
 #' When `node_attrs` or `edge_attrs` is a vector containing 'none' and any other
 #' option, no additional attributes will be added.
 #'
@@ -118,6 +122,29 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #' apply a sigmoid, so the lowest edge weights will have even lower width, and
 #' higher weight maintain high values.
 #'
+#' For `width_type` several option are available, all of which scale the absolute
+#' values of the edge attribute "weight". The most extreme values for "weight"
+#' get the highest value for edge width, and vice versa. The range of
+#' edge widths will be between 0 and 1, irrespective of the chosen method.
+#' Available options are: `"cor"`, which is
+#' intended to be used with Pearson or Spearman correlation values (range -1
+#' to 1). Widths will be the absolute value of the correlation, scaled with a
+#' sigmoid. `"partcor"`, which is intended to be use for partial correlation
+#' values (range -1 to 1). For this method, edge widths will be the cube root
+#' of absolute weight values, scaled with a sigmoid. The option `"MI"` is meant
+#' to be used with weights derived from mutual information (range 0 to +∞).
+#' Widths will be the weights divided by to maximum weight, then scaled with
+#' a sigmoid. `"default_scaling"` applies the same transformation as `"MI"`,
+#' as a result scaling the any weights to range 0 to 1.
+#' `"ranked"` will calculate percentage ranks of the weight, and
+#' scale them with a sigmoid. `"percentile"` will chose a set of fixed widths
+#' determined by the percentile of a weight value. The highest percentiles will
+#' be assigned the largest width, but they are the smallest group, vice versa
+#' for the lowest percentiles. This argument can be abbreviated.
+#'
+#' @param adj_mats A square adjacency matrix or data frame or a list of these.
+#'     The data in the matrix is used as edge weights for the network. Row names
+#'     and column names specify interacting nodes, and are required.
 #' @inheritParams adj_matrix_to_edgelist
 #' @param node_attrs Character strings, one or multiple of 'none', 'all', 'group',
 #'     'color_group', and 'size'. This argument can be used to choose which
@@ -128,21 +155,41 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #'     Selecting 'size' will add a column with node sizes, that are based on the
 #'     connectivity of the nodes.
 #' @param edge_attrs Character strings, one or multiple of 'none, 'all', 'width',
-#'   'color'. This argument can be used to choose which additional attributes
-#'   should be added to the edge table. Selecting 'width' will add a column to
-#'   edge table that contains edge width values. These are determined by scaling
-#'   the edge weights to range 0 to 1 using a sigmoid and a method based on
-#'   `width_type` (more info in [edge_weight_to_widths]).
-#' @inheritParams group_nodes
+#'     'color'. This argument can be used to choose which additional attributes
+#'     should be added to the edge table. Selecting 'width' will add a column to
+#'     edge table that contains edge width values. These are determined by scaling
+#'     the edge weights to range 0 to 1 using a sigmoid and a method based on
+#'     `width_type` (more info in Details section).
+#' @param group_vec A vector of character strings that assigns group labels to
+#'     the nodes. The order of this vector should match the order of column and
+#'     rownames of the input adjacency matrices. If `adj_mats` is a list, a single
+#'     group vector can be used if it matches all adjacency matrices.
+#'     Alternatively, provide a list of group vectors with one vector for each
+#'     adj. matrix in the list. For this information to be added, `node_attrs`
+#'     must be 'group' or 'all'.
 #' @inheritParams add_colors
 #' @inheritParams node_size_connectivity
-#' @inheritParams edge_weight_to_widths
 #' @inheritParams weights_to_color
+#' @param colorblind Logical (default `FALSE`), determining if the default colors
+#'     should be exchanged for colorblind accessible colors.
+#' @param width_type Argument used to convert edge weights into widths for
+#'     visualizations that are more easy to interpret. Options are `"default_scaling"`,
+#'     `"MI"`, `"cor"`, `"partcor"`, `"ranked"`, and `"percentile"`, or a vector
+#'     containing the name of one of the methods for each network.
+#'     A detailed description of the options can be found in the Details section.
+#' @param arrange_co Logical (default `FALSE`), should nodes be reordered based on
+#'     their average connectivity in multiple networks? Requires
+#'     the same node names to be present in all networks. Also requires 'size'
+#'     column to be present in node tables, so `node_attrs` should be 'all' or
+#'     include 'size'.
 #'
-#' @return Will return a list with two data frames, named 'edge_table' and
-#' 'node_table'. The 'node_table' data frame has a 'node' column and other
-#' columns for the additional attributes that were added. The 'edge_table' has
-#' columns 'source' and 'target', and more columns for the added attributes.
+#' @seealso [addVisAttrs] for adding attributes to an existing network objects.
+#'
+#'
+#' @return This function returns a graphNEL object or a list of these.
+#' The nodes and edges of these graph objects will have additional attributes
+#' added corresponding with the provided input arguments.
+#'
 #' @export
 adjToNetwork <- function(adj_mats,
                          directed = FALSE,
@@ -248,7 +295,26 @@ adjToNetwork <- function(adj_mats,
     return(graphNELs)
 }
 
-
+#' Add attributes to networks to improve visualizations
+#'
+#' Takes networks of 3 possible classes and adds edge and node attributes
+#' that can be used in network visualization. A list of networks
+#' can be provided as input, to add attributes to multiple networks at once.
+#'
+#' @param network A network or a list of these. Valid classes for the network are
+#'     "igraph", "graphNEL", and "list" of two data frames with the names "edges"
+#'     and "vertices".
+#' @inheritParams adjToNetwork
+#'
+#' @inheritSection adjToNetwork Details
+#'
+#' @return
+#' Returns the input network(s) with added attributes.
+#'
+#' @seealso [adjToNetwork] for creating a network from an adjacency matrix and
+#' adding node and edge attributes in a single step.
+#'
+#' @export
 addVisAttrs <- function(network,
                         node_attrs = c("none", "all", "group",
                                        "color_group", "size"),
@@ -398,6 +464,7 @@ addVisAttrs <- function(network,
     return(final_nets)
 }
 
+# Function that adds the visualization attributes to a network
 addVisAttrsCore <- function(edge_table,
                            node_table,
                         node_attrs = c("none", "all", "group",
