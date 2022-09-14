@@ -11,10 +11,11 @@ node_size_connectivity(
 )
 }
 \arguments{
-\item{node_table}{A data frame with a column named 'node'. The values in this
-column (names of nodes), must be the same as the row names
-of \code{adj_matrix}. Having nodes in the same order in \code{node_table} and the
-matrix not required.}
+\item{node_table}{A data frame with a column named 'node'.}
+
+\item{edge_table}{A data frame with with columns source and target, containing
+the names of nodes connected by an edge, and a column called "weight" containing
+numeric values.}
 
 \item{size_type}{One of "igraph" (default), "cytoscape", or "scaled_only".
 This argument determines a factor for linear scaling of node size. Factors
@@ -24,8 +25,9 @@ are 15, 25, and 1, respectively.}
 Returns \code{node_table} with an added column 'size'.
 }
 \description{
-Calculates the connectivity of nodes as the row sums from an adjacency matrix.
+Calculates the connectivity of nodes as the sum of all weights of edges
+originating or ending at a node.
 For use as node size, the values are scaled to range 0 to 1, transformed
 with a sigmoid, and then multiplied with a constant factor that is determined
-by \code{size_type}
+by \code{size_type}.
 }

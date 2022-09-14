@@ -124,21 +124,20 @@ add_colors <- function(node_table, group_colors = NULL) {
 
 #' Add connectivity based 'size' column to node table
 #'
-#' Calculates the connectivity of nodes as the row sums from an adjacency matrix.
+#' Calculates the connectivity of nodes as the sum of all weights of edges
+#' originating or ending at a node.
 #' For use as node size, the values are scaled to range 0 to 1, transformed
 #' with a sigmoid, and then multiplied with a constant factor that is determined
-#' by `size_type`
+#' by `size_type`.
 #'
-#' @param node_table A data frame with a column named 'node'. The values in this
-#'   column (names of nodes), must be the same as the row names
-#'   of `adj_matrix`. Having nodes in the same order in `node_table` and the
-#'   matrix not required.
+#' @param node_table A data frame with a column named 'node'.
+#' @param edge_table A data frame with with columns source and target, containing
+#'   the names of nodes connected by an edge, and a column called "weight" containing
+#'   numeric values.
 #' @param size_type One of "igraph" (default), "cytoscape", or "scaled_only".
 #'   This argument determines a factor for linear scaling of node size. Factors
 #'   are 15, 25, and 1, respectively.
 #' @return Returns `node_table` with an added column 'size'.
-#'
-#' @inheritParams adj_matrix_to_edgelist
 node_size_connectivity <- function(node_table,
                                    edge_table,
                                    size_type = c("igraph", "cytoscape", "scaled_only")) {
