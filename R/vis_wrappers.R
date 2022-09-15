@@ -329,4 +329,3 @@ anvis <- function(networks,
         }
     }
 }
-
