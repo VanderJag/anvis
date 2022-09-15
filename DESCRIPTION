@@ -1,5 +1,5 @@
 Package: anvis
-Title: Automated Network VISualization: A package for Network Comparisons and Visual Styling
+Title: Automated Network VISualization: Facilitating interpretation and comparison of networks by visualizing derived network properties
 Version: 0.0.0.9000
 Authors@R: 
     person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
