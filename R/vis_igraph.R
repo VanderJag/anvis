@@ -1,30 +1,25 @@
 #' Visualize with igraph
 #'
-#' This function takes an node and edge list, or an igraph object, to create a
-#' network visualization. Depending on the attributes that are present in these
-#' input options, nodes and edges will be visually styled.
+#' This function takes a network object and visualizes it visualization.
+#' Depending on the additional attributes that are present in the
+#' input network, nodes and edges will be visually styled.
 #'
-#' When all three network input parameters are provided, `edge_table` and
-#' `node_table` will be used instead of `igraph_obj`. This function uses defaults
-#' for visual styling, based on a series of fixed names such as 'color'. The used
-#' defaults can be overwritten by supplying additional arguments to this function
-#' that are specified in [igraph::igraph.plotting].
+#' This function uses defaults for visual styling, based network attributes with
+#' fixed names such as 'color'. The used defaults can be overwritten by supplying
+#' additional arguments to this function that are specified in
+#' [igraph::igraph.plotting].
 #'
-#' @param edge_table Data frame of which the first two columns contain names of
-#'     vertices connected by edges. Additional columns may be present, columns
-#'     with the names 'width' and 'color' will be used to style the edges in the
-#'     visualization.
-#' @param node_table Data frame in which the first column contains the names of
-#'     the vertices in the network. Additional columns may be present, column
-#'     'group' will be used to arrange vertices so those with the same group
-#'     label will be placed next to each other, 'color' and 'size' will be used
-#'     to adjust the corresponding features of the vertices.
-#' @param igraph_obj Object of class igraph. Can be provided instead of
-#'     `edge_table` and `node_table`. Edge attributes 'width' and 'color' and
-#'     vertex attributes 'group', 'size', and 'color', will be used to style the
-#'     visualization.
-#' @param directed A logical (default `FALSE`). When this argument is `TRUE` the
-#'     defaults will be adjusted to visualize directed graphs. Edges will be
+#' @param network A network object of one of the valid classes:
+#'     "igraph", "graphNEL", and "list" of two data frames with the names "edges"
+#'     and "vertices". If the edges in the network have the additional attributes
+#'     'width' or 'color' those attributes will be used to style the edges in
+#'     the visualization. Optional node attribute 'group' will be used to arrange
+#'     vertices so those with the same group label will be placed next to each
+#'     other, 'color' and 'size' will be used to adjust the corresponding
+#'     features of the vertices.
+#' @param directed A logical (automatically determined for network objects of
+#'     class 'igraph' and 'graphNEL', otherwise default `FALSE`).
+#'     When this argument is `TRUE` edges will be
 #'     drawn with a curvature and they will be shown as arrows.
 #' @param radial_labs A logical (default `TRUE`) to indicate whether vertex labels
 #'     should be positioned radially around the circular arrangement of vertices.
