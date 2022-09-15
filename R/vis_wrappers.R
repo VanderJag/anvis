@@ -103,6 +103,11 @@
 #'     the same title, or a vector of strings matching the length of input
 #'     networks, to provide each networks its own title.
 #'
+#' @seealso Generate more interesting visualizations by using [addVisAttrs]
+#'     for adding attributes to an existing network objects, and
+#'     [adjToNetwork] for creating a network from an adjacency matrix and
+#'     adding node and edge attributes in a single step.
+#'
 #' @export
 anvis <- function(networks,
                   directed = NULL,
