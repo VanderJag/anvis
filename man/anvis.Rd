@@ -6,7 +6,7 @@
 \title{anvis: A package for convenient network visualizations}
 \usage{
 anvis(
-  network,
+  networks,
   directed = NULL,
   save_names = "network",
   output_type = c("igraph", "cytoscape", "network"),
@@ -29,13 +29,19 @@ anvis(
 )
 }
 \arguments{
-\item{network}{Input network.}
+\item{networks}{A network or a list of these. Valid classes for the network are
+"igraph", "graphNEL", and "list" of two data frames with the names "edges"
+and "vertices". If the edges in the network have the additional attributes
+'width' or 'color' those attributes will be used to style the edges in
+the visualization. Optional node attribute 'group' will be used to arrange
+vertices so those with the same group label will be placed next to each
+other, 'color' and 'size' will be used to adjust the corresponding
+features of the vertices.}
 
-\item{directed}{Logical (default \code{FALSE}), whether edges are directed in the
-network. If \code{FALSE}, the information in the lower triangle of the
-adjacency matrix will be discarded. If \code{TRUE} this information will be
-retained and the style of visualizations will be adjusted to feature
-edge curvature and arrows.}
+\item{directed}{Logical (default \code{NULL}), whether visualizations should
+feature edge curvature and arrows. If this argument is \code{NULL} this
+property will be automatically determined for 'igraph' or 'graphNEL'
+object, and otherwise by it will be \code{FALSE} by default.}
 
 \item{save_names}{Base name for the files that are saved by this function
 (default: 'network'). If a single name is provided for multiple networks,
@@ -135,25 +141,18 @@ the \code{save_names} as a network title, a single string, to give all networks
 the same title, or a vector of strings matching the length of input
 networks, to provide each networks its own title.}
 }
-\value{
-The main purpose of this function is to create visualizations or
-export networks. In addition, this function returns a list of two lists,
-containing the information of the created networks. The first is named 'nodes'
-and it is a list containing a node table (data frame) for each input adjacency
-matrix. The second list is named 'edges' and it contains edge tables. The
-return is invisible, so it will not print when not assigned.
-}
 \description{
 Here there will be a short package functionality summary later
 
-This function takes one or more adjacency matrices as input. It uses the
-adjacency information (weights) to create several attributes for network
-visualization such as scaled edge widths and node sizes based on node
-connectivity. The created network with additional attributes can be visualized
-with igraph or cytoscape, or exported in several common file formats.
+This function takes a (list of) network object(s) and visualizes them or
+exports them in various formats. Based on additional attributes of
+nodes and edges, visual elements such as edge widths and node sizes are
+adjusted in the visualizations. Networks can be visualized with Cytoscape
+or igraph. For the latter, there are options available to visualize multiple
+networks in a grid, for easier comparison.
 }
 \details{
-Note: When using this function to create visualizations with cytoscape, the
+Note: When using this function to create visualizations with Cytoscape, the
 cytoscape software needs to be running in the background already.
 }
 \section{Foo functions}{

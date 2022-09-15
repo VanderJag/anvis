@@ -28,8 +28,21 @@ visCytoscape(
 )
 }
 \arguments{
-\item{directed}{A logical (default \code{FALSE}). When this argument is \code{TRUE}
-edges will be drawn with arrows.}
+\item{network}{A network object of one of the valid classes:
+"igraph", "graphNEL", and "list" of two data frames with the names "edges"
+and "vertices". If the nodes have an additional attribute 'color' or
+'size', the respective the respective element will be adjusted in the
+visualization. If edges have the attributes 'width' or 'weight', this will
+be used to determine edge widths in the visualization (only when 'width'
+is not present weight will be used). Edge attribute 'color' determines
+the color of edges.}
+
+\item{directed}{A logical (automatically determined for network
+objects of class 'igraph' and 'graphNEL', otherwise default \code{FALSE}).
+When this argument is \code{TRUE} edges will be drawn with arrows.}
+
+\item{radial_labs}{A logical (default \code{TRUE}) to indicate whether node labels
+should be positioned radially around the circular arrangement of nodes.}
 
 \item{export_image}{Logical (default \code{TRUE}), should the visualization be saved?}
 
@@ -66,21 +79,10 @@ space around a node will be twice the (maximum) node size.}
 Cytoscape version 3.8.x is detected? \code{FALSE} to skip this test.
 Cytoscape version 3.8.x has problems interacting with \code{RCy3}, first
 visualization may not show.}
-
-\item{node_table}{Data frame with required column 'node'. Optional are columns
-'color' and 'size': when present, these will be used to determine the
-respective visual properties of the visualization. Other columns with
-node attributes will not be used in the visualization, but they will be
-added to the node table in cytoscape.}
-
-\item{edge_table}{Data frame with required columns 'source' and 'target'.
-Optional are columns: 'width' or 'weight' to determine edge widths in the
-visualization (only when 'width' is not present weight will be used), and
-'color' to determine the color of the edges.}
 }
 \description{
 Uses RCy3 to communicate to your running cytoscape software. Visualizes your
 network with a circular layout. Depending on the attributes of your
-\code{edge_table} and \code{node_table}, additional visual properties will be added to
+network, additional visual properties will be added to
 the visualization. Image and session object can be saved.
 }

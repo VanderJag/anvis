@@ -26,8 +26,18 @@ visIgraph(
 )
 }
 \arguments{
-\item{directed}{A logical (default \code{FALSE}). When this argument is \code{TRUE} the
-defaults will be adjusted to visualize directed graphs. Edges will be
+\item{network}{A network object of one of the valid classes:
+"igraph", "graphNEL", and "list" of two data frames with the names "edges"
+and "vertices". If the edges in the network have the additional attributes
+'width' or 'color' those attributes will be used to style the edges in
+the visualization. Optional node attribute 'group' will be used to arrange
+vertices so those with the same group label will be placed next to each
+other, 'color' and 'size' will be used to adjust the corresponding
+features of the vertices.}
+
+\item{directed}{A logical (automatically determined for network objects of
+class 'igraph' and 'graphNEL', otherwise default \code{FALSE}).
+When this argument is \code{TRUE} edges will be
 drawn with a curvature and they will be shown as arrows.}
 
 \item{radial_labs}{A logical (default \code{TRUE}) to indicate whether vertex labels
@@ -69,22 +79,6 @@ reset to their original value.}
 visualizing your network. Any options provided here will overwrite the
 defaults. If \code{radial_labs} is \code{FALSE}, this argument can also be used to
 customize the vertex labels placed by \code{plot.igraph}.}
-
-\item{edge_table}{Data frame of which the first two columns contain names of
-vertices connected by edges. Additional columns may be present, columns
-with the names 'width' and 'color' will be used to style the edges in the
-visualization.}
-
-\item{node_table}{Data frame in which the first column contains the names of
-the vertices in the network. Additional columns may be present, column
-'group' will be used to arrange vertices so those with the same group
-label will be placed next to each other, 'color' and 'size' will be used
-to adjust the corresponding features of the vertices.}
-
-\item{igraph_obj}{Object of class igraph. Can be provided instead of
-\code{edge_table} and \code{node_table}. Edge attributes 'width' and 'color' and
-vertex attributes 'group', 'size', and 'color', will be used to style the
-visualization.}
 }
 \value{
 Returns \code{NULL} invisibly. This functions creates visualizations and
@@ -92,14 +86,13 @@ will show them directly in your R session or save them to the selected
 graphical device.
 }
 \description{
-This function takes an node and edge list, or an igraph object, to create a
-network visualization. Depending on the attributes that are present in these
-input options, nodes and edges will be visually styled.
+This function takes a network object and visualizes it visualization.
+Depending on the additional attributes that are present in the
+input network, nodes and edges will be visually styled.
 }
 \details{
-When all three network input parameters are provided, \code{edge_table} and
-\code{node_table} will be used instead of \code{igraph_obj}. This function uses defaults
-for visual styling, based on a series of fixed names such as 'color'. The used
-defaults can be overwritten by supplying additional arguments to this function
-that are specified in \link[igraph:plot.common]{igraph::igraph.plotting}.
+This function uses defaults for visual styling, based network attributes with
+fixed names such as 'color'. The used defaults can be overwritten by supplying
+additional arguments to this function that are specified in
+\link[igraph:plot.common]{igraph::igraph.plotting}.
 }
