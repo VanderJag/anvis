@@ -2,20 +2,22 @@
 #'
 #' Uses RCy3 to communicate to your running cytoscape software. Visualizes your
 #' network with a circular layout. Depending on the attributes of your
-#' `edge_table` and `node_table`, additional visual properties will be added to
+#' network, additional visual properties will be added to
 #' the visualization. Image and session object can be saved.
 #'
-#' @param node_table Data frame with required column 'node'. Optional are columns
-#'     'color' and 'size': when present, these will be used to determine the
-#'     respective visual properties of the visualization. Other columns with
-#'     node attributes will not be used in the visualization, but they will be
-#'     added to the node table in cytoscape.
-#' @param edge_table Data frame with required columns 'source' and 'target'.
-#'     Optional are columns: 'width' or 'weight' to determine edge widths in the
-#'     visualization (only when 'width' is not present weight will be used), and
-#'     'color' to determine the color of the edges.
-#' @param directed A logical (default `FALSE`). When this argument is `TRUE`
-#'     edges will be drawn with arrows.
+#' @param network A network object of one of the valid classes:
+#'     "igraph", "graphNEL", and "list" of two data frames with the names "edges"
+#'     and "vertices". If the nodes have an additional attribute 'color' or
+#'     'size', the respective the respective element will be adjusted in the
+#'     visualization. If edges have the attributes 'width' or 'weight', this will
+#'     be used to determine edge widths in the visualization (only when 'width'
+#'     is not present weight will be used). Edge attribute 'color' determines
+#'     the color of edges.
+#' @param directed A logical (automatically determined for network
+#'     objects of class 'igraph' and 'graphNEL', otherwise default `FALSE`).
+#'     When this argument is `TRUE` edges will be drawn with arrows.
+#' @param radial_labs A logical (default `TRUE`) to indicate whether node labels
+#'     should be positioned radially around the circular arrangement of nodes.
 #' @param export_image Logical (default `TRUE`), should the visualization be saved?
 #' @param save_session Logical (default `TRUE`), specifying whether the cytoscape
 #'     session should be saved (as .cys file).
