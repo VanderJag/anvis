@@ -1,20 +1,27 @@
-#' Create network and visualize or export
+#' Visualize or export networks
 #'
-#' This function takes one or more adjacency matrices as input. It uses the
-#' adjacency information (weights) to create several attributes for network
-#' visualization such as scaled edge widths and node sizes based on node
-#' connectivity. The created network with additional attributes can be visualized
-#' with igraph or cytoscape, or exported in several common file formats.
+#' This function takes a (list of) network object(s) and visualizes them or
+#' exports them in various formats. Based on additional attributes of
+#' nodes and edges, visual elements such as edge widths and node sizes are
+#' adjusted in the visualizations. Networks can be visualized with Cytoscape
+#' or igraph. For the latter, there are options available to visualize multiple
+#' networks in a grid, for easier comparison.
 #'
-#' Note: When using this function to create visualizations with cytoscape, the
+#' Note: When using this function to create visualizations with Cytoscape, the
 #' cytoscape software needs to be running in the background already.
 #'
-#' @param network Input network.
-#' @param directed Logical (default `FALSE`), whether edges are directed in the
-#'     network. If `FALSE`, the information in the lower triangle of the
-#'     adjacency matrix will be discarded. If `TRUE` this information will be
-#'     retained and the style of visualizations will be adjusted to feature
-#'     edge curvature and arrows.
+#' @param networks A network or a list of these. Valid classes for the network are
+#'     "igraph", "graphNEL", and "list" of two data frames with the names "edges"
+#'     and "vertices". If the edges in the network have the additional attributes
+#'     'width' or 'color' those attributes will be used to style the edges in
+#'     the visualization. Optional node attribute 'group' will be used to arrange
+#'     vertices so those with the same group label will be placed next to each
+#'     other, 'color' and 'size' will be used to adjust the corresponding
+#'     features of the vertices.
+#' @param directed Logical (default `NULL`), whether visualizations should
+#'     feature edge curvature and arrows. If this argument is `NULL` this
+#'     property will be automatically determined for 'igraph' or 'graphNEL'
+#'     object, and otherwise by it will be `FALSE` by default.
 #' @param vis_edge_factor Numeric, a number that will be multiplied with the edge
 #'     widths, scaling the edge widths linearly. When this argument is `NULL`,
 #'     default values will be used (3.25 for igraph and 2 for cytoscape).
@@ -96,15 +103,8 @@
 #'     the same title, or a vector of strings matching the length of input
 #'     networks, to provide each networks its own title.
 #'
-#' @return The main purpose of this function is to create visualizations or
-#' export networks. In addition, this function returns a list of two lists,
-#' containing the information of the created networks. The first is named 'nodes'
-#' and it is a list containing a node table (data frame) for each input adjacency
-#' matrix. The second list is named 'edges' and it contains edge tables. The
-#' return is invisible, so it will not print when not assigned.
-#'
 #' @export
-anvis <- function(network,
+anvis <- function(networks,
                   directed = NULL,
                   save_names = "network",
                   output_type = c("igraph", "cytoscape", "network"),
@@ -146,12 +146,12 @@ anvis <- function(network,
     if (output_type == "cytoscape") vis_edge_factor <- vis_edge_factor %||% 2
 
     # For the other steps we need a list in which each element is a single network
-    if (!inherits(network, "list") || is_network_list(network)) {
-        network <- list(network)
+    if (!inherits(networks, "list") || is_network_list(networks)) {
+        networks <- list(networks)
     }
 
-    for (i in seq_along(network)) {
-        net <- network[[i]]
+    for (i in seq_along(networks)) {
+        net <- networks[[i]]
         if (!(is(net, "graphNEL") || is(net, "igraph") || is_network_list(net))) {
             stop("Input networks must be graphNEL, igraph, or list containing data ",
                  "frames named 'vertices' and 'edges'. \nℹ Class of your network: ",
@@ -160,7 +160,7 @@ anvis <- function(network,
     }
 
     # Check number of matrices for later tests
-    n_nets <- length(network)
+    n_nets <- length(networks)
 
     # Check save names
     names_match <- length(save_names) == n_nets
@@ -172,7 +172,7 @@ anvis <- function(network,
 
     # Get edge mode (directed or not?) from network if it wasn't explicitly provided
     if (is.null(directed)) {
-        directed <- sapply(network, function(net) {
+        directed <- sapply(networks, function(net) {
             if (is(net, "graphNEL")) {
                 graph::edgemode(net) == "directed"
             } else if (is(net, "igraph")) {
@@ -241,7 +241,7 @@ anvis <- function(network,
         if (!(vis_save) || (vis_save && igr_grid)) vis_export_type <- "print"
 
         # Create igraph plots
-        for (i in seq_along(network)) {
+        for (i in seq_along(networks)) {
             # Set plot title for grip plots when it is requested
             if (igr_grid && isTRUE(igr_grid_names)) {
                 igr_plot_opts[["main"]] <- names(adj_mats)[i]
@@ -250,7 +250,7 @@ anvis <- function(network,
             }
 
             do.call(visIgraph,
-                    c(list(network[[i]],
+                    c(list(networks[[i]],
                            directed = directed[[if (directed_match) i else 1]],
                            save_name = save_names[[if (names_match) i else 1]],
                            export_type = vis_export_type,
@@ -270,8 +270,8 @@ anvis <- function(network,
 
     } else if (output_type == "cytoscape") {
         # If plots are not saved keep igraph session open
-        for (i in seq_along(network)) {
-            visCytoscape(network[[i]],
+        for (i in seq_along(networks)) {
+            visCytoscape(networks[[i]],
                          directed = directed[[if (directed_match) i else 1]],
                          save_name = save_names[[if (names_match) i else 1]],
                          export_type = vis_export_type %>% stringr::str_to_upper(),
@@ -298,8 +298,8 @@ anvis <- function(network,
 
         # To make sure the networks are either igraph or graphNEL, otherwise
         #   BioNet::saveNetwork will run into problems
-        network <- lapply(seq_along(network), function(i) {
-            net <- network[[i]]
+        networks <- lapply(seq_along(networks), function(i) {
+            net <- networks[[i]]
             if (is_network_list(net)) {
                 igraph::graph_from_data_frame(
                     net$edges, vertices = net$vertices,
@@ -309,8 +309,8 @@ anvis <- function(network,
             }
         })
 
-        for (i in seq_along(network)) {
-            netw <- network[[i]]
+        for (i in seq_along(networks)) {
+            netw <- networks[[i]]
 
             # Avoid overwriting by appending number
             save_name <- file_sequence(name_base = save_names[[if (names_match) i else 1]],
