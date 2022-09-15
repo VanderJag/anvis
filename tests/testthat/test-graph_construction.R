@@ -641,3 +641,74 @@ test_that("sorting by connectivity works for a multiple networks", {
                  width_type = "partcor") %>% anvis(igr_grid = c(1,3)),
                  NA)
 })
+
+
+test_that("addVisAttr produces same result as adjToNet",{
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    net <- adjToNetwork(adj_mats, edge_attrs = "none", node_attrs = "none")
+
+    net_ref <- adjToNetwork(adj_mats, group_vec = group_vec,
+                        edge_attrs = "all", node_attrs = "all", arrange_co = TRUE,
+                        width_type = "partcor")
+
+    net_test <- addVisAttrs(net, group_vec = group_vec,
+                            edge_attrs = "all", node_attrs = "all",
+                            arrange_co = TRUE, width_type = "partcor")
+
+    expect_equal(net_test, net_ref)
+})
+
+
+test_that("addVisAttr works for all network input types",{
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1] %>%
+        {replicate(n = 3, expr = .)}
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    net <- adjToNetwork(adj_mats, edge_attrs = "none", node_attrs = "none")
+    net[[2]] <- net[[2]] %>% igraph::graph_from_graphnel()
+    net[[3]] <- net[[3]] %>% dfs_from_graphNEL()
+
+    net_test <- addVisAttrs(net, group_vec = group_vec,
+                            edge_attrs = "all", node_attrs = "all",
+                            arrange_co = TRUE, width_type = "partcor")
+    # Should produce 3 equal looking plots
+    expect_error(anvis(net_test, igr_grid = c(1,3)),
+                 NA)
+})
+
+
+test_that("addVisAttr maintains graph information for igraph objects",{
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    net <- adjToNetwork(adj_mats, edge_attrs = "none", node_attrs = "none")
+    net <- net %>% igraph::graph_from_graphnel()
+
+    # Set graph attribute
+    igraph::graph_attr(net, name = "layout") <- "circular"
+
+    net_test <- addVisAttrs(net, edge_attrs = "none", node_attrs = "none")
+
+    expect_equal(igraph::graph_attr(net), igraph::graph_attr(net_test))
+})
+
+
+test_that("addVisAttr maintains graph information for graphNEL objects",{
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    net <- adjToNetwork(adj_mats, edge_attrs = "none", node_attrs = "none")
+
+    # Set graph attribute
+    net@graphData$layout <- "circular"
+
+    net_test <- addVisAttrs(net, edge_attrs = "none", node_attrs = "none")
+
+    expect_equal(net, net_test)
+})

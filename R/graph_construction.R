@@ -359,7 +359,7 @@ addVisAttrs <- function(network,
 
     network_dfs <- lapply(network, function (net) {
         if (is(net, "graphNEL")) dfs_from_graphNEL(gr_nel = net)
-        else if (is(net, "igraph")) dfs_from_igraph(igraph_obj = network)
+        else if (is(net, "igraph")) dfs_from_igraph(igraph_obj = net)
         else if (is_network_list(net)) net
     })
 
