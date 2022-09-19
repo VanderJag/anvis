@@ -132,7 +132,7 @@ visIgraph <- function(network,
 
     # Get the values from additional user input or otherwise use the defaults
     edge_width <- plot_params[["edge.width"]] %||%
-        igraph::edge.attributes(graph)[["width"]]
+        igraph::edge.attributes(graph)[["width"]] %||% 1
     edge_color <- plot_params[["edge.color"]] %||%
         igraph::edge.attributes(graph)[["color"]]
     edge_arrowsize <- plot_params[["edge.arrow.size"]] %||% 0.3

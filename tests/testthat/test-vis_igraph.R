@@ -493,3 +493,26 @@ test_that("basic visualization works for list of dataframes input",{
                  NA)
 })
 
+
+test_that("self loops work even when no vis attrs are added",{
+    # When NULL is passed to edge width igraph will keep normal edges but
+    #     discard self loops. Now the code prevents passing NULL, so the
+    #     the problem should be fixed
+
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    net <- adjToNetwork(adj_mats, edge_attrs = "none", node_attrs = "none",
+                        directed = T, self_loops = T, group_vec = group_vec) %>%
+        dfs_from_graphNEL()
+
+    expect_error(visIgraph(net, export_type = "print", edge.width = NULL,
+                           scale_width = 1),
+                 NA)
+})
+
