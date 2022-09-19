@@ -242,7 +242,7 @@ anvis <- function(networks,
             }
 
             # Allow that plots can be arranged in grid
-            par(mfrow= user_dims %||% n2mfrow(n_nets))
+            par(mfrow= user_dims %||% rev(n2mfrow(n_nets)))
         }
 
         # If plots are not saved show them in the R session, to arrange on grid
