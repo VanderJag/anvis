@@ -238,7 +238,9 @@ anvis <- function(networks,
 
             if (vis_save) {
                 start_saving(vis_export_type, vis_export_opts, save_names[[1]])
-                on.exit(if (dev.cur() > 1) dev.off())
+                # Close the device if an error occurs
+                dev_name <- if (vis_export_type == "ps") "postscript" else vis_export_type
+                on.exit(if (names(dev.cur()) == dev_name) dev.off())
             }
 
             # Allow that plots can be arranged in grid
