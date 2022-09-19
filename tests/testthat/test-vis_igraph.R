@@ -185,7 +185,7 @@ test_that("igraph plot saving works in multiple formats", {
                             width_type = "partcor")
 
     withr::with_file(c("network.png", "network.pdf", "network.svg", "network.ps"), {
-        visIgraph(network, radial_labs = T)
+        visIgraph(network, radial_labs = T, export_type = "png")
         visIgraph(network, radial_labs = T, export_type = "svg")
         visIgraph(network, radial_labs = T, export_type = "pdf")
         visIgraph(network, radial_labs = T, export_type = "ps")
@@ -208,9 +208,9 @@ test_that("igraph plot saving creates name series", {
                             width_type = "partcor")
 
     withr::with_file(c("network.png", "network_2.png", "network_3.png"), {
-        visIgraph(network, radial_labs = T)
-        visIgraph(network, radial_labs = T)
-        visIgraph(network, radial_labs = T)
+        visIgraph(network, radial_labs = T, export_type = "png")
+        visIgraph(network, radial_labs = T, export_type = "png")
+        visIgraph(network, radial_labs = T, export_type = "png")
 
         expect_setequal(list.files(pattern = "network"),
                         c("network.png", "network_2.png", "network_3.png"))
@@ -230,7 +230,7 @@ test_that("igraph plot saving works with custom names", {
                             width_type = "partcor")
 
     withr::with_file("my_vis.png", {
-        visIgraph(network, radial_labs = T, save_name = "my_vis")
+        visIgraph(network, radial_labs = T, save_name = "my_vis", export_type = "png")
 
         expect_setequal(list.files(pattern = "my_vis"),
                         c("my_vis.png"))
