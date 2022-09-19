@@ -712,3 +712,23 @@ test_that("addVisAttr maintains graph information for graphNEL objects",{
 
     expect_equal(net, net_test)
 })
+
+
+test_that("self loops are not doubled for undirected network",{
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    # Get network with double self loops
+    net0 <- adjToNetwork(adj_mats, edge_attrs = "all", node_attrs = "all",
+                        directed = F, self_loops = T, group_vec = group_vec) %>%
+        dfs_from_graphNEL()
+
+    net <- net0
+
+    visIgraph(net0)
+    # Remove any self loop duplicate manually
+    net$edges <- dplyr::distinct(net$edges)
+
+    expect_equal(net0, net)
+
+})
