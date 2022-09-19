@@ -70,10 +70,14 @@
 #'     the graphical parameters will be applied to your selected graphical device
 #'     before making the visualization. After the visualization is completed,
 #'     the graphical parameters will be reset to their original value.
-#' @param igr_grid Logical (default: `FALSE`), or a vector with two numbers
+#' @param igr_grid Logical (default: `TRUE`), or a vector with two numbers
 #'     representing grid dimensions. This argument will determine whether igraph
-#'     visualization are be made separately, or arranged on a grid in a single
-#'     image. `TRUE` will automatically determine grid size.
+#'     visualization are made separately, or arranged on a grid in a single
+#'     image. `TRUE` will automatically determine grid size. Note: the defaults
+#'     (`output_type = "igraph"`, and `vis_save = TRUE`) will output to the
+#'     Rstudio graphical device, which will fail to show plots when the plot's
+#'     margins are too large for the plotting window. This issue is more likely
+#'     to occur for larger grids.
 #' @param igr_grid_names Logical (default: `FALSE`) determining whether titles
 #'     should be placed above the individual networks in the grid layout. `TRUE`
 #'     will use the names of the `adj_mats` list to place titles. Alternatively,
@@ -121,7 +125,7 @@ anvis <- function(networks,
                   igr_rad_lab_opts = list(),
                   igr_plot_opts = list(),
                   igr_par_opts = list(),
-                  igr_grid = FALSE,
+                  igr_grid = TRUE,
                   igr_grid_names = FALSE,
                   cyto3.8_check = TRUE,
                   cyto_save_session = FALSE,
