@@ -38,8 +38,8 @@
 #'     appended if a file with the same name and extension already exists in the
 #'     directory used for saving.
 #' @param export_type Character string, one of the following graphical devices:
-#'     'png' (default), 'print' (instead of saving, show the plot in your R
-#'     session), 'pdf', 'svg', 'jpeg', 'tiff', 'bmp', 'ps'.
+#'     'print' (default, instead of saving, show the plot in your R
+#'     session), 'png', 'pdf', 'svg', 'jpeg', 'tiff', 'bmp', 'ps'.
 #' @param export_opts A list with named elements. The list items will be used
 #'     as arguments for the graphical device selected with `export_type`. Check
 #'     which options are available for your graphical device with e.g. [png].
