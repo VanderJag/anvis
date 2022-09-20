@@ -99,6 +99,8 @@ graphNEL_from_dfs <- function(edge_table, node_table, directed) {
                                                 vertices = node_table,
                                                 directed = directed)
     nel <- igraph::as_graphnel(igraph_obj)
+    # Edge attributes are correct and need to be retained
+    edge_attrs <- nel@edgeData@data
 
     # self loops are duplicated when undirected igraph is converted to graphNEL
     #     this doesn't make sense for the visualizations
@@ -109,12 +111,12 @@ graphNEL_from_dfs <- function(edge_table, node_table, directed) {
 
     dbl_self <- n_self == 2
 
+    # Remove the duplicated edges
     nel <- graph::removeEdge(from = graph::nodes(nel)[dbl_self],
                              to = graph::nodes(nel)[dbl_self],
                              graph = nel)
-    graph::edgeL(nel)
-    # TODO
-    graph::edgeData(nel)[!duplicated(graph::edgeData(nel))]
+    # Add the accidentally removed edge attributes
+    nel@edgeData@data <- edge_attrs
 
     return(nel)
 }

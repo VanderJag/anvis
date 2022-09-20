@@ -720,14 +720,19 @@ test_that("self loops are not doubled for undirected network",{
 
     # Get network with double self loops
     net0 <- adjToNetwork(adj_mats, edge_attrs = "all", node_attrs = "all",
-                        directed = F, self_loops = T, group_vec = group_vec) %>%
+                        directed = F, self_loops = T, group_vec = group_vec,
+                        width_type = "partcor") %>%
         dfs_from_graphNEL()
 
     net <- net0
 
-    visIgraph(net0)
+    # visCytoscape(net0, close_session = F, save_session = F, export_image = T)
+
     # Remove any self loop duplicate manually
     net$edges <- dplyr::distinct(net$edges)
+
+    igraph::graph_from_data_frame(d = net$edges, directed = F, vertices = net$vertices) %>%
+        igraph::as_data_frame("both")
 
     expect_equal(net0, net)
 
