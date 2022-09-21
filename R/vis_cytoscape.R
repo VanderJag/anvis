@@ -18,11 +18,11 @@
 #'     When this argument is `TRUE` edges will be drawn with arrows.
 #' @param radial_labs A logical (default `TRUE`) to indicate whether node labels
 #'     should be positioned radially around the circular arrangement of nodes.
-#' @param export_image Logical (default `TRUE`), should the visualization be saved?
-#' @param save_session Logical (default `TRUE`), specifying whether the cytoscape
+#' @param export_image Logical (default `FALSE`), should the visualization be saved?
+#' @param save_session Logical (default `FALSE`), specifying whether the Cytoscape
 #'     session should be saved (as .cys file).
-#' @param close_session Logical (default `TRUE`), should the cytoscape session be
-#'     closed after optional saving?
+#' @param close_session Logical (default equal to `export_image`), should the
+#'     Cytoscape session be closed after optional saving?
 #' @param save_name Character string (default 'network') that will be used to
 #'     name image and session save files. File extensions should not be included
 #'     for this argument, as they will be added automatically. If the name
@@ -56,8 +56,8 @@ visCytoscape <- function(network,
                              FALSE
                          },
                          radial_labs = TRUE,
-                         export_image = TRUE,
-                         save_session = TRUE,
+                         export_image = FALSE,
+                         save_session = FALSE,
                          close_session = export_image,
                          save_name = "network",
                          export_type = c("PNG", "JPEG", "PDF", "SVG", "PS"),

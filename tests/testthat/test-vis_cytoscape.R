@@ -90,7 +90,7 @@ test_that("Cytoscape saves session", {
 
     withr::with_file("temp_network.cys", {
         visCytoscape(network = network,
-                     export_image = FALSE,
+                     export_image = FALSE, close_session = T,
                      save_session = TRUE, save_name = "temp_network")
 
         expect_equal(list.files(pattern = "temp_network"), "temp_network.cys")
@@ -117,7 +117,7 @@ test_that("Cytoscape exports image with name", {
     # perform save and check
     withr::with_file("temp_network.png", {
         visCytoscape(network = network,
-                     save_session = FALSE, export_image = TRUE,
+                     save_session = FALSE, export_image = TRUE, close_session = T,
                      save_name = "temp_network")
 
         expect_equal(list.files(pattern = "temp_network"), "temp_network.png")
@@ -125,7 +125,7 @@ test_that("Cytoscape exports image with name", {
     # don't save and check
     withr::with_file("temp_network.png", {
         visCytoscape(network = network,
-                     save_session = FALSE, export_image = FALSE,
+                     save_session = FALSE, export_image = FALSE, close_session = T,
                      save_name = "temp_network");
         expect_equal(list.files(pattern = "temp_network"), character(0))
     })
@@ -150,7 +150,7 @@ test_that("cytoscape saves image when no name is provided", {
 
     # perform save and check
     withr::with_file("network.png", {
-        visCytoscape(network = network,
+        visCytoscape(network = network, close_session = T,
                      save_session = FALSE, export_image = TRUE)
 
         expect_equal(list.files(pattern = "network"), "network.png")
@@ -177,11 +177,11 @@ test_that("image saving without name works while a previous save is present", {
     # perform save and check
     withr::with_file(list("network.png", "network_2.png", "network_3.png"), {
         visCytoscape(network = network,
-                     save_session = FALSE, export_image = TRUE)
+                     save_session = FALSE, close_session = T, export_image = TRUE)
         visCytoscape(network = network,
-                     save_session = FALSE, export_image = TRUE)
+                     save_session = FALSE, close_session = T, export_image = TRUE)
         visCytoscape(network = network,
-                     save_session = FALSE, export_image = TRUE)
+                     save_session = FALSE, close_session = T, export_image = TRUE)
 
         expect_equal(list.files(pattern = "network"), c("network.png",
                                                         "network_2.png",
@@ -208,11 +208,11 @@ test_that("image saving file name sequence works with non default names", {
 
     # perform save and check
     withr::with_file(list("temp_network.png", "temp_network_2.png", "temp_network_3.png"), {
-        visCytoscape(network = network,
+        visCytoscape(network = network, close_session = T,
                      save_session = FALSE, export_image = TRUE, save_name = "temp_network")
-        visCytoscape(network = network,
+        visCytoscape(network = network, close_session = T,
                      save_session = FALSE, export_image = TRUE, save_name = "temp_network")
-        visCytoscape(network = network,
+        visCytoscape(network = network, close_session = T,
                      save_session = FALSE, export_image = TRUE, save_name = "temp_network")
 
         expect_equal(list.files(pattern = "temp_network"), c("temp_network.png",
@@ -240,11 +240,11 @@ test_that("session saving without name works while a previous save is present", 
 
     # perform save and check
     withr::with_file(list("network.cys", "network_2.cys", "network_3.cys"), {
-        visCytoscape(network = network,
+        visCytoscape(network = network, close_session = T,
                      save_session = TRUE, export_image = FALSE)
-        visCytoscape(network = network,
+        visCytoscape(network = network, close_session = T,
                      save_session = TRUE, export_image = FALSE)
-        visCytoscape(network = network,
+        visCytoscape(network = network, close_session = T,
                      save_session = TRUE, export_image = FALSE)
 
         expect_equal(list.files(pattern = "network"), c("network.cys",
@@ -273,13 +273,13 @@ test_that("image saving file name sequence works with non default names", {
     # perform save and check
     withr::with_file(list("temp_network.cys", "temp_network_2.cys",
                           "temp_network_3.cys"), {
-        visCytoscape(network = network,
+        visCytoscape(network = network, close_session = T,
                      save_session = TRUE, export_image = FALSE,
                      save_name = "temp_network")
-        visCytoscape(network = network,
+        visCytoscape(network = network, close_session = T,
                      save_session = TRUE, export_image = FALSE,
                      save_name = "temp_network")
-        visCytoscape(network = network,
+        visCytoscape(network = network, close_session = T,
                      save_session = TRUE, export_image = FALSE,
                      save_name = "temp_network")
 
@@ -310,12 +310,12 @@ test_that("image and session save number will be matching (default names)", {
     withr::with_file(list("network.cys", "network_2.cys",
                           "network_3.cys", "network_3.png"), {
                               visCytoscape(network = network,
+                                           save_session = TRUE, close_session = T,
+                                           export_image = FALSE)
+                              visCytoscape(network = network, close_session = T,
                                            save_session = TRUE,
                                            export_image = FALSE)
-                              visCytoscape(network = network,
-                                           save_session = TRUE,
-                                           export_image = FALSE)
-                              visCytoscape(network = network,
+                              visCytoscape(network = network, close_session = T,
                                            save_session = TRUE,
                                            export_image = TRUE)
 
@@ -326,13 +326,13 @@ test_that("image and session save number will be matching (default names)", {
     # Check if session adjusts to image names
     withr::with_file(list("network.png", "network_2.png",
                           "network_3.png", "network_3.cys"), {
-                              visCytoscape(network = network,
+                              visCytoscape(network = network, close_session = T,
                                            save_session = FALSE,
                                            export_image = TRUE)
-                              visCytoscape(network = network,
+                              visCytoscape(network = network, close_session = T,
                                            save_session = FALSE,
                                            export_image = TRUE)
-                              visCytoscape(network = network,
+                              visCytoscape(network = network, close_session = T,
                                            save_session = TRUE,
                                            export_image = TRUE)
 
@@ -361,15 +361,15 @@ test_that("image and session save number will be matching (non default names)", 
     # Check if image adjusts to session names
     withr::with_file(list("temp_network.cys", "temp_network_2.cys",
                           "temp_network_3.cys", "temp_network_3.png"), {
-                              visCytoscape(network = network,
+                              visCytoscape(network = network, close_session = T,
                                            save_session = TRUE,
                                            export_image = FALSE,
                                            save_name = "temp_network")
-                              visCytoscape(network = network,
+                              visCytoscape(network = network, close_session = T,
                                            save_session = TRUE,
                                            export_image = FALSE,
                                            save_name = "temp_network")
-                              visCytoscape(network = network,
+                              visCytoscape(network = network, close_session = T,
                                            save_session = TRUE,
                                            export_image = TRUE,
                                            save_name = "temp_network")
@@ -383,15 +383,15 @@ test_that("image and session save number will be matching (non default names)", 
     # Check if session adjusts to image names
     withr::with_file(list("temp_network.png", "temp_network_2.png",
                           "temp_network_3.png", "temp_network_3.cys"), {
-                              visCytoscape(network = network,
+                              visCytoscape(network = network, close_session = T,
                                            save_session = FALSE,
                                            export_image = TRUE,
                                            save_name = "temp_network")
-                              visCytoscape(network = network,
+                              visCytoscape(network = network, close_session = T,
                                            save_session = FALSE,
                                            export_image = TRUE,
                                            save_name = "temp_network")
-                              visCytoscape(network = network,
+                              visCytoscape(network = network, close_session = T,
                                            save_session = TRUE,
                                            export_image = TRUE,
                                            save_name = "temp_network")
@@ -426,10 +426,10 @@ test_that("no error when node or edge attributes are missing", {
     graph::edgeDataDefaults(network2, attr = "weight") <- NULL
     graph::edgeDataDefaults(network2, attr = "width") <- NULL
 
-    expect_error(visCytoscape(network = network,
+    expect_error(visCytoscape(network = network, close_session = T,
                               save_session = FALSE, export_image = FALSE),
                  NA)
-    expect_error(visCytoscape(network = network2,
+    expect_error(visCytoscape(network = network2, close_session = T,
                               save_session = FALSE, export_image = FALSE),
                  NA)
 })
