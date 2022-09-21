@@ -19,7 +19,7 @@ visIgraph(
   rad_lab_opts = list(),
   scale_width = 3.25,
   save_name = "network",
-  export_type = c("png", "print", "pdf", "svg", "jpeg", "tiff", "bmp", "ps"),
+  export_type = c("print", "png", "pdf", "svg", "jpeg", "tiff", "bmp", "ps"),
   export_opts = list(),
   par_opts = list(),
   ...
@@ -61,8 +61,8 @@ appended if a file with the same name and extension already exists in the
 directory used for saving.}
 
 \item{export_type}{Character string, one of the following graphical devices:
-'png' (default), 'print' (instead of saving, show the plot in your R
-session), 'pdf', 'svg', 'jpeg', 'tiff', 'bmp', 'ps'.}
+'print' (default, instead of saving, show the plot in your R
+session), 'png', 'pdf', 'svg', 'jpeg', 'tiff', 'bmp', 'ps'.}
 
 \item{export_opts}{A list with named elements. The list items will be used
 as arguments for the graphical device selected with \code{export_type}. Check

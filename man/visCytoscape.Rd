@@ -16,8 +16,8 @@ visCytoscape(
      FALSE
  },
   radial_labs = TRUE,
-  export_image = TRUE,
-  save_session = TRUE,
+  export_image = FALSE,
+  save_session = FALSE,
   close_session = export_image,
   save_name = "network",
   export_type = c("PNG", "JPEG", "PDF", "SVG", "PS"),
@@ -44,13 +44,13 @@ When this argument is \code{TRUE} edges will be drawn with arrows.}
 \item{radial_labs}{A logical (default \code{TRUE}) to indicate whether node labels
 should be positioned radially around the circular arrangement of nodes.}
 
-\item{export_image}{Logical (default \code{TRUE}), should the visualization be saved?}
+\item{export_image}{Logical (default \code{FALSE}), should the visualization be saved?}
 
-\item{save_session}{Logical (default \code{TRUE}), specifying whether the cytoscape
+\item{save_session}{Logical (default \code{FALSE}), specifying whether the Cytoscape
 session should be saved (as .cys file).}
 
-\item{close_session}{Logical (default \code{TRUE}), should the cytoscape session be
-closed after optional saving?}
+\item{close_session}{Logical (default equal to \code{export_image}), should the
+Cytoscape session be closed after optional saving?}
 
 \item{save_name}{Character string (default 'network') that will be used to
 name image and session save files. File extensions should not be included

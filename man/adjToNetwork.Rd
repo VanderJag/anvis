@@ -16,6 +16,7 @@ adjToNetwork(
   arrange_co = FALSE,
   width_type = NULL,
   colorblind = FALSE,
+  output_as = c("graphNEL", "igraph", "list"),
   edge_color_func = NULL
 )
 }
