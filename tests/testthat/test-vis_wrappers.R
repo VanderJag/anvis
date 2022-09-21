@@ -493,25 +493,25 @@ test_that("igraph grid titles cause warning when requested but adj list unnamed"
 })
 
 
-# test_that("igraph grid titles can be drawn from names of adj_mats list", {
-#     test_call <- deparse(sys.calls()[[1]][1])
-#     skip_if_not(test_call == "test_that()",
-#                 message = "igraph visualizations need to be checked manually")
-#
-#     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
-#     names(adj_mats) <- paste("person", LETTERS[1:3])
-#     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-#
-#     nets <- adjToNetwork(adj_mats = adj_mats, group_vec = group_vec,
-#                          edge_attrs = "all", node_attrs = "all",
-#                          arrange_co = TRUE, width_type = "partcor")
-#
-#     expect_error(
-#         anvis(nets, output_type = "igraph", vis_save = F, igr_grid = c(1,3),
-#               igr_par_opts = list(mar=c(2,4,5,4)),
-#               igr_grid_names = T),
-#         NA)
-# })
+test_that("igraph grid titles can be drawn from names of adj_mats list", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
+    names(adj_mats) <- paste("person", LETTERS[1:3])
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    nets <- adjToNetwork(adj_mats = adj_mats, group_vec = group_vec,
+                         edge_attrs = "all", node_attrs = "all",
+                         arrange_co = TRUE, width_type = "partcor")
+
+    expect_error(
+        anvis(nets, output_type = "igraph", vis_save = F, igr_grid = c(1,3),
+              igr_par_opts = list(mar=c(2,4,5,4)),
+              igr_grid_names = T),
+        NA)
+})
 
 
 test_that("validation of list arguments works", {
@@ -669,4 +669,60 @@ test_that("cytoscape visualizes self loops for directed and undirected networks"
                          self_loops = TRUE)
 
     expect_error(anvis(nets, output_type = "cytoscape", vis_save = F),NA)
+})
+
+
+test_that("anvis makes cytoscape visualization for 3 network types", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "cytoscape visualizations need to be checked manually")
+
+    # Check if cytoscape is active
+    cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+    skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+                message = "this test runs only when cytoscape is active")
+
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    nel <- adjToNetwork(adj_mats = adj_mats, group_vec = group_vec,
+                         edge_attrs = "all", node_attrs = "all",
+                         arrange_co = TRUE, width_type = "partcor", directed = T,
+                         self_loops = TRUE)
+    igr <- igraph::graph_from_graphnel(nel)
+    df <- nel %>% dfs_from_graphNEL()
+
+    expect_error(anvis(nel, output_type = "cytoscape", vis_save = F), NA)
+    expect_error(anvis(igr, output_type = "cytoscape", vis_save = F), NA)
+    # Only the below one will be undirected, to make it directed anvis needs an
+    #     additional argument
+    expect_error(anvis(df, output_type = "cytoscape", vis_save = F), NA)
+})
+
+
+test_that("anvis makes igraph visualization for 3 network types", {
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "igraph visualizations need to be checked manually")
+
+    # Check if cytoscape is active
+    cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+    skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+                message = "this test runs only when cytoscape is active")
+
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    nel <- adjToNetwork(adj_mats = adj_mats, group_vec = group_vec,
+                         edge_attrs = "all", node_attrs = "all",
+                         arrange_co = TRUE, width_type = "partcor", directed = T,
+                         self_loops = TRUE)
+    igr <- igraph::graph_from_graphnel(nel)
+    df <- nel %>% dfs_from_graphNEL()
+
+    expect_error(anvis(nel, output_type = "igraph", vis_save = F), NA)
+    expect_error(anvis(igr, output_type = "igraph", vis_save = F), NA)
+    # Only the below one will be undirected, to make it directed anvis needs an
+    #     additional argument
+    expect_error(anvis(df, output_type = "igraph", vis_save = F), NA)
 })

@@ -80,7 +80,7 @@
 #'     to occur for larger grids.
 #' @param igr_grid_names Logical (default: `FALSE`) determining whether titles
 #'     should be placed above the individual networks in the grid layout. `TRUE`
-#'     will use the names of the `adj_mats` list to place titles. Alternatively,
+#'     will use the names of the `networks` list to place titles. Alternatively,
 #'     a vector with a name for each network can be provided as input for this
 #'     argument.
 #' @param cyto3.8_check Logical (default `TRUE`). Should execution stop if
@@ -176,7 +176,7 @@ anvis <- function(networks,
     if (!(names_match || length(save_names) == 1)) {
         stop("Length of save names must be 1 or matching with number of networks: ",
              "\nℹ Length of `save_names` = ", length(save_names),
-             ", length of `adj_mats` = ", n_nets, ".", call.=FALSE)
+             ", length of `networks` = ", n_nets, ".", call.=FALSE)
     }
 
     # Get edge mode (directed or not?) from network if it wasn't explicitly provided
@@ -227,12 +227,12 @@ anvis <- function(networks,
                 if (length(igr_grid_names) != n_nets) {
                     stop("Grid names must be TRUE, FALSE, or of length matching with number of matrices: ",
                          "\nℹ Length of `igr_grid_names` = ", length(igr_grid_names),
-                         ", length of `adj_mats` = ", n_nets, ".", call.=FALSE)
+                         ", length of `networks` = ", n_nets, ".", call.=FALSE)
                 }
             } else if (isTRUE(igr_grid_names)) {
-                if (length(names(adj_mats)) != n_nets) {
+                if (length(names(networks)) != n_nets) {
                     warning("`igr_grid_names` is TRUE but no names were found in ",
-                            "adjacency matrix list.")
+                            "network list.")
                 }
             }
 
@@ -255,7 +255,7 @@ anvis <- function(networks,
         for (i in seq_along(networks)) {
             # Set plot title for grip plots when it is requested
             if (igr_grid && isTRUE(igr_grid_names)) {
-                igr_plot_opts[["main"]] <- names(adj_mats)[i]
+                igr_plot_opts[["main"]] <- names(networks)[i]
             } else if (igr_grid && !isFALSE(igr_grid_names)) {
                 igr_plot_opts[["main"]] <- igr_grid_names[i]
             }
@@ -303,7 +303,7 @@ anvis <- function(networks,
             if (!(length(netw_xgmml_title) == n_nets || length(netw_xgmml_title) == 1)) {
                 stop("Length of xgmml titles must be 1 or matching with number of matrices: ",
                      "\nℹ Length of `netw_xgmml_title` = ", length(netw_xgmml_title),
-                     ", length of `adj_mats` = ", n_nets, ".", call.=FALSE)
+                     ", length of `networks` = ", n_nets, ".", call.=FALSE)
             }
         }
 

@@ -215,6 +215,8 @@ adjToNetwork <- function(adj_mats,
         adj_mats <- list(adj_mats)
 
     } else if (inherits(adj_mats, "list")) {
+        # Extract network names to reuse them later
+        netw_names <- names(adj_mats)
 
         for (i in seq_along(adj_mats)) {
 
@@ -285,6 +287,8 @@ adjToNetwork <- function(adj_mats,
                           node_table = node_table,
                           directed = directed)
     })
+
+    names(graphNELs) <- netw_names
 
     ## To match user input better, unlist the network when there is only one
     ##    in the list
