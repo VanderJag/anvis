@@ -213,6 +213,8 @@ adjToNetwork <- function(adj_mats,
     if(inherits(adj_mats, "data.frame") == TRUE |
        inherits(adj_mats, "matrix") == TRUE) {
         adj_mats <- list(adj_mats)
+        # This input does not allow providing a name for the network
+        netw_names <- NULL
 
     } else if (inherits(adj_mats, "list")) {
         # Extract network names to reuse them later
