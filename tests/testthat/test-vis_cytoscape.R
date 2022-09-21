@@ -631,3 +631,61 @@ test_that("visualization works with graphNEL input",{
                               export_image = F),
                  NA)
 })
+
+
+test_that("visualization of self loops works for directed network",{
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "cytoscape visualizations need to be checked manually")
+
+    # Test for presence of cytoscape
+    cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+    skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+                message = "this test runs only when cytoscape is active")
+
+    dir_mat <- readRDS(testthat::test_path("fixtures", "directed_adj_matrix.rds"))
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    network <- adjToNetwork(dir_mat,
+                            node_attrs = "all",
+                            edge_attrs = "all",
+                            directed = T,
+                            self_loops = T,
+                            group_vec = group_vec,
+                            width_type = "partcor",
+                            size_type = "cytoscape")
+
+    expect_error(visCytoscape(network = network,
+                              save_session = FALSE, scale_width = 3, close_session = F,
+                              export_image = F, directed = T),
+                 NA)
+})
+
+
+test_that("visualization of self loops works for undirected network",{
+    test_call <- deparse(sys.calls()[[1]][1])
+    skip_if_not(test_call == "test_that()",
+                message = "cytoscape visualizations need to be checked manually")
+
+    # Test for presence of cytoscape
+    cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+    skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+                message = "this test runs only when cytoscape is active")
+
+    dir_mat <- readRDS(testthat::test_path("fixtures", "directed_adj_matrix.rds"))
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    network <- adjToNetwork(dir_mat,
+                            node_attrs = "all",
+                            edge_attrs = "all",
+                            directed = F,
+                            self_loops = T,
+                            group_vec = group_vec,
+                            width_type = "partcor",
+                            size_type = "cytoscape") %>% suppressWarnings()
+
+    expect_error(visCytoscape(network = network,
+                              save_session = FALSE, scale_width = 3, close_session = F,
+                              export_image = F, directed = T),
+                 NA)
+})
