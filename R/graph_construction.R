@@ -203,11 +203,13 @@ adjToNetwork <- function(adj_mats,
                          arrange_co = FALSE,
                          width_type = NULL,
                          colorblind = FALSE,
+                         output_as = c("graphNEL", "igraph", "list"),
                          edge_color_func = NULL) {
 
     # Check which attributes should be added
     node_attrs <- match.arg(node_attrs, several.ok = TRUE)
     edge_attrs <- match.arg(edge_attrs, several.ok = TRUE)
+    output_as <- match.arg(output_as)
 
     # Check if input is adjacency matrix or a list of adj matrices
     if(inherits(adj_mats, "data.frame") == TRUE |
@@ -285,9 +287,19 @@ adjToNetwork <- function(adj_mats,
         node_table <- network$vertices
         edge_table <- network$edges
 
-        graphNEL_from_dfs(edge_table = edge_table,
-                          node_table = node_table,
-                          directed = directed)
+        if (output_as == "graphNEL") {
+            out <- graphNEL_from_dfs(edge_table = edge_table,
+                                  node_table = node_table,
+                                  directed = directed)
+        } else if (output_as == "igraph") {
+            out <- igraph::graph_from_data_frame(edge_table,
+                                                 vertices = node_table,
+                                                 directed = directed)
+        } else {
+            out <- network
+        }
+
+        return(out)
     })
 
     names(graphNELs) <- netw_names

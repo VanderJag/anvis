@@ -735,5 +735,25 @@ test_that("self loops are not doubled for undirected network",{
         igraph::as_data_frame("both")
 
     expect_equal(net0, net)
+})
 
+
+test_that("adjToNetwork creates graphNEL, igraph, and list output",{
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1]
+    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+
+    # Get network with double self loops
+    nel <- adjToNetwork(adj_mats, edge_attrs = "all", node_attrs = "all",
+                        directed = F, self_loops = T, group_vec = group_vec,
+                        width_type = "partcor", output_as = "graphNEL")
+    igr <- adjToNetwork(adj_mats, edge_attrs = "all", node_attrs = "all",
+                        directed = F, self_loops = T, group_vec = group_vec,
+                        width_type = "partcor", output_as = "igraph")
+    df_list <- adjToNetwork(adj_mats, edge_attrs = "all", node_attrs = "all",
+                        directed = F, self_loops = T, group_vec = group_vec,
+                        width_type = "partcor", output_as = "list")
+
+    expect_true(is(nel, "graphNEL"))
+    expect_equal(class(igr), "igraph")
+    expect_equal(class(df_list), "list")
 })
