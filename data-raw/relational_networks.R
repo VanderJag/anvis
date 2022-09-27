@@ -27,6 +27,9 @@ getHighestLinks <- function(matrix, rank.thr=0.3, verbose=FALSE)    {
     return(net)
 }
 
+# When using the PCLRC algorithm please cite the references:
+# DOI: 10.1021/acs.jproteome.5b00344
+# DOI: 10.1021/acs.jproteome.8b00781
 PCLRC.gmm <- function(datamatrix, prob.threshold = 0.95, Niter=1000, frac=0.75, rank.thr=0.3){
 
     # Check if input parameters are in correct range

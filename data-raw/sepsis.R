@@ -1,3 +1,12 @@
+# -------------------------------------------------------------------------
+# When using the PCLRC algorithm please cite the references:
+# DOI: 10.1021/acs.jproteome.5b00344
+# DOI: 10.1021/acs.jproteome.8b00781
+
+# Find more info and a download for PCLRC on the following page:
+# https://www.systemsbiology.nl/download-page/
+# -------------------------------------------------------------------------
+
 # library(magrittr)       # for %>% operator
 
 # Load functions to create adjacency matrix
@@ -37,7 +46,6 @@ sub_groups <- list(
     "Poly-microbial no-septicshock patients" = datamatrix %>% dplyr::rowwise() %>%
         dplyr::filter(Type == "Type I" && Septicshock == 0) %>% rm_info()
 )
-
 
 # Get partial correlations and probability matrix
 vis_data <- lapply(sub_groups, function (x) PCLRC.gmm(x,
