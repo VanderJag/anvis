@@ -62,8 +62,6 @@ for (i in seq_along(sepsis)) {
     for (at in rm_attrs) attr(sepsis[[i]], at) <- NULL
 }
 
-
-
 # Visualization to compare with the other dataset
 ## Create group labels
 # idx_ccl <- which(stringr::str_detect(colnames(sepsis[[1]]), "^CCL"))
