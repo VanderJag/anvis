@@ -251,28 +251,42 @@ anvis <- function(networks,
         #   also print first
         if (!(vis_save) || (vis_save && igr_grid)) vis_export_type <- "print"
 
-        # Create igraph plots
-        for (i in seq_along(networks)) {
-            # Set plot title for grip plots when it is requested
-            if (igr_grid && isTRUE(igr_grid_names)) {
-                igr_plot_opts[["main"]] <- names(networks)[i]
-            } else if (igr_grid && !isFALSE(igr_grid_names)) {
-                igr_plot_opts[["main"]] <- igr_grid_names[i]
-            }
+        # Unclear errors may occur when plot margins are too large
+        tryCatch({
+            # Create igraph plots
+            for (i in seq_along(networks)) {
+                # Set plot title for grip plots when it is requested
+                if (igr_grid && isTRUE(igr_grid_names)) {
+                    igr_plot_opts[["main"]] <- names(networks)[i]
+                } else if (igr_grid && !isFALSE(igr_grid_names)) {
+                    igr_plot_opts[["main"]] <- igr_grid_names[i]
+                }
 
-            do.call(visIgraph,
-                    c(list(networks[[i]],
-                           directed = directed[[if (directed_match) i else 1]],
-                           save_name = save_names[[if (names_match) i else 1]],
-                           export_type = vis_export_type,
-                           export_opts = vis_export_opts,
-                           radial_labs = vis_radial_labs,
-                           scale_width = vis_edge_factor,
-                           rad_lab_opts = igr_rad_lab_opts,
-                           par_opts = igr_par_opts),
-                      igr_plot_opts)
-            )
-        }
+                do.call(visIgraph,
+                        c(list(networks[[i]],
+                               directed = directed[[if (directed_match) i else 1]],
+                               save_name = save_names[[if (names_match) i else 1]],
+                               export_type = vis_export_type,
+                               export_opts = vis_export_opts,
+                               radial_labs = vis_radial_labs,
+                               scale_width = vis_edge_factor,
+                               rad_lab_opts = igr_rad_lab_opts,
+                               par_opts = igr_par_opts),
+                          igr_plot_opts)
+                )
+            }
+        }, error=function(cond) {
+            if (stringr::str_detect(cond$message, "figure margins too large") ||
+                stringr::str_detect(cond$message, "invalid graphics state")) {
+                message("While creating your visualization an error occurred",
+                        " that might be caused by a plot window that is too",
+                        " small to show your visualization. Resizing the plot",
+                        " window, changing the margins size of the visualization",
+                        " or saving the visualization might resolve the issue.")
+            }
+            stop(cond)
+        })
+
 
         if (igr_grid) {
             if (vis_save) dev.off()

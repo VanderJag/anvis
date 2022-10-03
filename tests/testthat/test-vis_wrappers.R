@@ -726,3 +726,29 @@ test_that("anvis makes igraph visualization for 3 network types", {
     #     additional argument
     expect_error(anvis(df, output_type = "igraph", vis_save = F), NA)
 })
+
+
+# test_that("informative errors are raised when plotting window is too small", {
+#     # To reproduce the error that is caught the plotting window of Rstudio
+#     #     must be very narrow. We've detected two possible errors that occur for
+#     #     figure margins that are to large for the plotting window. When the
+#     #     Rstudio graphical device is active (`names(dev.cur()[1]) == "RStudioGD"`)
+#     #     the raised error will be "invalid graphics state". When instead the
+#     #     null device is active `names(dev.cur()[1]) == "null device"` the error
+#     #     will be "figure margins too large".
+#
+#     test_call <- deparse(sys.calls()[[1]][1])
+#     skip_if_not(test_call == "test_that()",
+#                 message = "igraph visualizations need to be checked manually")
+#
+#     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+#
+#     nets <- adjToNetwork(adj_mats = sepsis, group_vec = group_vec,
+#                          edge_attrs = "all", node_attrs = "all",
+#                          arrange_co = TRUE, width_type = "partcor")
+#
+#     expect_message(
+#         anvis(nets, output_type = "igraph", vis_save = F, igr_grid = c(2,6),
+#               igr_grid_names = T), "Resizing plot window") %>%
+#         expect_error()
+# })
