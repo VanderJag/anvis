@@ -14,7 +14,7 @@ library(magrittr)       # for %>% operator
 
 
 # Read a file from doi:10.1016/j.margeo.2005.02.009
-#   on protein levels for patients with sepsis
+#   on element abundance for a deep sea drilling project
 end_comment <- readLines("data-raw/paleo_data_Elemental_dsdp_48_401_thomas_etal2005.tab") %>%
     stringr::str_detect("^\\*/") %>% which()
 datamatrix <- readr::read_tsv("data-raw/paleo_data_Elemental_dsdp_48_401_thomas_etal2005.tab",
@@ -23,10 +23,10 @@ datamatrix <- readr::read_tsv("data-raw/paleo_data_Elemental_dsdp_48_401_thomas_
 
 
 
-# Get partial correlations and probability matrix
+# Get mutual information and probability matrix
 network_for_visualisation <- PCLRC.mi(datamatrix)
 
-# Save just partial correlation values
+# Save just mutual information values
 paleo <- network_for_visualisation$MiMatFiltered
 
 # Remove additional attributes
