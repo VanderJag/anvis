@@ -351,7 +351,7 @@ addVisAttrs <- function(network,
     }
 
     # Check number of matrices for later tests
-    n_mats <- length(network)
+    n_nets <- length(network)
 
     network_type_list <- lapply(seq_along(network), function (i) {
         net <- network[[i]]
@@ -383,22 +383,22 @@ addVisAttrs <- function(network,
 
     # Check if grouping vector is list, if not, turn into list
     if (!is.null(group_vec)) {
-        if (!is.list(group_vec)) {
-            group_vec <- list(group_vec)
-        } else {
-            if (!length(group_vec) == n_mats && !length(group_vec) == 1) {
-                stop("Grouping vector list must be of equal length as adj_mats, or length 1",
-                     "\nℹ Length of `group_vec` = ", length(group_vec),
-                     ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
-            }
+    }
+    if (!is.list(group_vec)) {
+        group_vec <- list(group_vec)
+    } else {
+        if (!length(group_vec) == n_nets && !length(group_vec) == 1) {
+            stop("Grouping vector list must be of equal length as network list, or length 1",
+                 "\nℹ Length of `group_vec` = ", length(group_vec),
+                 ", length of `network` = ", n_nets, ".", call.=FALSE)
         }
     }
 
     if (!is.null(width_type)){
-        if (!(length(width_type) == n_mats || length(width_type) == 1)) {
-            stop("Length of width type must be 1 or matching with number of matrices: ",
+        if (!(length(width_type) == n_nets || length(width_type) == 1)) {
+            stop("Length of width type must be 1 or matching with number of networks: ",
                  "\nℹ Length of `width_type` = ", length(width_type),
-                 ", length of `adj_mats` = ", n_mats, ".", call.=FALSE)
+                 ", length of `networks` = ", n_nets, ".", call.=FALSE)
         }
     }
 
@@ -426,11 +426,11 @@ addVisAttrs <- function(network,
                        node_attrs = node_attrs,
                        edge_attrs = edge_attrs,
                        group_vec = group_vec[[
-                           if (length(group_vec) == n_mats) i else 1]],
+                           if (length(group_vec) == n_nets) i else 1]],
                        group_colors = group_colors,
                        size_type = size_type,
                        width_type = width_type[[
-                           if (length(width_type) == n_mats) i else 1]],
+                           if (length(width_type) == n_nets) i else 1]],
                        edge_color_func = edge_color_func)
     })
 
