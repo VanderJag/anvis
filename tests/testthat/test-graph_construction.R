@@ -675,7 +675,7 @@ test_that("adjToNetwork creates graphNEL, igraph, and list output",{
 })
 
 
-test_that("edge_attr and node_attr do not cause error when default is 'all'",{
+test_that("edge_attr and node_attr as empty arguments adds all attributes",{
     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[[1]]
 
     # Get network with double self loops
