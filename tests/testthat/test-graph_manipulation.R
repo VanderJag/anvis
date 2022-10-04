@@ -153,7 +153,7 @@ test_that("connectivity based on edge weights matches one determined by rowSums"
   # Load adjacency matrix
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
 
-  network <- adjToNetwork(Mat1, directed = T, self_loops = T)
+  network <- adjToNetwork(Mat1, directed = T, self_loops = T, node_attrs = "none")
   network <- dfs_from_graphNEL(network)
   edge_table <- network[["edges"]]
   node_table <- network[["vertices"]]
@@ -173,7 +173,7 @@ test_that("connectivity can be determined when a node has no edges", {
   # Load adjacency matrix
   Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
 
-  network <- adjToNetwork(Mat1, directed = F, self_loops = F)
+  network <- adjToNetwork(Mat1, directed = F, self_loops = F, node_attrs = "none")
   network <- dfs_from_graphNEL(network)
   edge_table <- network[["edges"]]
   edge_table <- edge_table %>% dplyr::rowwise() %>%

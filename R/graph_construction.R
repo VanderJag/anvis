@@ -146,7 +146,7 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #'     The data in the matrix is used as edge weights for the network. Row names
 #'     and column names specify interacting nodes, and are required.
 #' @inheritParams adj_matrix_to_edgelist
-#' @param node_attrs Character strings, one or multiple of 'none', 'all', 'group',
+#' @param node_attrs Character strings, one or multiple of 'none', 'all' (default), 'group',
 #'     'color_group', and 'size'. This argument can be used to choose which
 #'     additional attributes should be added to the node table. Selecting 'group'
 #'     will append a column to the node table that corresponds to `group_vec`.
@@ -154,7 +154,7 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #'     contains a color for each node, selected based on the group of this node.
 #'     Selecting 'size' will add a column with node sizes, that are based on the
 #'     connectivity of the nodes.
-#' @param edge_attrs Character strings, one or multiple of 'none, 'all', 'width',
+#' @param edge_attrs Character strings, one or multiple of 'none, 'all' (default), 'width',
 #'     'color'. This argument can be used to choose which additional attributes
 #'     should be added to the edge table. Selecting 'width' will add a column to
 #'     edge table that contains edge width values. These are determined by scaling
@@ -194,9 +194,9 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 adjToNetwork <- function(adj_mats,
                          directed = FALSE,
                          self_loops = FALSE,
-                         node_attrs = c("none", "all", "group",
+                         node_attrs = c("all", "none", "group",
                                         "color_group", "size"),
-                         edge_attrs = c("none", "all", "width", "color"),
+                         edge_attrs = c("all", "none", "width", "color"),
                          group_vec = NULL,
                          group_colors = NULL,
                          size_type = c("igraph", "cytoscape", "scaled_only"),
@@ -210,6 +210,7 @@ adjToNetwork <- function(adj_mats,
     node_attrs <- match.arg(node_attrs, several.ok = TRUE)
     edge_attrs <- match.arg(edge_attrs, several.ok = TRUE)
     output_as <- match.arg(output_as)
+    size_type <- match.arg(size_type)
 
     # Check if input is adjacency matrix or a list of adj matrices
     if(inherits(adj_mats, "data.frame") == TRUE |
@@ -264,18 +265,16 @@ adjToNetwork <- function(adj_mats,
     })
 
     ## Optionally, add additional attributes for visualizations
-    if (!"none" %in% node_attrs || !"none" %in% edge_attrs) {
-        networks <- addVisAttrs(network = networks,
-                               node_attrs = node_attrs,
-                               edge_attrs = edge_attrs,
-                               group_vec = group_vec,
-                               group_colors = group_colors,
-                               size_type = size_type,
-                               arrange_co = arrange_co,
-                               width_type = width_type,
-                               colorblind = colorblind,
-                               edge_color_func = edge_color_func)
-    }
+    networks <- addVisAttrs(network = networks,
+                            node_attrs = node_attrs,
+                            edge_attrs = edge_attrs,
+                            group_vec = group_vec,
+                            group_colors = group_colors,
+                            size_type = size_type,
+                            arrange_co = arrange_co,
+                            width_type = width_type,
+                            colorblind = colorblind,
+                            edge_color_func = edge_color_func)
 
     ## For a single network the addVisAttrs will remove it from list, the next
     ##    step requires list input
@@ -334,16 +333,21 @@ adjToNetwork <- function(adj_mats,
 #'
 #' @export
 addVisAttrs <- function(network,
-                        node_attrs = c("none", "all", "group",
+                        node_attrs = c("all", "none", "group",
                                        "color_group", "size"),
-                        edge_attrs = c("none", "all", "width", "color"),
+                        edge_attrs = c("all", "none", "width", "color"),
                         group_vec = NULL,
                         group_colors = NULL,
-                        size_type = NULL,
+                        size_type = c("igraph", "cytoscape", "scaled_only"),
                         arrange_co = FALSE,
                         width_type = NULL,
                         colorblind = FALSE,
                         edge_color_func = NULL) {
+
+    # Check which attributes should be added
+    node_attrs <- match.arg(node_attrs, several.ok = TRUE)
+    edge_attrs <- match.arg(edge_attrs, several.ok = TRUE)
+    size_type <- match.arg(size_type)
 
     # Due to vectorization of this function we need to ensure the input is list
     if (!inherits(network, "list") || is_network_list(network)) {
@@ -382,8 +386,10 @@ addVisAttrs <- function(network,
     })
 
     # Check if grouping vector is list, if not, turn into list
-    if (!is.null(group_vec)) {
+    if (is.null(group_vec)) {
+        group_vec <- lapply(network_dfs, function (x) rep("A", nrow(x$vertices)))
     }
+
     if (!is.list(group_vec)) {
         group_vec <- list(group_vec)
     } else {
@@ -497,8 +503,8 @@ addVisAttrsCore <- function(edge_table,
 
     # Adding grouping information
 
-    if ((!"none" %in% node_attrs) &
-        ("all" %in% node_attrs | "group" %in% node_attrs)) {
+    if ("all" %in% node_attrs ||
+        ((!"none" %in% node_attrs) && "group" %in% node_attrs)) {
         if (is.null(group_vec)) {
             stop("Must provide grouping vector:",
                  "\n✖ `group_vec` should not be NULL when `node_attrs` is ",
@@ -510,16 +516,16 @@ addVisAttrsCore <- function(edge_table,
 
     # Add colors for the groups
 
-    if ((!"none" %in% node_attrs) &
-        ("all" %in% node_attrs | "color_group" %in% node_attrs)) {
+    if ("all" %in% node_attrs ||
+        ((!"none" %in% node_attrs) && "color_group" %in% node_attrs)) {
         node_table <- add_colors(node_table, group_colors = group_colors)
     }
 
 
     # Add node size
 
-    if ((!"none" %in% node_attrs) &
-        ("all" %in% node_attrs | "size" %in% node_attrs)) {
+    if ("all" %in% node_attrs ||
+        ((!"none" %in% node_attrs) && "size" %in% node_attrs)) {
         node_table <- node_size_connectivity(node_table = node_table,
                                              edge_table = edge_table,
                                              size_type = size_type)
@@ -527,15 +533,15 @@ addVisAttrsCore <- function(edge_table,
 
     # Convert edge weight to edge width
 
-    if ((!"none" %in% edge_attrs) &
-        ("all" %in% edge_attrs | "width" %in% edge_attrs)) {
+    if ("all" %in% edge_attrs ||
+        ((!"none" %in% edge_attrs) && "width" %in% edge_attrs)) {
         edge_table <- edge_weight_to_widths(edge_table, width_type = width_type)
     }
 
     # Add colour column to edge table
 
-    if ((!"none" %in% edge_attrs) &
-        ("all" %in% edge_attrs | "color" %in% edge_attrs)) {
+    if ("all" %in% edge_attrs ||
+        ((!"none" %in% edge_attrs) && "color" %in% edge_attrs)) {
         edge_table <- weights_to_color(edge_table,
                                        edge_color_func = edge_color_func)
     }

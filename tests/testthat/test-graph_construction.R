@@ -52,15 +52,6 @@ test_that("creating edgelist does not fail when adj. matrix is symmetrical", {
 })
 
 
-test_that("group vector must be provided to add node groups", {
-  Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
-
-  expect_error(adjToNetwork(adj_mats = Mat1, node_attrs = "group",
-                                     edge_attrs = "none", group_vec = NULL),
-               "Must provide grouping vector")
-})
-
-
 test_that("group column is added to node table when 'group' is selected", {
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
@@ -136,14 +127,14 @@ test_that("no additional column is added to node table when 'none' is selected",
 })
 
 
-test_that("no additional column is added to node table when node_attrs is blank", {
+test_that("all additional column are added to node table when node_attrs is blank", {
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adjToNetwork(adj_mats = Mat1,
                                      edge_attrs = "none") %>%
                    {dfs_from_graphNEL(.)[['vertices']]},
-               c("node"), ignore.order = TRUE)
+               c("node", "group", "color", "size"), ignore.order = TRUE)
 })
 
 
@@ -191,88 +182,13 @@ test_that("no additional column is added to edge table when 'none' is selected",
 })
 
 
-test_that("no additional column is added to edge table when edge_attrs is left blank", {
+test_that("all additional column are added to edge table when edge_attrs is left blank", {
   Mat1 <- readRDS(test_path("fixtures", "trail_adjacency_matrix.rds"))
   group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
 
   expect_named(adjToNetwork(adj_mats = Mat1) %>%
                    {dfs_from_graphNEL(.)[['edges']]},
-               c("source", "target", "weight"), ignore.order = TRUE)
-})
-
-
-test_that("creating adj matrix from edgelist creates original matrix",{
-    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
-    names_order <- colnames(Mat1)
-    diag(Mat1) <- 0
-    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-
-    network_list <- adjToNetwork(Mat1,
-                                          node_attrs = "all",
-                                          edge_attrs = "all",
-                                          group_vec = group_vec,
-                                          width_type = "partcor")  %>%
-        dfs_from_graphNEL()
-    edge_table <- network_list[["edges"]]
-    node_table <- network_list[["vertices"]]
-
-    new_adj <- edgelist_to_adj(edge_table) %>% as.matrix()
-    new_adj <- new_adj[names_order,names_order]
-
-    expect_equal(new_adj, Mat1)
-})
-
-
-test_that("error is shown by edge to adj when to weight column is not found", {
-    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
-    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-    network_list <- adjToNetwork(Mat1, width_type = "partcor",
-                                          edge_attrs = "width") %>%
-        dfs_from_graphNEL()
-    edge_table <- network_list[["edges"]]
-    edge_table2 <- edge_table %>% dplyr::select(-weight)
-
-    expect_error(edgelist_to_adj(edge_table2, weight_col = "weight"),
-                 "Weight column name must be NULL or present in names")
-    expect_error(edgelist_to_adj(edge_table2, weight_col = "width"),
-                 NA)
-    expect_error(edgelist_to_adj(edge_table2, weight_col = NULL),
-                 NA)
-})
-
-# the two plots created by this function should be identical
-test_that("other functions can make use of the adj. matrix created from edgelist", {
-    test_call <- deparse(sys.calls()[[1]][1])
-    skip_if_not(test_call == "test_that()",
-                message = "igraph visualizations need to be checked manually")
-
-    # data to make matrix
-    Mat1 <- readRDS(testthat::test_path("fixtures", "trail_adjacency_matrix.rds"))
-    names_order <- colnames(Mat1)
-    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-    network <- adjToNetwork(Mat1,
-                                          node_attrs = "all",
-                                          edge_attrs = "all",
-                                          group_vec = group_vec,
-                                          width_type = "partcor")
-
-
-    expect_error(visIgraph(network, radial_labs = T, export_type = "print"),
-                 NA)
-
-    edge_table <- dfs_from_graphNEL(network)[["edges"]]
-    # use matrix for visualization
-    new_adj <- edgelist_to_adj(edge_table)
-    new_adj <- new_adj[names_order,names_order]
-    network <- adjToNetwork(new_adj,
-                                          node_attrs = "all",
-                                          edge_attrs = "all",
-                                          group_vec = group_vec,
-                                          width_type = "partcor")
-
-
-    expect_error(visIgraph(network, radial_labs = T, export_type = "print"),
-                 NA)
+               c('color', 'source', 'target', 'weight', 'width'), ignore.order = TRUE)
 })
 
 
@@ -756,4 +672,25 @@ test_that("adjToNetwork creates graphNEL, igraph, and list output",{
     expect_true(is(nel, "graphNEL"))
     expect_equal(class(igr), "igraph")
     expect_equal(class(df_list), "list")
+})
+
+
+test_that("edge_attr and node_attr do not cause error when default is 'all'",{
+    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[[1]]
+
+    # Get network with double self loops
+    net_0 <- adjToNetwork(adj_mats, edge_attrs = "none", node_attrs = "none",
+                          output_as = "igraph")
+    net1 <- adjToNetwork(adj_mats, width_type = "partcor", output_as = 'igraph')
+    net2 <- addVisAttrs(net_0)
+
+    edge_ats_1 <- igraph::list.edge.attributes(net1)
+    node_ats_1 <- igraph::list.vertex.attributes(net1)
+    edge_ats_2 <- igraph::list.edge.attributes(net2)
+    node_ats_2 <- igraph::list.vertex.attributes(net2)
+
+    expect_equal(edge_ats_1, c("weight", "width", "color"))
+    expect_equal(node_ats_1, c("name", "group", "color", "size"))
+    expect_equal(edge_ats_2, c("weight", "width", "color"))
+    expect_equal(node_ats_2, c("name", "group", "color", "size"))
 })
