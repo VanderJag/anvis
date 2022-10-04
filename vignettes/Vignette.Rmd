@@ -30,7 +30,10 @@ knitr::opts_chunk$set(
 
 ## About `anvis`
 
-The `anvis` package was developed to automate the process of creating network visualizations. It generates styling for visual properties of networks to highlight the most relevant edges and nodes. In addition, the package can be used to create visualizations for multiple networks at once, allowing for easy comparison of similar networks. For creating visualizations this package relies on software that is popular for network visualization: [Cytoscape](https://cytoscape.org/) (accessed with `r Biocpkg("RCy3")`), and `r CRANpkg("igraph")`. Any user familiar with this software will be easily able to extend and customize the visualizations made with `netvis`. To provide the freedom to make visualizations with other software, `netvis` offers exports of networks and the added attributes (e.g. node size and edge color) in various common formats. To obtain the best results relatively small networks (< 150 nodes) should be used. For visualization of larger networks we refer users to the package `r Biocpkg("netbiov")`, as this package offers a variety of options aimed at visualization of large networks. 
+The `anvis` package was developed to automate the process of creating network visualizations. It generates visual styling for network properties to highlight the most relevant features. In addition, the package is prudently suited to create multiple network comparisons to study different states of the given system. The basic visualization tools and functions (pre-requisite to applying anvis skins) are imported from popular network visualization platforms: `r CRANpkg("igraph")`, and [Cytoscape](https://cytoscape.org/) (via `r Biocpkg("RCy3")`). Any user familiar with these software packages will be easily able to extend and customize the visualizations made with `anvis`. `anvis` can be integrated in any user-defined analysis pipeline, to this end `anvis` offers exports of networks and the added attributes (e.g. node size and edge color) in various common formats. Relatively small networks offer optimal results, so it is recommended to include a maximum of 100 nodes (variables) or 500 edges (similarity scores or similar relations). 
+
+* Brief review of similar packages (create a list and discuss with Sanjee, possibly integrate this: For visualization of larger networks we refer users to the package `r Biocpkg("netbiov")`, as this package offers a variety of options aimed at visualization of large networks.)
+* short motivation of the package (copy from fellowship application)
 
 Paragraph of bioconductor guidelines for vignette introduction section:
 
@@ -47,7 +50,7 @@ BiocManager::install("anvis")
 ```
 
 
-# How to use - Basic example
+## How to use - Basic example
 
 Here we will give some demonstrations. Start by loading the package.
 
@@ -137,12 +140,6 @@ my_cols <- function (n) rev(pals::magma(n))
 * add titles to the grid elements, either by hand or from the names of the list
 * Point out that it can be helpful to change the margins
 
-##  saving of the visualizations
-
-* export types
-* further export options
-
-
 ## Further customization
 
 * give some examples, to demonstrate that the full set of options of igraph is still available
@@ -196,6 +193,11 @@ my_cols <- function (n) rev(pals::magma(n))
 * make a note on how the exports can include the columns that have info for visual styling
 * Example with xgmml and another type
 * file save name and xgmml title
+
+##  saving of the visualizations
+
+* export types
+* further export options
 
 # Session info
 
