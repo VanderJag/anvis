@@ -281,7 +281,7 @@ anvis <- function(networks,
                 message("While creating your visualization an error occurred",
                         " that might be caused by a plot window that is too",
                         " small to show your visualization. Resizing the plot",
-                        " window, changing the margins size of the visualization",
+                        " window in Rstudio, changing the margins size of the visualization",
                         " or saving the visualization might resolve the issue.")
             }
             stop(cond)
