@@ -94,10 +94,10 @@ proteins
 # We find multiple proteins that include "IL", "CCL", or "CXCL" in their name.
 #   These will be assigned their own group label
 groups <- dplyr::case_when(
-    stringr::str_starts(proteins, "IL") ~ "A", 
-    stringr::str_starts(proteins, "CCL") ~ "B", 
-    stringr::str_starts(proteins, "CXCL") ~ "C", 
-    TRUE ~ "D")  # All other proteins will be group "D"
+    stringr::str_starts(proteins, "IL") ~ "group A", 
+    stringr::str_starts(proteins, "CCL") ~ "group B", 
+    stringr::str_starts(proteins, "CXCL") ~ "group C", 
+    TRUE ~ "group D")  # All other proteins will be group D
 groups
 ```
 
@@ -165,6 +165,9 @@ anvis(net1)
 
 
 # Creating networks & Options for adding attributes 
+
+- for vignette to showcase how you can edit parts of the visualizations use the paleo data, but then a partial correlation version of it. use the Mi paleo data for showing edge width algorithms
+    - use sepsis when multiple networks are required
 
 These attributes can all be added in a single step. To demonstrate the available options and their effect we list them below.
 
