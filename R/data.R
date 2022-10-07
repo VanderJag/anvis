@@ -46,6 +46,25 @@
 #' previously been investigated to study the environmental change that
 #' occurred late Paleocene–early Eocene.
 #'
+#' @format ## `paleo_mi`
+#' A matrix made of 38 rows and columns. The rows and columns represent
+#' several trace elements and depth and age of the ground. The cells of the matrix
+#' give mutual information values that give an estimate for the extent to which
+#' the abundance of the elements show the same patterns.
+#'
+#' @source For more information on the raw data or a download thereof:
+#' \url{doi:10.1016/j.margeo.2005.02.009}
+"paleo_mi"
+
+
+#' Partial correlation matrix for elements detected in deep sea drilling
+#'
+#' A dataset containing partial correlation values, that indicate which trace
+#' elements show the same trends in the samples of a deep sea drilling experiment.
+#' The data presented here was generated from element abundance data that has
+#' previously been investigated to study the environmental change that
+#' occurred late Paleocene–early Eocene.
+#'
 #' @format ## `paleo`
 #' A matrix made of 38 rows and columns. The rows and columns represent
 #' several trace elements and depth and age of the ground. The cells of the matrix

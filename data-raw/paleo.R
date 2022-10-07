@@ -22,15 +22,37 @@ datamatrix <- readr::read_tsv("data-raw/paleo_data_Elemental_dsdp_48_401_thomas_
     dplyr::select(-1)
 
 
+# Mutual information dataset prep -----------------------------------------
 
 # Get mutual information and probability matrix
 network_for_visualisation <- PCLRC.mi(datamatrix)
 
 # Save just mutual information values
-paleo <- network_for_visualisation$MiMatFiltered
+paleo_mi <- network_for_visualisation$MiMatFiltered
+
+# Remove additional attributes
+rm_attrs <- attributes(paleo_mi) %>% names() %>% {.[!. %in% c("dim", "dimnames")]}
+for (at in rm_attrs) attr(paleo_mi, at) <- NULL
+
+usethis::use_data(paleo_mi, overwrite = TRUE)
+
+
+# Partial correlation datset prep -----------------------------------------
+
+# Get mutual information and probability matrix
+network_for_visualisation <- PCLRC.gmm(datamatrix,
+                                       prob.threshold = 0.85,
+                                       Niter=1000,
+                                       frac=0.75,
+                                       rank.thr=0.3)
+
+# Save just mutual information values
+paleo <- network_for_visualisation$CorrMatFiltered
 
 # Remove additional attributes
 rm_attrs <- attributes(paleo) %>% names() %>% {.[!. %in% c("dim", "dimnames")]}
 for (at in rm_attrs) attr(paleo, at) <- NULL
 
 usethis::use_data(paleo, overwrite = TRUE)
+
+
