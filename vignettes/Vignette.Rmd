@@ -155,14 +155,78 @@ generate our output). Other options will be showcased later in this vignette.
 anvis(net1)
 ```
 
+# Example data available with package
+
+We have included two datasets with the package so its functions can be 
+tested. `sepsis` relates to protein levels in the blood of hospital patients, 
+`paleo` relates to the abundance of chemical elements detected in ocean ground
+drilling. Throughout this vignette we will use this data to showcase the 
+package's features. More background on the datasets follows:
+
+### `sepsis`
+
+The levels of 36 selected proteins was measured in the plasma of hospital patients 
+with one of three varieties of soft tissue infections (necrotizing soft tissue infection, 
+non-necrotizing soft tissue infection, and cellulitis), and a in surgical control group.
+Patients were divided into 12 groups based on characteristics of their disease. 
+To create the groups, a distinction was made between the type of disease, whether
+patients had a septic shock, and whether their disease had a mono-microbial or 
+poly-microbial origin. Within each group, partial correlation was calculated 
+between the level of the proteins, to generate the `sepsis` dataset. `sepsis`
+is a list with 12 elements, each of which is an adjacency matrix of 36 rows and
+columns, representing the similarity in the levels of the proteins measured in 
+the patients (`?sepsis` for more info).
+
+
+### `paleo`
+
+To study the environmental change that occurred in the late Paleocene-early Eocene
+period, deep sea drilling experiments were performed. The levels of trace elements
+in the sediment of the sea were measured at different depths. The `paleo` dataset
+is an adjacency matrix containing partial correlations that were calculated 
+between the levels of the elements measured in the experiments. `paleo_mi` is 
+a similar adjacancy matrix, containing mutual information values instead of 
+partial correlation values (`?paleo` or `?paleo_mi` for more info). 
+
 # Data preparation
 
-## Brief introduction of example data
-* adjacency matrix
-* edgelist can be used, by converting to to adjacency 
+`anvis` functions can use used with different types of network data. Depending 
+on which data will be available, slightly different functions should be used
 
+## Input of adjacency matrices
 
+Adjacency matrices can be a valid input for creating visualizations with `anvis`, 
+if they are square and contain names for the rows and columns. A single matrix 
+may be used, or a list of several. Before a visualization can be made, the 
+adjacency matrices should be converted into a network object. This can be done
+with the function `adjToNetwork`. As demonstrated below, this function provides
+the option to create directed networks and show self interactions between nodes
+if this is relevant. 
 
+```{r adj_to_net, fig.height=16}
+# create network from 'paleo' (adjacency matrix)
+net1 <- adjToNetwork(paleo)
+net2 <- adjToNetwork(paleo, directed = T)
+net3 <- adjToNetwork(paleo, directed = T, self_loops = T)
+
+# add networks to a list
+paleo_nets <- list("undirected" = net1, "directed" = net2, "self loops" = net3)
+
+# Visualize the networks to show their different properties, for now make 
+#   seperate visualizations for each network instead of showing them in a grid
+anvis(paleo_nets, igr_grid = c(3,1), igr_grid_names = T)
+```
+
+For the `paleo` data having directed edges or self loops is not very informative,
+as the adjacency matrix is symmetrical and all nodes have a perfect partial 
+correlation with themselves. 
+    
+## Input of network objects
+
+The functions of `anvis` allow network data of different classes as input, any
+network of class `"graphNEL"`, `"igraph"`, or list of data frames `"vertices"` 
+and `"edges"` will be valid. To make use of the full set of features of `anvis`,
+networks will require and edge weight attribute. 
 
 # Creating networks & Options for adding attributes 
 
@@ -171,9 +235,7 @@ anvis(net1)
 
 These attributes can all be added in a single step. To demonstrate the available options and their effect we list them below.
 
-* Explanation of criteria for in input:
-    + Square matrix with names
-    + List of matrices, names can be used in grid
+
   
     
 ## Creating basic networks
