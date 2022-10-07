@@ -25,6 +25,6 @@ A dataset containing partial correlation values, that indicate which trace
 elements show the same trends in the samples of a deep sea drilling experiment.
 The data presented here was generated from element abundance data that has
 previously been investigated to study the environmental change that
-occurred late Paleocene–early Eocene.
+occurred late Paleocene-early Eocene.
 }
 \keyword{datasets}

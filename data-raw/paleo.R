@@ -21,6 +21,11 @@ datamatrix <- readr::read_tsv("data-raw/paleo_data_Elemental_dsdp_48_401_thomas_
                               skip = end_comment) %>%
     dplyr::select(-1)
 
+# reorder the elements based on units
+# perc <- names(datamatrix) %>% stringr::str_subset("%")
+# mass <- names(datamatrix) %>% stringr::str_subset("kg")
+# alu <- names(datamatrix) %>% stringr::str_subset("/Al")
+# datamatrix <- datamatrix %>% dplyr::select(1, 2, alu, perc, mass)
 
 # Mutual information dataset prep -----------------------------------------
 
@@ -41,7 +46,7 @@ usethis::use_data(paleo_mi, overwrite = TRUE)
 
 # Get mutual information and probability matrix
 network_for_visualisation <- PCLRC.gmm(datamatrix,
-                                       prob.threshold = 0.85,
+                                       prob.threshold = 0.98,
                                        Niter=1000,
                                        frac=0.75,
                                        rank.thr=0.3)

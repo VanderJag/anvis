@@ -44,7 +44,7 @@
 #' elements show the same trends in the samples of a deep sea drilling experiment.
 #' The MI data presented here was generated from element abundance data that has
 #' previously been investigated to study the environmental change that
-#' occurred late Paleocene–early Eocene.
+#' occurred late Paleocene-early Eocene.
 #'
 #' @format ## `paleo_mi`
 #' A matrix made of 38 rows and columns. The rows and columns represent
@@ -63,7 +63,7 @@
 #' elements show the same trends in the samples of a deep sea drilling experiment.
 #' The data presented here was generated from element abundance data that has
 #' previously been investigated to study the environmental change that
-#' occurred late Paleocene–early Eocene.
+#' occurred late Paleocene-early Eocene.
 #'
 #' @format ## `paleo`
 #' A matrix made of 38 rows and columns. The rows and columns represent
