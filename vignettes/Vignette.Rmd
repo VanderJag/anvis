@@ -314,17 +314,6 @@ paleo_net <- addVisAttrs(paleo_net, node_attrs = "color_group", edge_attrs = "no
 title <- "Network with group and color_group (node 'color' attribute)"
 anvis(paleo_net, igr_plot_opts = list(main = title))
 
-# Custom colors can be used with "color_group"
-#   Since node colors have already been added to the network, previous colors
-#   will be overwritten. 
-custom_cols <- c("#4E79A7", "#F28E2B", "#E15759", "#76B7B2") # from ggthemes::tableau_color_pal(palette = "Tableau 10")(4)
-paleo_net <- addVisAttrs(paleo_net, node_attrs = "color_group", edge_attrs = "none", 
-                         group_colors = custom_cols)
-
-# Show network with custom group colors
-title <- "Network with custom group colors"
-anvis(paleo_net, igr_plot_opts = list(main = title))
-
 # `colorblind` argument can be used to create node colors or overwrite them 
 #   with colorblind accessible colors
 paleo_net <- addVisAttrs(paleo_net, node_attrs = "color_group", edge_attrs = "none", 
@@ -333,14 +322,64 @@ paleo_net <- addVisAttrs(paleo_net, node_attrs = "color_group", edge_attrs = "no
 # Show network with colorblind accessible colors
 title <- "Network with colorblind accessible colors"
 anvis(paleo_net, igr_plot_opts = list(main = title))
-```
 
+# Custom colors can be used with "color_group"
+custom_cols <- c("#4E79A7", "#F28E2B", "#E15759", "#76B7B2") # from ggthemes::tableau_color_pal(palette = "Tableau 10")(4)
+paleo_net <- addVisAttrs(paleo_net, node_attrs = "color_group", edge_attrs = "none", 
+                         group_colors = custom_cols)
+
+# Show network with custom group colors
+title <- "Network with custom group colors"
+anvis(paleo_net, igr_plot_opts = list(main = title))
+```
 
 ## Node size
 
-* How is connectivity calculated
-* nodes can be arranged by size (connectivity)
+A node size attribute can be added to networks with `adjToNetwork` or 
+`addVisAttr`. To determine node sizes, these functions will determine the 
+connectivity of a node by calculating the sum of 
+all edges associated with it. The values for all nodes are scaled to range 0 to 1, and transformed
+with a sigmoid to enhance the contrast of node sizes. Finally, node sizes are 
+multiplied with a constant factor that is determined by the argument 'size_type'.
+This will make sure that different output methods (igraph, Cytoscape, or export)
+can be used with node sizes that match their defaults. 
 
+```{r node_size}
+# Add node size attribute
+paleo_net <- addVisAttrs(paleo_net, node_attrs = "size", edge_attrs = "none")
+
+# Visualize network with node size attribute
+title <- "Network with node size determined by connectivity"
+anvis(paleo_net, igr_plot_opts = list(main = title))
+
+# When using cytoscape for visualization it's best to adjust node sizes to
+#   Cytoscape's defaults. This can be done with the 'size_type' argument
+# paleo_net <- addVisAttrs(paleo_net, node_attrs = "size", edge_attrs = "none", 
+#                          size_type = "cytoscape")
+
+# Visualize network with node size attribute
+# anvis(paleo_net, output_type = "cytoscape")  ## Run only when cytoscape is active
+```
+
+The options that can be used with 'size_type' are: "igraph" (default), so node
+sizes will be in the range 3 to 15, "cytoscape", nodes will be in the range 7 to
+27, and "scaled_only" for nodes in range 0 to 1. 
+
+When node sizes are added, it is possible to reorder the nodes based on the value
+of this attribute. For this, the argument 'arrange_co' (for: arrange by connectivity) 
+can be set to `TRUE`. If groups are found in the data, the nodes will be arranged
+by connectivity inside the groups. We demonstrate this in the following.
+
+```{r arrange_co}
+# Add no new attribute, but arrange by connectivity
+paleo_net <- addVisAttrs(paleo_net, 
+                         node_attrs = "none", 
+                         edge_attrs = "none",
+                         arrange_co = TRUE)
+
+title <- "Network with nodes arranged by connectivity"
+anvis(paleo_net, igr_plot_opts = list(main = title))
+```
 
 ## Edge width
 
