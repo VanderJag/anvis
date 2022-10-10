@@ -22,7 +22,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>", 
+  fig.height = 7, # Set default for showing a single network 
+  fig.width = 8
 )
 ```
 
@@ -85,7 +87,7 @@ more interesting visualizations later. In this case, we
 will assign proteins into groups based on their protein family (shared parts 
 of their name). 
 
-```{r create_groups}
+```{r preview_create_groups}
 # Create a vector that holds the names of all proteins
 proteins <- colnames(data1)
 proteins
@@ -114,7 +116,7 @@ Possible output types for the network are "graphNEL", "igraph", or list of
 dataframes. Here we selected "igraph" as output type, since this will make it 
 easy to demonstrate which attributes have been added to the network. 
 
-```{r}
+```{r preview_attrs}
 # Create network from adjacency, add all attributes for visual styling, 
 #    incorporate group information.
 net1 <- adjToNetwork(adj_mats = data1, 
@@ -151,7 +153,7 @@ visualization, or export the final network in various different formats. For now
 we make a basic visualization using the defaults (`igraph` will be used to 
 generate our output). Other options will be showcased later in this vignette. 
 
-```{r, fig.height=7}
+```{r preview_fig, fig.height=7, fig.width=8}
 anvis(net1)
 ```
 
@@ -188,7 +190,7 @@ between the levels of the elements measured in the experiments. `paleo_mi` is
 a similar adjacancy matrix, containing mutual information values instead of 
 partial correlation values (`?paleo` or `?paleo_mi` for more info). 
 
-# Data preparation
+# Data input
 
 `anvis` functions can use used with different types of network data. Depending 
 on which data will be available, slightly different functions should be used
@@ -220,34 +222,118 @@ anvis(paleo_nets, igr_grid = c(3,1), igr_grid_names = T)
 For the `paleo` data having directed edges or self loops is not very informative,
 as the adjacency matrix is symmetrical and all nodes have a perfect partial 
 correlation with themselves. 
+
+Use of `adjToNetwork` will by default return a network object of class `"graphNEL"`.
+Depending on the workflow that the newly created network will be subjected to, 
+other classes might be more relevant. For these cases, the parameter 'output_as'
+of `adjToNetwork` can be changed to "igraph" or "list". 
+
+The purpose of `adjToNetwork` is twofold. First, as demonstrated, it converts an
+adjacency matrix into a network class object. Second, it adds additional 
+attributes to the network that can be useful to create more clear visualizations.
+Most of these attributes are added by default. However, there is a set of additional 
+options that allows for customization and extension of the attributes that are 
+added. These options will be explained in a following section. For adding 
+attributes to networks, 
+`adjToNetwork` uses the same parameters as the `addVisAttr` function, and can 
+therefore be used in a similar way. 
     
 ## Input of network objects
 
-The functions of `anvis` allow network data of different classes as input, any
-network of class `"graphNEL"`, `"igraph"`, or list of data frames `"vertices"` 
-and `"edges"` will be valid. To make use of the full set of features of `anvis`,
-networks will require and edge weight attribute. 
+With `anvis`, any network of class `"graphNEL"`, `"igraph"`, or list of data 
+frames `"vertices"` and `"edges"` can be manipulated and visualized. To make use of the 
+full set of features of `anvis`, networks require and edge weight attribute. 
 
-# Creating networks & Options for adding attributes 
+To create a styled visualization of a network with `anvis`, first several 
+attributes need to be added. The function `addVisAttr` automates this task. 
+It comes with various options to customize the added attributes. This will
+be elaborated in detail in the next section. 
 
-- for vignette to showcase how you can edit parts of the visualizations use the paleo data, but then a partial correlation version of it. use the Mi paleo data for showing edge width algorithms
-    - use sepsis when multiple networks are required
+# Adding attributes to networks
 
-These attributes can all be added in a single step. To demonstrate the available options and their effect we list them below.
+For making visualizations we add attributes, such as node group, color, and size,
+and edge color and width, to networks. These attributes can all be added in a single step 
+using `adjToNetwork` or `addVisAttr`. To demonstrate the available options we 
+add the attributes individually below, and show which choices are available for
+customization.
 
+## No additional attributes
 
-  
-    
-## Creating basic networks
+Addition of attributes to the network can be skipped, resulting in the most 
+basic visualization. 
 
-* Adding edge directionality or self loops
-    
-    
-## Node grouping
+```{r no_attrs}
+# We create a basic network from the paleo adjacency matrix, without additional
+#   attributes. 
+# This can be skipped if a network object is already available
+paleo_net0 <- adjToNetwork(paleo, node_attrs = "none", edge_attrs = "none")
+
+# In other code chunks paleo_net0 stays without additional attributes,
+#   paleo_net might be altered
+paleo_net <- paleo_net0
+
+# Visualize without adding attributes
+title <- "Network without additional attributes"
+anvis(paleo_net, igr_plot_opts = list(main = title))
+```
+
+## Node groups and colors
+
+Todo: 
 
 * group vector either one for all networks or one for each
-* color of groups can be changed
-* colorblind accessible option is available
+
+Nodes can be assigned to a group. This will place all nodes with the same group
+label adjacent to each other in the visualization. To make distinction of groups easier,
+each group can be assigned a color. The following code chunk shows how the group 
+attribute can be added and which additional options are available.
+
+```{r groups}
+# get the nodes of the network
+nodes_paleo <- graph::nodes(paleo_net)
+
+# Create vector with group labels for each node
+groups_paleo <- dplyr::case_when(
+    stringr::str_detect(nodes_paleo, "%") ~ "group %", 
+    stringr::str_detect(nodes_paleo, "kg") ~ "group mg/kg", 
+    stringr::str_detect(nodes_paleo, "/Al") ~ "group /Al", 
+    TRUE ~ "others") 
+
+# Add group attribute
+paleo_net <- addVisAttrs(paleo_net, node_attrs = "group", edge_attrs = "none", 
+                         group_vec = groups_paleo)
+
+# Visualize grouped network
+title <- "Network with group attribute (nodes reordered)"
+anvis(paleo_net, igr_plot_opts = list(main = title))
+
+# Now also add colors for the groups
+paleo_net <- addVisAttrs(paleo_net, node_attrs = "color_group", edge_attrs = "none")
+
+# Visualization with group colors
+title <- "Network with group and color_group (node 'color' attribute)"
+anvis(paleo_net, igr_plot_opts = list(main = title))
+
+# Custom colors can be used with "color_group"
+#   Since node colors have already been added to the network, previous colors
+#   will be overwritten. 
+custom_cols <- c("#4E79A7", "#F28E2B", "#E15759", "#76B7B2") # from ggthemes::tableau_color_pal(palette = "Tableau 10")(4)
+paleo_net <- addVisAttrs(paleo_net, node_attrs = "color_group", edge_attrs = "none", 
+                         group_colors = custom_cols)
+
+# Show network with custom group colors
+title <- "Network with custom group colors"
+anvis(paleo_net, igr_plot_opts = list(main = title))
+
+# `colorblind` argument can be used to create node colors or overwrite them 
+#   with colorblind accessible colors
+paleo_net <- addVisAttrs(paleo_net, node_attrs = "color_group", edge_attrs = "none", 
+                         colorblind = TRUE)
+
+# Show network with colorblind accessible colors
+title <- "Network with colorblind accessible colors"
+anvis(paleo_net, igr_plot_opts = list(main = title))
+```
 
 
 ## Node size
@@ -281,6 +367,9 @@ my_cols <- function (n) rev(pals::magma(n))
 
 * Colors go from low to high values
 * for positive and negative weights the colors are split into two halves, to be assigned to either sign
+
+
+
 
 
 # Visualizing with igraph
