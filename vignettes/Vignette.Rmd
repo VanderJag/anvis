@@ -383,9 +383,34 @@ anvis(paleo_net, igr_plot_opts = list(main = title))
 
 ## Edge width
 
-* Explain the different types of methods that are available to calculate edge width
-* there is an option available to rescale these edge widths
 * The argument in the wrapper is vectorized
+
+To distinguish between stronger and weaker connections between nodes, the edge 
+'width' attribute can be added to a network. Using edge weight as edge width is 
+not always appropriate, because different ranges of values may be 
+found in networks to describe the strength of the association between nodes. 
+For example, the range of correlations is between
+-1 and 1, while the range of mutual information values may be between 0 and +Inf.
+Consequently, these values need to be transformed so they can be used as edge 
+widths. `anvis` offers 5 algorithms for converting edge weights into useful edge 
+widths. The algorithms can be set via the argument 'width_type' of `adjToNetwork`
+and `addVisAttr`. The possible choices for this argument are: 
+
+"cor", which is intended to be used with Pearson or Spearman correlation values 
+(range -1 to 1). Widths will be the absolute value of the correlation, scaled 
+with a sigmoid. "partcor", which is intended to be use for partial correlation 
+values (range -1 to 1). For this method, edge widths will be the cube root of 
+absolute weight values, scaled with a sigmoid. The option "MI" is meant to be 
+used with weights derived from mutual information (range 0 to +∞). Widths will 
+be the weights divided by to maximum weight, then scaled with a sigmoid. 
+"default_scaling" applies the same transformation as "MI", as a result scaling 
+the any weights to range 0 to 1. "ranked" will calculate percentage ranks of the 
+weight, and scale them with a sigmoid. "percentile" will chose a set of fixed 
+widths determined by the percentile of a weight value. The highest percentiles 
+will be assigned the largest width, but they are the smallest group, vice versa 
+for the lowest percentiles. 
+
+* there is an option available to rescale these edge widths
    
    
 ## Edge colors
