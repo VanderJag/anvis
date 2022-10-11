@@ -381,6 +381,65 @@ title <- "Network with nodes arranged by connectivity"
 anvis(paleo_net, igr_plot_opts = list(main = title))
 ```
 
+## Edge colors
+
+The weight of edges might include positive and negative values, and more or less
+extreme values. A distinction between the different types of edges can be made 
+by changing edge widths (next section) or by changing the color of the edges. 
+`adjToNetwork` or `addVisAttr` can automatically determine edge colors based on
+edge weights. By default, a divergent color palette will be used for edge 
+weights that include negative values. For all positive values, a sequential 
+color palette will be used. The following code demonstrates how the color 
+attribute is added to a network.
+
+```{r edge_color}
+# Add edge color attribute to paleo_net (network with partial correlation edge
+#   weights, containing positive and negative values)
+paleo_net <- addVisAttrs(paleo_net, 
+                         node_attrs = "none", 
+                         edge_attrs = "color")
+
+title <- "Network with edge colors for positive and negative values"
+anvis(paleo_net, igr_plot_opts = list(main = title))
+
+# Create new network for paleo_mi data (network with mutual information edge
+#   weights, containing only positive values). Add same attributes as to the 
+#   paleo_net network. 
+paleo_mi_net <- adjToNetwork(paleo_mi, 
+                         node_attrs = "all", 
+                         group_vec = groups_paleo,
+                         group_colors = custom_cols,
+                         arrange_co = TRUE,
+                         edge_attrs = "color")
+
+title <- "Network with edge colors for exclusively positive values"
+anvis(paleo_mi_net, igr_plot_opts = list(main = title))
+```
+
+### Custom edge color palette
+
+The colors that are used for edges can be customized. For this, use the argument
+'edge_color_func'. As input a function is required that takes as first argument 
+a number, and returns a vector of colors, the length of which equals the input 
+number. The first colors in this vector will be used for low edge weight values, 
+the last colors will be assigned to high values.
+
+Options for providing a custom color palette are using a function from a 
+package (e.g. `r CRANpkg("pals")`), or creating your own (e.g. with 
+`colorRampPalette`).
+
+
+* `Rcoloramp` can be used to convert colors to a spectrum. 
+* demonstrate how to flip color spectra: 
+
+```{r color_func}
+# when the colors are opposite of what you expect
+my_cols <- function (n) rev(pals::magma(n))
+```
+
+* for positive and negative weights the colors are split into two halves, to be assigned to either sign
+
+
 ## Edge width
 
 * The argument in the wrapper is vectorized
@@ -390,7 +449,7 @@ To distinguish between stronger and weaker connections between nodes, the edge
 not always appropriate, because different ranges of values may be 
 found in networks to describe the strength of the association between nodes. 
 For example, the range of correlations is between
--1 and 1, while the range of mutual information values may be between 0 and +Inf.
+-1 and 1, while the range of mutual information values may be between 0 and +∞.
 Consequently, these values need to be transformed so they can be used as edge 
 widths. `anvis` offers 5 algorithms for converting edge weights into useful edge 
 widths. The algorithms can be set via the argument 'width_type' of `adjToNetwork`
@@ -410,27 +469,23 @@ widths determined by the percentile of a weight value. The highest percentiles
 will be assigned the largest width, but they are the smallest group, vice versa 
 for the lowest percentiles. 
 
+Below we demonstrate how the edge width attribute can be added to a network, for
+the case of partial correlation and mutual information data.
+
+```{r width_type}
+# Add edge width attribute
+paleo_net <- addVisAttrs(paleo_net, 
+                         node_attrs = "none", 
+                         edge_attrs = "width")
+
+title <- "Network with edge width attribute"
+anvis(paleo_net, igr_plot_opts = list(main = title))
+```
+
+
 * there is an option available to rescale these edge widths
    
    
-## Edge colors
-
-### Available color spectra
-
-* Diverging and sequential
-    
-### Changing edge colors with custom color function
-
-* `Rcoloramp` can be used to convert colors to a spectrum. 
-* demonstrate how to flip color spectra: 
-
-```{r color_func}
-# when the colors are opposite of what you expect
-my_cols <- function (n) rev(pals::magma(n))
-```
-
-* Colors go from low to high values
-* for positive and negative weights the colors are split into two halves, to be assigned to either sign
 
 
 
