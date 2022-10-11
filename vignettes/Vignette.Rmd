@@ -426,19 +426,57 @@ the last colors will be assigned to high values.
 
 Options for providing a custom color palette are using a function from a 
 package (e.g. `r CRANpkg("pals")`), or creating your own (e.g. with 
-`colorRampPalette`).
-
-
-* `Rcoloramp` can be used to convert colors to a spectrum. 
-* demonstrate how to flip color spectra: 
+`colorRampPalette`). The following code demonstrates how custom edge colors 
+can be used. 
 
 ```{r color_func}
-# when the colors are opposite of what you expect
-my_cols <- function (n) rev(pals::magma(n))
+# we will use a custom sequential color palette for paleo_mi_net edge colors
+# A convenient way to test a color palette is by using the pie function:
+pie(rep(1, 40), col = pals::ocean.oxy(40))
+
+# The first colors will be used for the lowest edge weight values. Here,
+#   we prefer to use darker colors for the greatest edge weights, so the 
+#   color palette needs to be reversed.
+rev_pal <- function (n) rev(pals::ocean.oxy(n))
+
+# We can now add our colors for the edges to the network
+paleo_mi_net <- addVisAttrs(paleo_mi_net, 
+                         node_attrs = "none", 
+                         edge_attrs = "color", 
+                         edge_color_func = rev_pal)
+
+title <- "Network with custom edge colors (sequential)"
+anvis(paleo_mi_net, igr_plot_opts = list(main = title))
+
+
+# For paleo_net we will use a divergent color palette since it contains positive
+#   and negative values. For demonstration purposes, we will use 
+#   `colorRampPalette` to make our own color palette. 
+
+# Create a palette that goes from green to orange
+pal_gwo <- colorRampPalette(colors = c("darkgreen", "white", "darkorange"))
+
+# Optional check if the palette behaves as expected. 
+pie(rep(1, 40), col = pal_gwo(40))
+
+# Add edge color attribute that used our gwo palette
+paleo_net <- addVisAttrs(paleo_net, 
+                         node_attrs = "none", 
+                         edge_attrs = "color",
+                         edge_color_func = pal_gwo)
+
+title <- "Network with custom edge colors (divergent)"
+anvis(paleo_net, igr_plot_opts = list(main = title))
 ```
 
-* for positive and negative weights the colors are split into two halves, to be assigned to either sign
-
+Note: When colors are assigned based on edge weights that include both positive and negative 
+values, the first half of the color palette will be used for the negative values,
+the second half for the positive values. As consequence, it is important that 
+divergent color spectra that are provided with 'edge_color_func' have the colors 
+meant for values close to 0 exactly in the center of the color palette. For 
+example, if the green orange color palette from above returns 40 colors by giving
+10 for the green-white range, and 30 for the white-orange color range, edges 
+would receive unexpected colors.
 
 ## Edge width
 
@@ -473,26 +511,31 @@ Below we demonstrate how the edge width attribute can be added to a network, for
 the case of partial correlation and mutual information data.
 
 ```{r width_type}
-# Add edge width attribute
+# Add edge width attribute, also overwrite gwo edge colors with the default colors
 paleo_net <- addVisAttrs(paleo_net, 
                          node_attrs = "none", 
-                         edge_attrs = "width")
+                         edge_attrs = c("width", "color"), 
+                         width_type = "partcor")
 
-title <- "Network with edge width attribute"
+title <- "Network with edge width attribute (for partial correlation)"
 anvis(paleo_net, igr_plot_opts = list(main = title))
+
+
+# Add edge width attribute to paleo_mi_net, also overwrite edge colors with the 
+#   default colors.
+paleo_mi_net <- addVisAttrs(paleo_mi_net, 
+                         node_attrs = "none", 
+                         edge_attrs = c("width", "color"), 
+                         width_type = "MI")
+
+title <- "Network with edge width attribute (for mutual information)"
+anvis(paleo_mi_net, igr_plot_opts = list(main = title))
 ```
-
-
-* there is an option available to rescale these edge widths
-   
-   
-
-
-
-
 
 # Visualizing with igraph
 
+In some cases it might be helpful to rescale the edge widths, this can be done 
+with the 
 
 ## Changing the layout of the nodes
 
