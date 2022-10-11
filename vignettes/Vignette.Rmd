@@ -532,6 +532,29 @@ title <- "Network with edge width attribute (for mutual information)"
 anvis(paleo_mi_net, igr_plot_opts = list(main = title))
 ```
 
+# Creating visualizations
+
+For displaying and customizing visualizations, `anvis` provides the equally named
+`anvis()` function. Both `r CRANpkg("igraph")`, and [Cytoscape](https://cytoscape.org/) 
+can be used by this function to create visual output. 
+
+To make visualizations with `r CRANpkg("igraph")` no additional actions are 
+required. `r CRANpkg("igraph")` is installed at the same time as the `anvis` 
+package, since it is an essential component. By default `anvis()` uses 
+`r CRANpkg("igraph")` to create visualizations. 
+
+To make visualization with [Cytoscape](https://cytoscape.org/), the software
+needs to be installed separately. We suggest avoiding Cytoscape version 3.8.x,
+since problems may occur when it is accessed with `r Biocpkg("RCy3")` (this 
+package is used by `anvis` to communicate with Cytoscape). To be available for 
+network visualizations with `anvis`, Cytoscape needs to be running on your machine. 
+
+## Creating a basic visualization 
+
+### Igraph
+
+### Cytoscape
+
 # Visualizing with igraph
 
 In some cases it might be helpful to rescale the edge widths, this can be done 
