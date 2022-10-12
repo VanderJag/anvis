@@ -50,13 +50,11 @@ saved. If in any case one of the same names already exist in the save
 target directory, numbers will added to the base file name, and incremented
 until a no file with the same base name and number exists.}
 
-\item{output_type}{Choose 'igraph' (default), 'cytoscape', 'network', or
-'return_only', can be abbreviated. This argument determines the main
+\item{output_type}{Choose 'igraph' (default), 'cytoscape', or 'network',
+can be abbreviated. This argument determines the main
 output of this function. The first two options will make a
 visualization with the respective software. The third option will save
-the networks in a format that is determined by the \code{netw_ext} argument.
-The 'return_only' returns the networks created by this function, just
-like all other options, but without any side effects.}
+the networks in a format that is determined by the \code{netw_ext} argument.}
 
 \item{vis_edge_factor}{Numeric, a number that will be multiplied with the edge
 widths, scaling the edge widths linearly. When this argument is \code{NULL},
