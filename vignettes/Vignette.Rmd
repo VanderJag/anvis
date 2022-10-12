@@ -266,11 +266,7 @@ basic visualization.
 # We create a basic network from the paleo adjacency matrix, without additional
 #   attributes. 
 # This can be skipped if a network object is already available
-paleo_net0 <- adjToNetwork(paleo, node_attrs = "none", edge_attrs = "none")
-
-# In other code chunks paleo_net0 stays without additional attributes,
-#   paleo_net might be altered
-paleo_net <- paleo_net0
+paleo_net <- adjToNetwork(paleo, node_attrs = "none", edge_attrs = "none")
 
 # Visualize without adding attributes
 title <- "Network without additional attributes"
@@ -551,45 +547,133 @@ network visualizations with `anvis`, Cytoscape needs to be running on your machi
 
 ## Creating a basic visualization 
 
+To create a basic visualization a network object is required, with the desired 
+visualization attributes added. We will use a network created from our sepsis 
+example data to demonstrate the available options for customizing visualizations.
+
+```{r}
+# Create grouping vector for the nodes of sepsis data
+proteins <- colnames(sepsis[[1]])
+groups <- dplyr::case_when(
+    stringr::str_starts(proteins, "IL") ~ "group A", 
+    stringr::str_starts(proteins, "CCL") ~ "group B", 
+    stringr::str_starts(proteins, "CXCL") ~ "group C", 
+    TRUE ~ "group D") 
+
+# Create a network with node groups, color, and size, and edge width, and color
+#   attributes added. We'll use the first network from our sepsis example data
+sepsis_net <- adjToNetwork(sepsis[[1]], 
+                           node_attrs = "all", 
+                           edge_attrs = "all", 
+                           width_type = "partcor", 
+                           group_vec = groups)
+```
+
 ### Igraph
+
+To visualize our network with `r CRANpkg("igraph")` no additional argument is 
+required for the `anvis()` function (as igraph is the default). 
+
+```{r}
+# Visualize with igraph (output_type = "igraph" is default)
+anvis(sepsis_net)
+```
 
 ### Cytoscape
 
-# Visualizing with igraph
+Visualizations can be made in cytoscape with `output_type = "cytoscape"`. Since
+the visualizations will be shown in the external software, we insert images in 
+this vignette to show the output from cytoscape that users can expect.
+
+```{r}
+# First we check whether cytoscape is running. When this vignette is generated
+#   cytoscape will not be active. For users replicating the code of this vignette,
+#   with cytoscape running, the check should evaluate to TRUE
+cyto_message <- testthat::capture_condition(RCy3::cytoscapePing())$message
+cyto_active <- cyto_message == "You are connected to Cytoscape!\n"
+
+cyto_active
+
+# Omit check on personal machine
+if (cyto_active) {
+    anvis(sepsis_net, output_type = "cytoscape")
+}
+```
+
+```{r, echo=FALSE, fig.cap="Basic visualization made with Cytoscape. ", out.width = '100%', }
+knitr::include_graphics("cyto_images/basic_vis.png")
+```
+
+* comment on saving of visualizations?
+
+- Options for showing the visualizations
+
+## Scaling edge widths
 
 In some cases it might be helpful to rescale the edge widths, this can be done 
 with the 
 
-## Changing the layout of the nodes
+### Igraph
 
-* Explain how alternative layouts can be used, and how the node order can be maintained
+### Cytoscape
 
+## Setting more node space
+
+### Cytoscape
 
 ## Visualization of multiple networks
+
+### Igraph 
 
 * Options to visualize side by side
 * manually adjust the layout of the grid
 * add titles to the grid elements, either by hand or from the names of the list
 * Point out that it can be helpful to change the margins
 
+### Cytoscape
+
+* Multiple networks can be visualized, but they are either show in the session or saved seperately. No option to show side by side. 
+* One option to show graphs side by side: - [arrange network windows](http://manual.cytoscape.org/en/stable/Quick_Tour_of_Cytoscape.html#:~:text=Arrange%20Network%20Windows)
+* for easiest comparison we recommend igraph
+
+## Changing the layout of the nodes
+
+### Igraph
+
+* Explain how alternative layouts can be used, and how the node order can be maintained
+
+## Directionality
+ 
+### Igraph
+
+* Arrows, self loops
+* Recommend to use cytoscape instead of igraph since it looks neater
+
+### Cytoscape
+
+* Arrows, self loops
+
 ## Further customization
+
+### Igraph
 
 * give some examples, to demonstrate that the full set of options of igraph is still available
     + Change graphical parameter options with `par()` 
     + Various options because of the flexibility of igraph
     + radial labels have their own options to be adjusted
 
-## Directionality
+### Cytoscape
 
-* Arrows, self loops
-* Recommend to use cytoscape instead of igraph since it looks neater
+Using `r Biocpkg("RCy3")` for further customization
 
+* Show at least one example to change some visual features of the network.
 
+##  saving of the visualizations
 
-# Visualizing cytoscape
-
-
-## Options for showing the visualizations
+* export types
+* further export options
+ 
+### Cytoscape
 
 * Save image
     + export types
@@ -598,38 +682,11 @@ with the
 * Close session
 
 
-## Visualization of multiple networks
-
-* Multiple networks can be visualized, but they are either show in the session or saved seperately. No option to show side by side. 
-* One option to show graphs side by side: - [arrange network windows](http://manual.cytoscape.org/en/stable/Quick_Tour_of_Cytoscape.html#:~:text=Arrange%20Network%20Windows)
-* for easiest comparison we recommend igraph
-
-
-## Directionality
-
-* Arrows, self loops
-
-
-## Customization 
-
-* Setting more node space
-
-
-## Using `r Biocpkg("RCy3")` for further customization
-
-* Show at least one example to change some visual features of the network.
-
-
 # Exporting the networks
 
 * make a note on how the exports can include the columns that have info for visual styling
 * Example with xgmml and another type
 * file save name and xgmml title
-
-##  saving of the visualizations
-
-* export types
-* further export options
 
 # Session info
 
