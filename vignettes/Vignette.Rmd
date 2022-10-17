@@ -32,9 +32,25 @@ knitr::opts_chunk$set(
 
 ## About `anvis`
 
-The `anvis` package was developed to automate the process of creating network visualizations. It generates visual styling for network properties to highlight the most relevant features. In addition, the package is prudently suited to create multiple network comparisons to study different states of the given system. The basic visualization tools and functions (pre-requisite to applying anvis skins) are imported from popular network visualization platforms: `r CRANpkg("igraph")`, and [Cytoscape](https://cytoscape.org/) (via `r Biocpkg("RCy3")`). Any user familiar with these software packages will be easily able to extend and customize the visualizations made with `anvis`. `anvis` can be integrated in any user-defined analysis pipeline, to this end `anvis` offers exports of networks and the added attributes (e.g. node size and edge color) in various common formats. Relatively small networks offer optimal results, so it is recommended to include a maximum of 100 nodes (variables) or 500 edges (similarity scores or similar relations). 
+The `anvis` package was developed to automate the process of creating network 
+visualizations. It generates visual styling for network properties to highlight 
+the most relevant features. In addition, the package is prudently suited to 
+create multiple network comparisons to study different states of the given 
+system. The basic visualization tools and functions (pre-requisite to applying 
+anvis skins) are imported from popular network visualization platforms: 
+`r CRANpkg("igraph")`, and [Cytoscape](https://cytoscape.org/) (via 
+`r Biocpkg("RCy3")`). Any user familiar with these software packages will be 
+easily able to extend and customize the visualizations made with `anvis`. `anvis` 
+can be integrated in any user-defined analysis pipeline, to this end `anvis` 
+offers exports of networks and the added attributes (e.g. node size and edge color) 
+in various common formats. Relatively small networks offer optimal results, so 
+it is recommended to include a maximum of 100 nodes (variables) or 500 edges 
+(similarity scores or similar relations). 
 
-* Brief review of similar packages (create a list and discuss with Sanjee, possibly integrate this: For visualization of larger networks we refer users to the package `r Biocpkg("netbiov")`, as this package offers a variety of options aimed at visualization of large networks.)
+* Brief review of similar packages (create a list and discuss with Sanjee, 
+possibly integrate this: For visualization of larger networks we refer users to 
+the package `r Biocpkg("netbiov")`, as this package offers a variety of options 
+aimed at visualization of large networks.)
 * short motivation of the package (copy from fellowship application)
 
 ## Installation
@@ -630,6 +646,27 @@ with the
 * add titles to the grid elements, either by hand or from the names of the list
 * Point out that it can be helpful to change the margins
 
+```{r, fig.width=7, fig.height=12}
+proteins <- colnames(sepsis[[1]])
+groups <- dplyr::case_when(
+    stringr::str_starts(proteins, "IL") ~ "group A",
+    stringr::str_starts(proteins, "CCL") ~ "group B",
+    stringr::str_starts(proteins, "CXCL") ~ "group C",
+    TRUE ~ "group D")
+
+sepsis_net2 <- adjToNetwork(sepsis,
+                           node_attrs = "all",
+                           edge_attrs = "all",
+                           width_type = "partcor",
+                           group_vec = groups,
+                           arrange_co = T)
+
+anvis(sepsis_net2, output_type = "igraph", vis_save = F, igr_grid = c(4,3),
+      igr_par_opts = list(mar=c(2,4,5,4)),
+      igr_grid_names = T)
+```
+
+
 ### Cytoscape
 
 * Multiple networks can be visualized, but they are either show in the session or saved seperately. No option to show side by side. 
@@ -642,7 +679,7 @@ with the
 
 * Explain how alternative layouts can be used, and how the node order can be maintained
 
-## Directionality
+## Directed networks
  
 ### Igraph
 
@@ -653,6 +690,39 @@ with the
 
 * Arrows, self loops
 
+```{r}
+
+```
+
+```{r, echo=FALSE, fig.cap="Directed network visualization made with Cytoscape. ", fig.height=8}
+knitr::include_graphics("cyto_images/directed_net_temp.png")
+
+# Note, currently height and width of cytoscape export cannot be adjusted
+
+# test_that("cytoscape visualizes directed networks", {
+#     test_call <- deparse(sys.calls()[[1]][1])
+#     skip_if_not(test_call == "test_that()",
+#                 message = "cytoscape visualizations need to be checked manually")
+#     # Check if cytoscape is active
+#     cytosc <- RCy3::cytoscapePing() %>% capture_condition()
+#     skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
+#                 message = "this test runs only when cytoscape is active")
+# 
+#     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:2]
+#     adj_mats <- lapply(adj_mats, lower_tri_remix)
+# 
+#     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+# 
+#     nets <- adjToNetwork(adj_mats = adj_mats, group_vec = group_vec,
+#                          edge_attrs = "all", node_attrs = "all",
+#                          arrange_co = TRUE, width_type = "partcor", directed = T)
+# 
+#     expect_error(anvis(nets, output_type = "cytoscape",
+#                        vis_save = T, vis_export_opts = list(height = 7, width = 7)),
+#                  NA)
+# })
+```
+
 ## Further customization
 
 ### Igraph
@@ -661,6 +731,27 @@ with the
     + Change graphical parameter options with `par()` 
     + Various options because of the flexibility of igraph
     + radial labels have their own options to be adjusted
+    
+#### Overwriting visual attributes
+
+```{r}
+anvis(sepsis_net, igr_plot_opts = list(vertex.size = rep(c(5,15), times = 18)))
+```
+
+#### Changing options of `par()` 
+
+```{r}
+# small margins
+anvis(sepsis_net, igr_par_opts = list(mar=c(1,1,1,1)))
+```
+
+
+```{r}
+# large margins
+anvis(sepsis_net, igr_par_opts = list(mar=c(6,6,6,6)))
+
+```
+
 
 ### Cytoscape
 
