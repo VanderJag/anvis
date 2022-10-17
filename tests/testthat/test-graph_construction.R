@@ -24,7 +24,6 @@ test_that("creating edgelist from data frame or matrix gives same result", {
 
   df <- as.data.frame(Mat1)
 
-  # Check if no error occurs
   expect_equal(adj_matrix_to_edgelist(Mat1), adj_matrix_to_edgelist(df))
 })
 
@@ -34,7 +33,6 @@ test_that("creating edgelist throws error when adj. matrix is not symmetrical", 
   mat1 <- matrix(rep(1:3, each = 3), ncol =3, nrow = 3)
   row.names(mat1) <- colnames(mat1) <- c("A", "B", "C")
 
-  # Check if error occurs
   expect_warning(adj_matrix_to_edgelist(mat1), "unequal upper and lower")
 })
 
