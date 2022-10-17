@@ -253,13 +253,14 @@ anvis <- function(networks,
         tryCatch({
             # Create igraph plots
             for (i in seq_along(networks)) {
-                # Set plot title for grip plots when it is requested
+                # Set plot title for grid plots when it is requested
                 if (igr_grid && isTRUE(igr_grid_names)) {
                     igr_plot_opts[["main"]] <- names(networks)[i]
                 } else if (igr_grid && !isFALSE(igr_grid_names)) {
                     igr_plot_opts[["main"]] <- igr_grid_names[i]
                 }
 
+                # Run visualization of networks with visIgraph
                 do.call(visIgraph,
                         c(list(networks[[i]],
                                directed = directed[[if (directed_match) i else 1]],
@@ -273,6 +274,8 @@ anvis <- function(networks,
                           igr_plot_opts)
                 )
             }
+
+            # Extend potentially uninformative error message
         }, error=function(cond) {
             if (stringr::str_detect(cond$message, "figure margins too large") ||
                 stringr::str_detect(cond$message, "invalid graphics state")) {
