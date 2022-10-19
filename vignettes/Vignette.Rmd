@@ -561,6 +561,8 @@ since problems may occur when it is accessed with `r Biocpkg("RCy3")` (this
 package is used by `anvis` to communicate with Cytoscape). To be available for 
 network visualizations with `anvis`, Cytoscape needs to be running on your machine. 
 
+* EXPLAIN THE LOGIC BEHIND THE ARGUMENT NAMING? 
+
 ## Creating a basic visualization 
 
 To create a basic visualization a network object is required, with the desired 
@@ -616,22 +618,49 @@ if (cyto_active) {
 }
 ```
 
-```{r, echo=FALSE, fig.cap="Basic visualization made with Cytoscape. ", out.width = '100%', }
+```{r, echo=FALSE, fig.cap="Basic visualization made with Cytoscape. ", out.width = '100%'}
 knitr::include_graphics("cyto_images/basic_vis.png")
 ```
 
-* comment on saving of visualizations?
-
-- Options for showing the visualizations
+Instead of showing the visualization in your active session of R or Cytoscape,
+it is possible to save to the current working directory (or specified paths).
+For Cytoscape, also session objects can be saved. Details on saving can are 
+discussed in the [Saving](#saving) section of this document.
 
 ## Scaling edge widths
 
 In some cases it might be helpful to rescale the edge widths, this can be done 
-with the 
+with the argument 'vis_edge_factor' of the `anvis()` function. The edge widths 
+that are generated when edge attributes are added to a network will be in the 
+range 0 to 1. This edge width is hardly noticeable in igraph or Cytoscape 
+visualizations. Therefore, using the default for 'vis_edge_factor' (`NULL`), 
+will cause `anvis()` to use scaling values 3.25 for igraph and 2 for Cytoscape. 
+
+As an example for rescaling edge widths we will use more extreme values. For 
+reference, see the example below. 
 
 ### Igraph
 
+* sHOW AS 2x WIDER
+
+```{r}
+# to show igraph edges about 1.5x wider than default, we choose 4.5
+#   as a edge scaling factor
+anvis(sepsis_net, vis_edge_factor = 4.5)
+
+```
+
 ### Cytoscape
+
+```{r}
+# to show igraph edges 1.5x wider, we need to choose 3 as a edge scaling factor
+#   for cytoscape
+if (cyto_active) {
+    anvis(sepsis_net, output_type = "cytoscape", vis_edge_factor = 3)
+}
+```
+
+* INSERT THE IMAGE FOR CYTOSCAPE
 
 ## Setting more node space
 
@@ -759,7 +788,7 @@ Using `r Biocpkg("RCy3")` for further customization
 
 * Show at least one example to change some visual features of the network.
 
-##  saving of the visualizations
+## Saving {#saving}
 
 * export types
 * further export options
