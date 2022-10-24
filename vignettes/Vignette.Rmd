@@ -632,50 +632,79 @@ discussed in the [Saving](#saving) section of this document.
 In some cases it might be helpful to rescale the edge widths, this can be done 
 with the argument 'vis_edge_factor' of the `anvis()` function. The edge widths 
 that are generated when edge attributes are added to a network will be in the 
-range 0 to 1. This edge width is hardly noticeable in igraph or Cytoscape 
-visualizations. Therefore, using the default for 'vis_edge_factor' (`NULL`), 
-will cause `anvis()` to use scaling values 3.25 for igraph and 2 for Cytoscape. 
+range 0 to 1. This edge width is hardly noticeable in `r CRANpkg("igraph")` or 
+[Cytoscape](https://cytoscape.org/) 
+visualizations. Therefore, using the default (`vis_edge_factor = NULL`), 
+will cause `anvis()` to use scaling values 3.25 for `r CRANpkg("igraph")` and 2 
+for [Cytoscape](https://cytoscape.org/) 
 
-As an example for rescaling edge widths we will use more extreme values. For 
-reference, see the example below. 
+In the below example, we show edges with a width that is doubled relative to the
+default.
 
 ### Igraph
 
-* sHOW AS 2x WIDER
-
 ```{r}
-# to show igraph edges about 1.5x wider than default, we choose 4.5
+# to show igraph edges about 2x wider than default, we choose 6.5
 #   as a edge scaling factor
-anvis(sepsis_net, vis_edge_factor = 4.5)
+anvis(sepsis_net, vis_edge_factor = 6.5)
 
 ```
 
 ### Cytoscape
 
 ```{r}
-# to show igraph edges 1.5x wider, we need to choose 3 as a edge scaling factor
+# to show igraph edges 2x wider, we need to choose 4 as a edge scaling factor
 #   for cytoscape
 if (cyto_active) {
-    anvis(sepsis_net, output_type = "cytoscape", vis_edge_factor = 3)
+    anvis(sepsis_net, output_type = "cytoscape", vis_edge_factor = 4)
 }
 ```
 
-* INSERT THE IMAGE FOR CYTOSCAPE
+```{r, echo=FALSE, fig.cap="Visualization with increased edge width, made with Cytoscape. ", out.width = '100%'}
+knitr::include_graphics("cyto_images/double_edge_w.png")
+```
 
 ## Setting more node space
 
+The spacing between nodes can be changed for visualizations made with Cytoscape 
+(`output_type = "cytoscape"`), by using the 'cyto_node_space' argument. 
+Visualizations made with `r CRANpkg("igraph")` are not affected by this argument,
+because `r CRANpkg("igraph")` provides its own methods to choose layouts for 
+nodes.
+
+The use of 'cyto_node_space' is demonstrated below:
+
 ### Cytoscape
+
+```{r}
+# Make a visualization with increased spacing between nodes
+if (cyto_active) {
+    anvis(sepsis_net, output_type = "cytoscape", cyto_node_space = 2)
+}
+```
+```{r, echo=FALSE, fig.cap="Visualization with increased node spacing, made with Cytoscape. ", out.width = '100%'}
+knitr::include_graphics("cyto_images/more_nodespace.png")
+```
 
 ## Visualization of multiple networks
 
-### Igraph 
+`anvis` offers several options that facilitate network comparisons. For instance,
+multiple networks can be shown in a grid with the same node layout for each 
+network. Since [Cytoscape](https://cytoscape.org/) does not support arranging
+visualizations in a grid, we recommend using `r CRANpkg("igraph")` for network
+comparisons. 
 
-* Options to visualize side by side
-* manually adjust the layout of the grid
-* add titles to the grid elements, either by hand or from the names of the list
-* Point out that it can be helpful to change the margins
+To demonstrate visualizations of multiple networks, we first create a network 
+list. Preparation of the networks can be done in a single step, since both 
+`adjToNetwork` and `addVisAttr` can be used on multiple networks at once. 
 
-```{r, fig.width=7, fig.height=12}
+```{r}
+# We will show grouped nodes in the visualization, so we need to create a vector  
+#   with grouping information. Since all adjacency matrices in the list (sepsis) 
+#   contain the same nodes (column names) in the same order, we can make a 
+#   single vector. If each network contained different nodes, or nodes in a 
+#   different order, we would create a list of vectors with group labels, 
+#   with one grouping vector for each network.
 proteins <- colnames(sepsis[[1]])
 groups <- dplyr::case_when(
     stringr::str_starts(proteins, "IL") ~ "group A",
@@ -683,26 +712,73 @@ groups <- dplyr::case_when(
     stringr::str_starts(proteins, "CXCL") ~ "group C",
     TRUE ~ "group D")
 
-sepsis_net2 <- adjToNetwork(sepsis,
+# Convert our list of adjacency matrices into a list of network objects, with
+#   all additional attributes added. 
+net_list <- adjToNetwork(sepsis,
                            node_attrs = "all",
                            edge_attrs = "all",
                            width_type = "partcor",
-                           group_vec = groups,
-                           arrange_co = T)
-
-anvis(sepsis_net2, output_type = "igraph", vis_save = F, igr_grid = c(4,3),
-      igr_par_opts = list(mar=c(2,4,5,4)),
-      igr_grid_names = T)
+                           group_vec = groups)
 ```
 
+### Igraph 
+
+With `r CRANpkg("igraph")` as 'output_type', two options are available to show 
+multiple network visualizations. The argument 'igr_grid' can be used to change 
+between them, `igr_grid = FALSE` for showing networks separately or 
+`igr_grid = TRUE` for showing them combined in a grid. Respectively, 'vis_save' 
+will respond by saving multiple, or a single image. 
+
+Below the first two networks of our list shown seperately:
+
+```{r}
+anvis(net_list[1:2], igr_grid = FALSE)
+```
+
+Next, showing the networks in a grid, this time for all networks:
+
+```{r, fig.width=12, fig.height=10}
+anvis(net_list, igr_grid = TRUE,
+      igr_par_opts = list(mar=c(2,4,5,4)))
+```
+
+The 'igr_grid' argument can be used to manually specify grid dimension, we 
+demonstrate this below:
+
+```{r, fig.width=8, fig.height=12}
+anvis(net_list, igr_grid = c(4,3),
+      igr_par_opts = list(mar=c(2,4,5,4)))
+```
+
+Note that in the above visualizations we adjusted the margins of the networks 
+using 'igr_par_opts', so the node labels are shown completely. More info on this
+using this argument can be found in the 
+[section on changing graphical parameters](#par_opts). 
+
+Further, the above visualizations show titles for the networks. These have been
+extracted from the names of the network list. We can prevent that the names are 
+shown by using `igr_grid_names = FALSE`. Alternatively, we can provide a separate 
+vector with a name for each network.
+
+```{r, fig.width=8, fig.height=4.5}
+grid_titles <- c("case 1", "case 2")
+
+anvis(net_list[1:2], igr_grid = TRUE, igr_grid_names = grid_titles,
+      igr_par_opts = list(mar=c(4,4,4,4)))
+```
+
+* Note on -, and link to arrange_co
 
 ### Cytoscape
 
-* Multiple networks can be visualized, but they are either show in the session or saved seperately. No option to show side by side. 
+* Multiple networks can be visualized, but they are either show in the session or saved separately. No option to show side by side. 
 * One option to show graphs side by side: - [arrange network windows](http://manual.cytoscape.org/en/stable/Quick_Tour_of_Cytoscape.html#:~:text=Arrange%20Network%20Windows)
 * for easiest comparison we recommend igraph
 
 ## Changing the layout of the nodes
+ 
+* ,
+                           arrange_co = T
 
 ### Igraph
 
@@ -767,7 +843,7 @@ knitr::include_graphics("cyto_images/directed_net_temp.png")
 anvis(sepsis_net, igr_plot_opts = list(vertex.size = rep(c(5,15), times = 18)))
 ```
 
-#### Changing options of `par()` 
+#### Changing options of `par()` {#par_opts}
 
 ```{r}
 # small margins
