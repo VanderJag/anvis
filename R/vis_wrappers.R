@@ -76,7 +76,7 @@
 #'     Rstudio graphical device, which will fail to show plots when the plot's
 #'     margins are too large for the plotting window. This issue is more likely
 #'     to occur for larger grids.
-#' @param igr_grid_names Logical (default: `FALSE`) determining whether titles
+#' @param igr_grid_names Logical (default: `TRUE`) determining whether titles
 #'     should be placed above the individual networks in the grid layout. `TRUE`
 #'     will use the names of the `networks` list to place titles. Alternatively,
 #'     a vector with a name for each network can be provided as input for this
@@ -124,7 +124,7 @@ anvis <- function(networks,
                   igr_plot_opts = list(),
                   igr_par_opts = list(),
                   igr_grid = TRUE,
-                  igr_grid_names = FALSE,
+                  igr_grid_names = TRUE,
                   cyto3.8_check = TRUE,
                   cyto_save_session = FALSE,
                   cyto_close_session = vis_save,
@@ -227,12 +227,14 @@ anvis <- function(networks,
                          "\nℹ Length of `igr_grid_names` = ", length(igr_grid_names),
                          ", length of `networks` = ", n_nets, ".", call.=FALSE)
                 }
-            } else if (isTRUE(igr_grid_names)) {
-                if (length(names(networks)) != n_nets) {
-                    warning("`igr_grid_names` is TRUE but no names were found in ",
-                            "network list.")
-                }
             }
+            # Below code make more sense with default igr_grid_names = FALSE
+            #  else if (isTRUE(igr_grid_names)) {
+            #     if (length(names(networks)) != n_nets) {
+            #         warning("`igr_grid_names` is TRUE but no names were found in ",
+            #                 "network list.")
+            #     }
+            # }
 
             if (vis_save) {
                 start_saving(vis_export_type, vis_export_opts, save_names[[1]])
