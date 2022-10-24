@@ -345,7 +345,7 @@ title <- "Network with custom group colors"
 anvis(paleo_net, igr_plot_opts = list(main = title))
 ```
 
-## Node size
+## Node size {#node_size}
 
 A node size attribute can be added to networks with `adjToNetwork` or 
 `addVisAttr`. To determine node sizes, these functions will determine the 
@@ -729,7 +729,7 @@ between them, `igr_grid = FALSE` for showing networks separately or
 `igr_grid = TRUE` for showing them combined in a grid. Respectively, 'vis_save' 
 will respond by saving multiple, or a single image. 
 
-Below the first two networks of our list shown seperately:
+Below the first two networks of our list are shown separately:
 
 ```{r}
 anvis(net_list[1:2], igr_grid = FALSE)
@@ -755,7 +755,7 @@ using 'igr_par_opts', so the node labels are shown completely. More info on this
 using this argument can be found in the 
 [section on changing graphical parameters](#par_opts). 
 
-Further, the above visualizations show titles for the networks. These have been
+Furthermore, the above visualizations show titles for the networks. These have been
 extracted from the names of the network list. We can prevent that the names are 
 shown by using `igr_grid_names = FALSE`. Alternatively, we can provide a separate 
 vector with a name for each network.
@@ -767,22 +767,78 @@ anvis(net_list[1:2], igr_grid = TRUE, igr_grid_names = grid_titles,
       igr_par_opts = list(mar=c(4,4,4,4)))
 ```
 
-* Note on -, and link to arrange_co
-
 ### Cytoscape
 
-* Multiple networks can be visualized, but they are either show in the session or saved separately. No option to show side by side. 
-* One option to show graphs side by side: - [arrange network windows](http://manual.cytoscape.org/en/stable/Quick_Tour_of_Cytoscape.html#:~:text=Arrange%20Network%20Windows)
-* for easiest comparison we recommend igraph
+Cytoscape does not support arranging network is a grid. Visualizing a list of 
+networks in Cytoscape using `anvis()` will display each network in the Cytoscape
+session if `vis_save = FALSE`, or will save each separately if `vis_save = TRUE`.
 
 ## Changing the layout of the nodes
- 
-* ,
-                           arrange_co = T
 
-### Igraph
+By default `anvis` will use circular layouts for network visualizations. The 
+order of the nodes in the circular arrangement is determined by their group and 
+by the order in which they occur in the original data. 
+
+### Arranging nodes by connectivity
+
+Within the circular layout nodes can be rearranged by their connectivity. As 
+demonstrated in the [section on adding network attributes](#node_size), the 
+functions `adjToNetwork` or `addVisAttr`, can be used with `arrange_co = TRUE` 
+to achieve this. If a list of networks is used with these functions, the 
+nodes will be arranged by their connectivity averaged over all networks in the 
+list. As a result, it becomes easy to detect the nodes that have, on average, 
+the strongest connections to other nodes. In addition, the node positions will 
+be identical for each visualized network, facilitating network comparison. 
+
+#### Igraph
+
+```{r, fig.width=8, fig.height=6}
+# Create networks that have their nodes arranged by average connectivity
+net_list2 <- adjToNetwork(sepsis[1:6],
+                         node_attrs = "all",
+                         edge_attrs = "all",
+                         width_type = "partcor",
+                         group_vec = groups, 
+                         arrange_co = TRUE)
+
+# Visualize the networks
+anvis(net_list2,
+      igr_par_opts = list(mar=c(2,4,5,4)))
+```
+
+Note how on average larger nodes within each group are counter-clockwise 
+respective to on average smaller nodes. 
+
+#### Cytoscape
+
+Arranging by connectivity works in the same way as with igraph, but visualizations
+will be made separate instead of in a grid. 
+
+```{r}
+# Make a visualization for the network that has its nodes arranged by 
+#   average connectivity
+if (cyto_active) {
+    anvis(net_list2, output_type = "cytoscape")
+}
+```
+
+Images of the output are omitted here, check igraph visualizations for reference. 
+
+### Custom node layouts
+
+#### Igraph
 
 * Explain how alternative layouts can be used, and how the node order can be maintained
+
+```{r}
+anvis(net_list[[1]], igr_plot_opts = list(layout = igraph::layout.fruchterman.reingold, 
+                                          vertex.label.cex = 0.75, 
+                                          vertex.label.color = "black", 
+                                          vertex.label.family = "sans"),
+      vis_radial_labs = FALSE)
+```
+
+#### Cytoscape
 
 ## Directed networks
  
@@ -794,10 +850,6 @@ anvis(net_list[1:2], igr_grid = TRUE, igr_grid_names = grid_titles,
 ### Cytoscape
 
 * Arrows, self loops
-
-```{r}
-
-```
 
 ```{r, echo=FALSE, fig.cap="Directed network visualization made with Cytoscape. ", fig.height=8}
 knitr::include_graphics("cyto_images/directed_net_temp.png")
