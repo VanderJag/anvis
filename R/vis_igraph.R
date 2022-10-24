@@ -152,8 +152,38 @@ visIgraph <- function(network,
         layout_ord <- igraph::V(graph)
     }
 
-    node_arrangement <- plot_params[["layout"]] %||%
-        igraph::layout_in_circle(graph, order = layout_ord)
+    # If there is user input for layout it must be a function
+    if (!is.null(plot_params[["layout"]])) {
+        if (!is.function(plot_params[["layout"]])) {
+            stop("Must provide function to change graph layout with igraph:",
+            "\nℹ Class of your input for 'layout': ", class(plot_params[["layout"]]),
+            "\n✖ 'layout' should be a function.", call.=FALSE)
+        }
+    }
+
+    # Check if function has been provided for layout, else use default.
+    layout_func <- plot_params[["layout"]] %||%
+        igraph::layout_in_circle
+
+    # Radial labels only make sense with circular layout
+    if (!identical(layout_func, igraph::layout_in_circle)) {
+        if (radial_labs) {
+           warning("Radial label arrangement can only be used with ",
+                   "`igraph::layout_in_circle`. radial_labs = FALSE will ",
+                   "now be used.")
+
+            radial_labs <- FALSE
+        }
+    }
+
+    # Check if node order can be applied to the layout function
+    can_order <- "order" %in% formalArgs(layout_func)
+
+    if (can_order) {
+        node_arrangement <- layout_func(graph, order = layout_ord)
+    } else {
+        node_arrangement <- layout_func(graph)
+    }
 
     # If vertex labels are to be placed radially, there should be none placed
     #   by plot.igraph.
