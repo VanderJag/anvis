@@ -682,6 +682,7 @@ if (cyto_active) {
     anvis(sepsis_net, output_type = "cytoscape", cyto_node_space = 2)
 }
 ```
+
 ```{r, echo=FALSE, fig.cap="Visualization with increased node spacing, made with Cytoscape. ", out.width = '100%'}
 knitr::include_graphics("cyto_images/more_nodespace.png")
 ```
@@ -806,8 +807,9 @@ anvis(net_list2,
       igr_par_opts = list(mar=c(2,4,5,4)))
 ```
 
-Note how on average larger nodes within each group are counter-clockwise 
-respective to on average smaller nodes. 
+Note how larger nodes within each group are counter-clockwise 
+respective to smaller nodes. The position of the nodes of the nodes in their group
+is determined by the sum of the edges (connectivity) averaged over all networks. 
 
 #### Cytoscape
 
@@ -822,27 +824,99 @@ if (cyto_active) {
 }
 ```
 
-Images of the output are omitted here, check igraph visualizations for reference. 
+Images of the output are omitted here, check igraph visualizations for reference.  
 
 ### Custom node layouts
 
+By default, `anvis` will layout networks on a circle with the node labels 
+arranged radially around this circle. This layout reduces overlap of nodes and 
+node labels, and it ensures that the positions of nodes can be constant for 
+easier network comparisons. Below we provide an instruction on how to use 
+alternative layouts.
+
 #### Igraph
 
-* Explain how alternative layouts can be used, and how the node order can be maintained
+The layout of networks made with `r CRANpkg("igraph")` can be changed with the
+'igr_plot_opts' argument of `anvis()`. This argument takes a list with named 
+elements as input. We can provide any of the igraph layout functions for the 
+layout of our network. 
 
 ```{r}
-anvis(net_list[[1]], igr_plot_opts = list(layout = igraph::layout.fruchterman.reingold, 
-                                          vertex.label.cex = 0.75, 
+anvis(net_list[[1]], igr_plot_opts = list(layout = igraph::layout_with_dh, 
+                                          vertex.label.cex = 0.6, 
                                           vertex.label.color = "black", 
                                           vertex.label.family = "sans"),
       vis_radial_labs = FALSE)
 ```
 
+```{r, fig.width=7, fig.height=9}
+# We will use igraph::layout_as_grid for the layout of our network. This 
+#  additional step allows us to alter the number of row and columns for this
+#  layout function.
+layout_func <- function(graph) igraph::layout_on_grid(graph, 
+                                                      width = 4, 
+                                                      height = 9)
+# Use the grid node layout for 4 networks
+#   We adjusted appearance of the node labels, aspect ratio of the node grid, 
+#   and margins of the plots for a more clear image.
+anvis(net_list[1:4], 
+      igr_plot_opts = list(layout = layout_func, 
+                           vertex.label.cex = 0.7, 
+                           vertex.label.color = "black", 
+                           vertex.label.family = "sans", 
+                           asp = 1.4),
+      igr_par_opts = list(mar=c(0,1,1,1)),
+      vis_radial_labs = FALSE)
+```
+
 #### Cytoscape
 
+The features of `anvis` visualizations can be combined with 
+the layout options that are offered by the [Cytoscape](https://cytoscape.org/) 
+software. For this, keep the Cytoscape session open after visualization with 
+`anvis()`, and apply different layouts using the options offered by Cytoscape.
+
+```{r}
+# First create a visualization using anvis(), then apply a different layout in 
+#   cytoscape
+if (cyto_active) {
+    anvis(sepsis_net, 
+          output_type = "cytoscape", 
+          vis_radial_labs = FALSE,
+          cyto_close_session = FALSE)
+}
+```
+
+```{r, echo=FALSE, fig.cap="Visualization with layout changed in Cytoscape.", out.width = '100%'}
+knitr::include_graphics("cyto_images/alt_layout.png")
+```
+
 ## Directed networks
- 
+
+Directed networks will be visualized by `anvis()` with edges that feature 
+curvature and arrows. 
+For network objects of class "graphNEL" or "igraph" the edge mode will be 
+detected automatically, to make the appropriate visualization. We can use the
+argument 'directed' overwrite this automatic behaviour. Generally, we recommend 
+using Cytoscape for creating visualizations of directed networks, as its way of
+preventing overlap of directed edges generally creates more clear visualizations.
+
 ### Igraph
+
+```{r}
+net22 <- adjToNetwork(adj_mats = sepsis[4], group_vec = groups,
+                     edge_attrs = "all", node_attrs = "all",
+                     arrange_co = TRUE, width_type = "partcor", directed = T)
+
+cut(base::unique(sepsis[[4]][which(sepsis[[4]] < 0)]), 50)
+
+anvis(net22)
+
+cut.default
+
+# check why error occurs
+```
+
 
 * Arrows, self loops
 * Recommend to use cytoscape instead of igraph since it looks neater
