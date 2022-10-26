@@ -124,6 +124,12 @@ visIgraph <- function(network,
              class(network), call.=FALSE)
     }
 
+    # Overwrite network mode with directed argument
+    if (directed) {
+        graph <- igraph::as.directed(graph)
+    } else {
+        graph <- igraph::as.undirected(graph)
+    }
 
     # Capture input -----------------------------------------------------------
 
