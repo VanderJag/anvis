@@ -953,10 +953,49 @@ knitr::include_graphics("cyto_images/directed_network.png")
 Some networks may require a few tweaks in addition to the automated 
 visualization that is done by applying `anvis` functions with their default 
 settings. For this, we aimed to integrate the flexibility that the underlying 
-network visualization framework provides. 
+network visualization framework provides, as additional options of the `anvis()`
+function. 
 
 ### Igraph
 
+Users that are familiar with using `r CRANpkg("igraph")` will know of the many
+arguments that can be used to customize visualizations. These options are 
+available with the `anvis()` function through use of the 'igr_plot_opts' argument.
+This argument expect input as a list of name = value pairs, and it will work 
+with any argument that can be used with `plot.igraph` (check the options in the
+documentation by executing `?igraph::plot.igraph`). Below we provide 3 examples 
+of aspects of the visualization that can be adjusted using this argument. 
+
+To change the color of node borders: 
+
+```{r}
+anvis(sepsis_net, 
+      igr_plot_opts = list(vertex.frame.color = "black"))
+```
+
+To overwrite node sizes:
+
+```{r}
+anvis(sepsis_net, 
+      igr_plot_opts = list(vertex.size = rep(c(4,17), times = 18)))
+```
+
+To change the aspect ratio of the visualization:
+
+```{r}
+anvis(sepsis_net, 
+      igr_plot_opts = list(asp = 0.7))
+```
+
+Note: to change the node labels an different argument is available with the
+`anvis()` function: 'igr_rad_lab_opts'. Again, this argument takes a input a 
+list of name = value pairs. Check the documentation of `text()` by running 
+`?text` to see all valid arguments names. We provide one example:
+
+```{r}
+anvis(sepsis_net, 
+      igr_rad_lab_opts = list(col = "darkblue", cex = 1))
+```
 
 * give some examples, to demonstrate that the full set of options of igraph is still available
     + Change graphical parameter options with `par()` 
@@ -965,9 +1004,7 @@ network visualization framework provides.
     
 #### Overwriting visual attributes
 
-```{r}
-anvis(sepsis_net, igr_plot_opts = list(vertex.size = rep(c(5,15), times = 18)))
-```
+
 
 #### Changing options of `par()` {#par_opts}
 
