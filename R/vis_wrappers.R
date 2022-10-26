@@ -192,7 +192,7 @@ anvis <- function(networks,
 
     # Check if length of network mode matches
     directed_match <- length(directed) == n_nets
-    if (!(directed_match || length(save_names) == 1)) {
+    if (!(directed_match || length(directed) == 1)) {
         stop("Length of `directed` must be 1 or matching with number of networks: ",
              "\nℹ Length of `directed` = ", length(directed),
              ", length of `network` = ", n_nets, ".", call.=FALSE)
