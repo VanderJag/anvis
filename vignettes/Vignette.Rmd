@@ -75,8 +75,8 @@ library(anvis)
 
 ### Input data
 
-`anvis` uses network data, which can be provided in multiple formats: 'graphNEL', 
-'igraph', list of dataframes, or adjacency matrix. Two example 
+`anvis` uses network data, which can be provided in multiple formats: `"graphNEL"`, 
+`"igraph"`, list of dataframes, or adjacency matrix. Two example 
 datasets (`sepsis` and `paleo`) are integrated in the package and can be used for 
 trying out the functions of `anvis`. Here, we use `sepsis` to showcase 
 some key features. The `sepsis` dataset
@@ -125,7 +125,7 @@ Before making a visualization, we need to add additional attributes to our data
 that will help with the visual styling of the network. `anvis` provides functions
 to automate this process. The function `adjToNetwork` creates a network from an adjacency
 matrix and adds additional attributes, the function `addVisAttrs` adds attributes
-to an existing network of type "graphNEL", "igraph", or list of dataframes.
+to an existing network of type `"graphNEL"`, `"igraph"`, or list of dataframes.
 
 Since our example data is an adjacency matrix we will use `adjToNetwork` here. 
 Possible output types for the network are "graphNEL", "igraph", or list of 
@@ -895,68 +895,68 @@ knitr::include_graphics("cyto_images/alt_layout.png")
 
 Directed networks will be visualized by `anvis()` with edges that feature 
 curvature and arrows. 
-For network objects of class "graphNEL" or "igraph" the edge mode will be 
-detected automatically, to make the appropriate visualization. We can use the
-argument 'directed' overwrite this automatic behaviour. Generally, we recommend 
+For network objects of class `"graphNEL"` or `"igraph"` the edge mode will be 
+detected automatically, to make the appropriate visualization. Generally, we recommend 
 using Cytoscape for creating visualizations of directed networks, as its way of
 preventing overlap of directed edges generally creates more clear visualizations.
 
-### Igraph
+To demonstrate the visualization of directed networks with igraph and Cytoscape,
+we generate some example data. 
 
 ```{r}
-net22 <- adjToNetwork(adj_mats = sepsis[4], group_vec = groups,
-                     edge_attrs = "all", node_attrs = "all",
-                     arrange_co = TRUE, width_type = "partcor", directed = T)
+# Create an artificial directed network based on sepsis
+dir_adj <- sepsis[[1]]
+#   set half of our symmetric matrix to 0.
+dir_adj[lower.tri(dir_adj)] <- 0
+#   all proteins correlate perfectly with themselves, 
+#     which is not informative. We draw random values
+#     from the edges of the network for self interactions.
+set.seed(11)
+diag(dir_adj) <- sample(x = dir_adj[upper.tri(dir_adj)],
+                        size = length(diag(dir_adj)),
+                        replace = TRUE)
 
-cut(base::unique(sepsis[[4]][which(sepsis[[4]] < 0)]), 50)
-
-anvis(net22)
-
-cut.default
-
-# check why error occurs
+# Create directed network 
+dir_net <- adjToNetwork(adj_mats = dir_adj,
+                        directed = TRUE, self_loops = TRUE,
+                        edge_attrs = "all", node_attrs = "all", 
+                        width_type = "partcor", group_vec = groups, 
+                        arrange_co = TRUE)
 ```
 
+### Igraph
 
-* Arrows, self loops
-* Recommend to use cytoscape instead of igraph since it looks neater
+For `"graphNEL"` or `"igraph"` object the edge mode will be detected 
+automatically. We could overwrite this behavior by setting the 'directed' 
+argument to `FALSE`. 
+
+```{r}
+# Visualize directed network with igraph
+anvis(dir_net)
+```
 
 ### Cytoscape
 
-* Arrows, self loops
+```{r}
+# Visualize directed network with Cytoscape
+if (cyto_active) {
+    anvis(dir_net, output_type = "cytoscape")
+}
+```
 
-```{r, echo=FALSE, fig.cap="Directed network visualization made with Cytoscape. ", fig.height=8}
-knitr::include_graphics("cyto_images/directed_net_temp.png")
-
-# Note, currently height and width of cytoscape export cannot be adjusted
-
-# test_that("cytoscape visualizes directed networks", {
-#     test_call <- deparse(sys.calls()[[1]][1])
-#     skip_if_not(test_call == "test_that()",
-#                 message = "cytoscape visualizations need to be checked manually")
-#     # Check if cytoscape is active
-#     cytosc <- RCy3::cytoscapePing() %>% capture_condition()
-#     skip_if_not(cytosc$message == "You are connected to Cytoscape!\n",
-#                 message = "this test runs only when cytoscape is active")
-# 
-#     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:2]
-#     adj_mats <- lapply(adj_mats, lower_tri_remix)
-# 
-#     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-# 
-#     nets <- adjToNetwork(adj_mats = adj_mats, group_vec = group_vec,
-#                          edge_attrs = "all", node_attrs = "all",
-#                          arrange_co = TRUE, width_type = "partcor", directed = T)
-# 
-#     expect_error(anvis(nets, output_type = "cytoscape",
-#                        vis_save = T, vis_export_opts = list(height = 7, width = 7)),
-#                  NA)
-# })
+```{r, echo=FALSE, fig.cap="Visualization of directed network, generated with Cytoscape.", out.width = '100%'}
+knitr::include_graphics("cyto_images/directed_network.png")
 ```
 
 ## Further customization
 
+Some networks may require a few tweaks in addition to the automated 
+visualization that is done by applying `anvis` functions with their default 
+settings. For this, we aimed to integrate the flexibility that the underlying 
+network visualization framework provides. 
+
 ### Igraph
+
 
 * give some examples, to demonstrate that the full set of options of igraph is still available
     + Change graphical parameter options with `par()` 
