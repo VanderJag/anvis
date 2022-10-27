@@ -842,10 +842,11 @@ elements as input. We can provide any of the igraph layout functions for the
 layout of our network. 
 
 ```{r}
-anvis(net_list[[1]], igr_plot_opts = list(layout = igraph::layout_with_dh, 
-                                          vertex.label.cex = 0.6, 
-                                          vertex.label.color = "black", 
-                                          vertex.label.family = "sans"),
+anvis(net_list[[1]], 
+      igr_plot_opts = list(layout = igraph::layout_with_dh, 
+                           vertex.label.cex = 0.6, 
+                           vertex.label.color = "black", 
+                           vertex.label.family = "sans"),
       vis_radial_labs = FALSE)
 ```
 
@@ -958,13 +959,19 @@ function.
 
 ### Igraph
 
+Visualization made with igraph make use of the igraph framework and the default
+framework of R's graphical devices. Both of these can be conveniently controlled
+with arguments of `anvis()`. 
+
+#### Changing visual attributes
+
 Users that are familiar with using `r CRANpkg("igraph")` will know of the many
 arguments that can be used to customize visualizations. These options are 
 available with the `anvis()` function through use of the 'igr_plot_opts' argument.
 This argument expect input as a list of name = value pairs, and it will work 
 with any argument that can be used with `plot.igraph` (check the options in the
-documentation by executing `?igraph::plot.igraph`). Below we provide 3 examples 
-of aspects of the visualization that can be adjusted using this argument. 
+documentation by executing `?igraph::plot.igraph`). Below we provide a few examples 
+of adjustments that can be made using this argument. 
 
 To change the color of node borders: 
 
@@ -997,49 +1004,120 @@ anvis(sepsis_net,
       igr_rad_lab_opts = list(col = "darkblue", cex = 1))
 ```
 
-* give some examples, to demonstrate that the full set of options of igraph is still available
-    + Change graphical parameter options with `par()` 
-    + Various options because of the flexibility of igraph
-    + radial labels have their own options to be adjusted
-    
-#### Overwriting visual attributes
+We can choose not to add radial labels, in which case we can use 'igr_plot_opts' 
+to alter node label appearance.
 
-
+```{r}
+anvis(sepsis_net, 
+      vis_radial_labs = FALSE,
+      igr_plot_opts = list(vertex.label.color = "grey40"))
+```
 
 #### Changing options of `par()` {#par_opts}
 
+`par()` provides many arguments to set graphical parameters. Changing the options
+of the graphical parameters can be convenient, for example for adjusting the
+margins of network visualizations, to ensure radial labels are show completely.
+`par()` can be directly controlled with the argument 'igr_par_opts', which takes
+a list of name = value pairs as input. Check the options that can be used with 
+this argument by running `?par`.
+
 ```{r}
-# small margins
-anvis(sepsis_net, igr_par_opts = list(mar=c(1,1,1,1)))
+# reducing margins for demonstration
+anvis(sepsis_net, igr_par_opts = list(mar=c(0,0,0,0)))
 ```
 
 
 ```{r}
-# large margins
-anvis(sepsis_net, igr_par_opts = list(mar=c(6,6,6,6)))
+# Changing the background
+anvis(sepsis_net, igr_par_opts = list(bg = "grey20"),
+      igr_rad_lab_opts = list(col = "white"))
 
 ```
 
 
 ### Cytoscape
 
-Using `r Biocpkg("RCy3")` for further customization
+To further customization of networks shown in Cytoscape can be done using the
+`r Biocpkg("RCy3")` package. In the example below we show how the edge line 
+types of a directed network can be changed with `r Biocpkg("RCy3")`.
 
-* Show at least one example to change some visual features of the network.
+```{r}
+if (cyto_active) {
+    # RCy3 allows automated control of Cytoscape networks
+    library(RCy3)
+    
+    # We will change the line style of a directed network
+    # Get the line style options
+    getLineStyles()
+    
+    # Visualize directed network with Cytoscape
+    anvis(dir_net, output_type = "cytoscape")
+    
+    setEdgeLineStyleBypass(edge.names = getAllEdges(),
+                           new.styles = "DOT")
+}
+```
+
+```{r, echo=FALSE, fig.cap="Linetype changed with RCy3.", out.width = '100%'}
+knitr::include_graphics("cyto_images/changed_linetype.png")
+```
 
 ## Saving {#saving}
 
-* export types
-* further export options
- 
+`anvis()` supports saving of visualizations in the following formats: "png" 
+(default), "jpeg", "pdf", "svg" and "ps". These can be chosen with the 
+'vis_export_type' argument, and are compatible with both igraph and Cytoscape. 
+Using 'vis_export_opts' we can specify further preferences for saving, for 
+example by changing the resolution or size of the saved image. 
+
+### Igraph
+
+The following code demonstrates how to save an image with adjusted file type
+and export options.
+
+```{r}
+anvis(sepsis_net,
+      vis_save = T, 
+      vis_export_type = "svg", 
+      vis_export_opts = list(width = 5, height = 5))
+```
+
+```{r, echo=FALSE, fig.cap="The exported svg image. ", out.width = '100%'}
+knitr::include_graphics("igraph_images/saved_image.svg")
+```
+Note: The options provides to 'vis_export_opts' must match with the graphics 
+device that is used for saving. For example `res = 600` may be valid for "png", 
+but not for "svg". The options can be check in the documentation of the 
+graphical device, for example by running `?svg`. 
+
 ### Cytoscape
 
-* Save image
-    + export types
-    + further export options
-* Saving session
-* Close session
+Saving visualizations for Cytoscape works largely the same as for igraph. The
+options used with 'vis_export_opts' must be compatible with `RCy3::exportImage`. 
+To learn which export options are available, check the documentation with 
+`?RCy3::exportImage`. 
 
+```{r}
+# Saving demonstrated
+if (cyto_active) {
+    anvis(sepsis_net, 
+          output_type = "cytoscape",
+          vis_save = T, 
+          vis_export_type = "png", 
+          vis_export_opts = list(resolution = 300))
+}
+```
+
+```{r, echo=FALSE, fig.cap="Resulting image saved as png", out.width = '100%'}
+knitr::include_graphics("cyto_images/image_saving.png")
+```
+
+In addition to exports of images, we can save and close the active cytoscape 
+session. For this, seperate arguments are available with `anvis()`:
+'cyto_save_session', 'cyto_close_session', which can be set to `TRUE` or `FALSE`. 
+By default, the sessions are not saved and the session is closed if an image is
+exported. 
 
 # Exporting the networks
 
