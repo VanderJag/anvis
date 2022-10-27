@@ -18,7 +18,7 @@ anvis(
   igr_plot_opts = list(),
   igr_par_opts = list(),
   igr_grid = TRUE,
-  igr_grid_names = FALSE,
+  igr_grid_names = TRUE,
   cyto3.8_check = TRUE,
   cyto_save_session = FALSE,
   cyto_close_session = vis_save,
@@ -107,7 +107,7 @@ Rstudio graphical device, which will fail to show plots when the plot's
 margins are too large for the plotting window. This issue is more likely
 to occur for larger grids.}
 
-\item{igr_grid_names}{Logical (default: \code{FALSE}) determining whether titles
+\item{igr_grid_names}{Logical (default: \code{TRUE}) determining whether titles
 should be placed above the individual networks in the grid layout. \code{TRUE}
 will use the names of the \code{networks} list to place titles. Alternatively,
 a vector with a name for each network can be provided as input for this
@@ -133,7 +133,8 @@ only increases node spacing for cytoscape visualizations.}
 
 \item{netw_ext}{Character string (default 'XGMML'). When \code{output_type} is
 'network', which file format should be used to save the network? Options
-are 'XGMML', 'table', 'sif', 'tab', 'tgf', 'net'.}
+are 'XGMML', 'table', 'sif', 'tab', 'tgf', 'net'. Learn more about these
+formats in \link[BioNet:saveNetwork]{BioNet::saveNetwork}.}
 
 \item{netw_xgmml_title}{Only used when \code{output_type} is 'network' and \code{netw_ext}
 is 'XGMML'. This argument determines the title attribute of a network

@@ -3,12 +3,32 @@
 \docType{package}
 \name{anvis-package}
 \alias{anvis-package}
-\title{anvis: A package for convenient network visualizations}
+\title{anvis: A package for automated network visualizations}
 \description{
-Here there will be a short package functionality summary later
+This package provides functions aimed at facilitating the network
+visualization workflow. Adjacency matrices and igraph or graphNEL objects
+can be provided as network inputs. Edge weights of input networks will be
+used to infer visual properties of the network, such as node size or edge
+color. These visual properties will be integrated into visualizations that
+are automatically generated with the igraph or Cytoscape software frameworks.
 }
-\section{Foo functions}{
+\section{Network preparation}{
 
-The foo functions ...
+\itemize{
+\item Use \code{adjToNetwork} to convert an adjacency matrix into a network object,
+and to add visual attributes of choice.
+\item Use \code{addVisAttrs} to modify an existing network object by adding
+attributes for visualizations.
+}
+}
+
+\section{Network Visualization}{
+
+\itemize{
+\item \code{anvis()} can be use to visualize networks with added attributes. It
+allows choosing "igraph", "cytoscape", or "network" as output types. The
+first two options will create visualizations, the last option will export
+the network so it can visualized or processed in different software.
+}
 }
 
