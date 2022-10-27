@@ -1076,7 +1076,7 @@ example by changing the resolution or size of the saved image.
 The following code demonstrates how to save an image with adjusted file type
 and export options.
 
-```{r}
+```{r, eval=FALSE}
 anvis(sepsis_net,
       vis_save = T, 
       vis_export_type = "svg", 
@@ -1086,7 +1086,7 @@ anvis(sepsis_net,
 ```{r, echo=FALSE, fig.cap="The exported svg image. ", out.width = '100%'}
 knitr::include_graphics("igraph_images/saved_image.svg")
 ```
-Note: The options provides to 'vis_export_opts' must match with the graphics 
+Note: The options provided to 'vis_export_opts' must match with the graphics 
 device that is used for saving. For example `res = 600` may be valid for "png", 
 but not for "svg". The options can be check in the documentation of the 
 graphical device, for example by running `?svg`. 
@@ -1121,9 +1121,55 @@ exported.
 
 # Exporting the networks
 
-* make a note on how the exports can include the columns that have info for visual styling
-* Example with xgmml and another type
-* file save name and xgmml title
+To use networks modified with `anvis` in different software the 'output_type' 
+of `anvis()` can be set to "network". With this setting, networks can be saved 
+in common formats such as "XGMML", "table", "sif", "tab", "tgf", "net". We show
+network exports with two different file types below.
+
+To export create a network for exporting create a network from an adjacency 
+matrix with `adjToNetwork`, or add attributes to an existing network with 
+`addVisAttrs`.
+
+Creating a network from an adjacency matrix with visual attributes automatically
+inferred by `anvis`. 
+
+```{r}
+# Create grouping vector for the nodes of the network
+proteins <- colnames(sepsis[[1]])
+groups <- dplyr::case_when(
+    stringr::str_starts(proteins, "IL") ~ "group A", 
+    stringr::str_starts(proteins, "CCL") ~ "group B", 
+    stringr::str_starts(proteins, "CXCL") ~ "group C", 
+    TRUE ~ "group D") 
+
+# Create a network with node groups, color, and size, and edge width, and color
+#   attributes added. We'll use the first network from our sepsis example data
+sepsis_net <- adjToNetwork(sepsis[[1]], 
+                           node_attrs = "all", 
+                           edge_attrs = "all", 
+                           width_type = "partcor", 
+                           group_vec = groups)
+```
+
+Saving as xgmml:
+
+```{r, eval=FALSE}
+# Note: xgmml files have an additional network title that we can choose
+anvis(sepsis_net,
+      output_type = "network", 
+      netw_ext = "XGMML", 
+      netw_xgmml_title = "Hospital patients")
+```
+
+Saving a list of networks as "table" with custom names:
+
+```{r, eval=FALSE}
+# Save all our networks as tab separated edge table and node table
+anvis(net_list,
+      output_type = "network", 
+      netw_ext = "table",
+      save_names = names(net_list))
+```
 
 # Session info
 
