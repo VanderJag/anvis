@@ -97,7 +97,8 @@
 #'     only increases node spacing for cytoscape visualizations.
 #' @param netw_ext Character string (default 'XGMML'). When `output_type` is
 #'     'network', which file format should be used to save the network? Options
-#'     are 'XGMML', 'table', 'sif', 'tab', 'tgf', 'net'.
+#'     are 'XGMML', 'table', 'sif', 'tab', 'tgf', 'net'. Learn more about these
+#'     formats in [BioNet::saveNetwork].
 #' @param netw_xgmml_title Only used when `output_type` is 'network' and `netw_ext`
 #'     is 'XGMML'. This argument determines the title attribute of a network
 #'     when it's saved as XGMML file. Possible values are `NULL` (default), to use
