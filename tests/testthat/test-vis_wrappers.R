@@ -754,7 +754,7 @@ test_that("anvis makes igraph visualization for 3 network types", {
 # })
 
 
-# test_that("100 nodes is a reasonable limit for easy to interpret visualizations", {
+# test_that("100 nodes is a reasonable limit for easy to interpret visualizations made with igraph", {
 #     # Choose
 #     n <- 100
 #     # making a network from multiple times the existing network, n is nearest multiple
@@ -783,8 +783,44 @@ test_that("anvis makes igraph visualization for 3 network types", {
 #                         self_loops = F)
 #
 #     # check nr of non 0 edges
-#     n_edges <- sum(xl_mat[xl_mat %>% upper.tri()] > 0)
+#     n_edges <- sum(abs(xl_mat[xl_mat %>% upper.tri()]) > 0)
 #     expect_error(anvis(nel, output_type = "igraph", vis_save = T,
+#                        save_names = paste0("network_nodes_", n, "_edges_", n_edges)),
+#                  NA)
+# })
+#
+#
+# test_that("250 nodes is a reasonable limit for easy to interpret visualizations made with cytoscape", {
+#     # Choose
+#     n <- 250
+#     # making a network from multiple times the existing network, n is nearest multiple
+#     reps <- ceiling(n / 36)
+#     n <- reps * 36
+#
+#     adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[[1]]
+#     group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
+#
+#     xl_names <- adj_mats %>% names() %>% rep(times = reps) %>%
+#         paste0("_", rep(1:reps, each = ncol(adj_mats)))
+#
+#     xl_vals <- adj_mats[lower.tri(adj_mats)]
+#
+#     xl_mat <- matrix(sample(xl_vals, size = n*n, replace = T), nrow = n, ncol = n)
+#
+#     diag(xl_mat) <- 1
+#
+#     dimnames(xl_mat) <- list(xl_names, xl_names)
+#
+#     xl_groups <- rep(group_vec, times = reps)
+#
+#     nel <- adjToNetwork(adj_mats = xl_mat, group_vec = xl_groups,
+#                         edge_attrs = "all", node_attrs = "all",
+#                         arrange_co = TRUE, width_type = "partcor", directed = F,
+#                         self_loops = F)
+#
+#     # check nr of non 0 edges
+#     n_edges <- sum(abs(xl_mat[xl_mat %>% upper.tri()]) > 0)
+#     expect_error(anvis(nel, output_type = "cytoscape", vis_save = T,
 #                        save_names = paste0("network_nodes_", n, "_edges_", n_edges)),
 #                  NA)
 # })
