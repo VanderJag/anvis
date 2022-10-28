@@ -15,7 +15,7 @@ test_that("networks are converted into the expected format from graphNEL", {
                            edge_attrs = "none",
                            output_as = "graphNEL")
 
-  test_res <- dfsFromNet(test_obj)
+  test_res <- dfsFromNetwork(test_obj)
 
   expect_equal(test_res, control)
 })
@@ -38,7 +38,7 @@ test_that("networks are converted into the expected format from igraph", {
                              edge_attrs = "none",
                              output_as = "igraph")
 
-    test_res <- dfsFromNet(test_obj)
+    test_res <- dfsFromNetwork(test_obj)
 
     expect_equal(test_res, control)
 })
@@ -50,7 +50,7 @@ test_that("single network is not converted into multi level list", {
                             edge_attrs = "none",
                             output_as = "graphNEL")
 
-    test_res <- dfsFromNet(test_obj)
+    test_res <- dfsFromNetwork(test_obj)
 
     expect_true(is_network_list(test_res))
 })

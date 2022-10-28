@@ -1,4 +1,4 @@
-dfsFromNet <- function(networks) {
+dfsFromNetwork <- function(networks) {
 
     # Make sure input is a list, we will iterate later
     if (!inherits(networks, "list")) {
