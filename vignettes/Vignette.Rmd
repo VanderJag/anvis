@@ -37,7 +37,7 @@ visualizations. It generates visual styling for network properties to highlight
 the most relevant features. In addition, the package is prudently suited to 
 create multiple network comparisons to study different states of the given 
 system. The basic visualization tools and functions (pre-requisite to applying 
-anvis skins) are imported from popular network visualization platforms: 
+`anvis` skins) are imported from popular network visualization platforms: 
 `r CRANpkg("igraph")`, and [Cytoscape](https://cytoscape.org/) (via 
 `r Biocpkg("RCy3")`). Any user familiar with these software packages will be 
 easily able to extend and customize the visualizations made with `anvis`. `anvis` 
