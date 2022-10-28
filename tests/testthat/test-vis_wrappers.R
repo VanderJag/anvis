@@ -406,7 +406,7 @@ test_that("xgmml output contains the same attributes as the input data", {
     node_attrs <- output$vertices %>% names()
     node_attrs[(node_attrs %in% c("node"))] <- "name"
 
-    anvis(nets, output_type = "network",
+    anvis(output, output_type = "network",
                      netw_ext = "XGMML")
 
     xgmml_l <- readLines("network.xgmml")
@@ -474,22 +474,6 @@ test_that("igraph grid titles need correct length else error", {
             igr_par_opts = list(mar=c(2,4,5,4)),
             igr_grid_names = paste("patient", LETTERS[1:length(adj_mats)-1])),
       "Grid names must be TRUE, FALSE, or of length matching")
-})
-
-
-test_that("igraph grid titles cause warning when requested but adj list unnamed", {
-    adj_mats <- readRDS(test_path("fixtures", "adj_matrix_list.rds"))[1:3]
-    group_vec <- readRDS(test_path("fixtures", "group_vec_adj_matrix.rds"))
-
-    nets <- adjToNetwork(adj_mats = adj_mats, group_vec = group_vec,
-                         edge_attrs = "all", node_attrs = "all",
-                         arrange_co = TRUE, width_type = "partcor")
-
-    expect_warning(
-        anvis(nets, output_type = "igraph", vis_save = F, igr_grid = c(1,3),
-              igr_par_opts = list(mar=c(2,4,5,4)),
-              igr_grid_names = T),
-        "`igr_grid_names` is TRUE but no names were found")
 })
 
 

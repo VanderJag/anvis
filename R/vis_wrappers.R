@@ -229,13 +229,6 @@ anvis <- function(networks,
                          ", length of `networks` = ", n_nets, ".", call.=FALSE)
                 }
             }
-            # Below code make more sense with default igr_grid_names = FALSE
-            #  else if (isTRUE(igr_grid_names)) {
-            #     if (length(names(networks)) != n_nets) {
-            #         warning("`igr_grid_names` is TRUE but no names were found in ",
-            #                 "network list.")
-            #     }
-            # }
 
             if (vis_save) {
                 start_saving(vis_export_type, vis_export_opts, save_names[[1]])
