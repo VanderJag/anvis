@@ -2,10 +2,10 @@ Package: anvis
 Title: Automated Network VISualization: Facilitating interpretation and comparison of networks by visualizing derived network properties
 Version: 0.99.0
 Authors@R: c(
-    person("Robert", "Koetsier", email = "robertkoetsier778@gmail.com", role = "aut", 
-           comment = c(ORCID = "0000-0002-4477-5401")),
-    person("Sanjeevan", "Jahagirdar", email = "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+    person("Robert", "Koetsier", email = "robertkoetsier778@gmail.com", 
+    role = "aut", comment = c(ORCID = "0000-0002-4477-5401")),
+    person("Sanjeevan", "Jahagirdar", email = "sanjeevan.jahagirdar@wur.nl", 
+    role = c("aut", "cre"), comment = c(ORCID = "0000-0003-2213-4360"))
     )
 Description: This package automates the process of creating network 
     visualizations. It generates visual styling for network properties 
