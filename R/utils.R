@@ -144,6 +144,9 @@ dfs_from_igraph <- function(igraph_obj) {
     names(dfs$vertices) <- names(dfs$vertices) %>%
         stringr::str_replace_all("^name$", "node")
 
+    # Rownames can be omitted since they are equal to node column
+    row.names(dfs$vertices) <- NULL
+
     names(dfs$edges) <- names(dfs$edges) %>%
         stringr::str_replace_all("^from$", "source") %>%
         stringr::str_replace_all("^to$", "target")
