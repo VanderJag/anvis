@@ -3,6 +3,7 @@
 export(addVisAttrs)
 export(adjToNetwork)
 export(anvis)
+export(dfsFromNetwork)
 export(visCytoscape)
 export(visIgraph)
 importFrom(magrittr,"%>%")
