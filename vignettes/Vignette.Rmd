@@ -43,9 +43,7 @@ system. The basic visualization tools and functions (pre-requisite to applying
 easily able to extend and customize the visualizations made with `anvis`. `anvis` 
 can be integrated in any user-defined analysis pipeline, to this end `anvis` 
 offers exports of networks and the added attributes (e.g. node size and edge color) 
-in various common formats. Relatively small networks offer optimal results, so 
-it is recommended to include a maximum of 100 nodes (variables) or 500 edges 
-(similarity scores or similar relations). 
+in various common formats. 
 
 * Brief review of similar packages (create a list and discuss with Sanjee, 
 possibly integrate this: For visualization of larger networks we refer users to 
@@ -561,7 +559,22 @@ since problems may occur when it is accessed with `r Biocpkg("RCy3")` (this
 package is used by `anvis` to communicate with Cytoscape). To be available for 
 network visualizations with `anvis`, Cytoscape needs to be running on your machine. 
 
-* EXPLAIN THE LOGIC BEHIND THE ARGUMENT NAMING? 
+There are slight differences in the methods used by Cytoscape and igraph for the
+positioning of nodes and edges. As a result, visualizations of large networks 
+or directed networks may look more comprehensible when made with Cytoscape. Since
+plotting with igraph allows placing multiple visualizations in a grid, we 
+recommend using igraph for the comparison of networks. 
+
+For optimal results it is recommended to include a maximum of 100 nodes or 500 
+edges for igraph visualizations, and 250 nodes or 2500 edges for Cytoscape 
+visualizations.
+
+The `anvis()` function offers some arguments that are only relevant to specific
+output types. Arguments starting with "vis_" will affect both the visualizations
+made with Cytoscape or igraph, the prefix "igr_" is used for arguments that are
+only relevant for igraph visualizations, prefix "cyto_" arguments only affect
+cytoscape visualizations, and prefix "netw_" arguments are relevant only for 
+network exports.
 
 ## Creating a basic visualization 
 
