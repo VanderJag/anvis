@@ -79,6 +79,9 @@ A detailed description of the options can be found in the Details section.}
 \item{colorblind}{Logical (default \code{FALSE}), determining if the default colors
 should be exchanged for colorblind accessible colors.}
 
+\item{output_as}{Network object output type, one of \code{"graphNEL"}, \code{"igraph"},
+\code{"list"}.}
+
 \item{edge_color_func}{A function that takes as first argument a number, and
 returns a vector of colors, the length of which equals the input number.
 The first colors in this vector will be used for low values, the last

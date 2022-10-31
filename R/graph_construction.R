@@ -182,6 +182,8 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #'     the same node names to be present in all networks. Also requires 'size'
 #'     column to be present in node tables, so `node_attrs` should be 'all' or
 #'     include 'size'.
+#' @param output_as Network object output type, one of `"graphNEL"`, `"igraph"`,
+#'     `"list"`.
 #'
 #' @seealso [addVisAttrs] for adding attributes to an existing network objects.
 #'
