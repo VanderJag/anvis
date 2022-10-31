@@ -13,6 +13,8 @@
 #'
 #' @examples
 #' n_distinct_cols(6)
+#'
+#' @noRd
 n_distinct_cols <- function(n, colors = NULL) {
 
   # check correct n is supplied
