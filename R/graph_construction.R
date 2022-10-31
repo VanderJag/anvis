@@ -132,7 +132,7 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #' sigmoid. `"partcor"`, which is intended to be use for partial correlation
 #' values (range -1 to 1). For this method, edge widths will be the cube root
 #' of absolute weight values, scaled with a sigmoid. The option `"MI"` is meant
-#' to be used with weights derived from mutual information (range 0 to +∞).
+#' to be used with weights derived from mutual information (range 0 to +Inf).
 #' Widths will be the weights divided by to maximum weight, then scaled with
 #' a sigmoid. `"default_scaling"` applies the same transformation as `"MI"`,
 #' as a result scaling the any weights to range 0 to 1.
@@ -191,6 +191,23 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #' added corresponding with the provided input arguments.
 #'
 #' @export
+#'
+#' @examples
+#' # Create grouping vector for the nodes of sepsis data
+#' proteins <- colnames(sepsis[[1]])
+#' groups <- dplyr::case_when(
+#'     stringr::str_starts(proteins, "IL") ~ "group A",
+#'     stringr::str_starts(proteins, "CCL") ~ "group B",
+#'     stringr::str_starts(proteins, "CXCL") ~ "group C",
+#'     TRUE ~ "group D")
+#'
+#' # Create a network with node groups, color, and size, and edge width, and color
+#' #   attributes added. We'll use the first network from our sepsis example data
+#' adjToNetwork(sepsis[[1]],
+#'              node_attrs = "all",
+#'              edge_attrs = "all",
+#'              width_type = "partcor",
+#'              group_vec = groups)
 adjToNetwork <- function(adj_mats,
                          directed = FALSE,
                          self_loops = FALSE,
@@ -332,6 +349,28 @@ adjToNetwork <- function(adj_mats,
 #' adding node and edge attributes in a single step.
 #'
 #' @export
+#'
+#' @examples
+#' # Create grouping vector for the nodes of sepsis data
+#' proteins <- colnames(sepsis[[1]])
+#' groups <- dplyr::case_when(
+#'     stringr::str_starts(proteins, "IL") ~ "group A",
+#'     stringr::str_starts(proteins, "CCL") ~ "group B",
+#'     stringr::str_starts(proteins, "CXCL") ~ "group C",
+#'     TRUE ~ "group D")
+#'
+#' # Create a network without additional attributes. Users that are adding
+#' #   attributes an to existing network can skip this step
+#' netw <- adjToNetwork(sepsis[[1]],
+#'              node_attrs = "none",
+#'              edge_attrs = "none")
+#'
+#' # Add attributes to our network
+#' addVisAttrs(netw,
+#'             node_attrs = "all",
+#'             edge_attrs = "all",
+#'             width_type = "partcor",
+#'             group_vec = groups)
 addVisAttrs <- function(network,
                         node_attrs = c("all", "none", "group",
                                        "color_group", "size"),

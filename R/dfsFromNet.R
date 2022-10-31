@@ -14,6 +14,16 @@
 #'     if multiple networks have been provided as input.
 #'
 #' @export
+#'
+#' @examples
+#' # We create basic networks for this example
+#' nets <- adjToNetwork(sepsis[1:2],
+#'              node_attrs = "size",
+#'              edge_attrs = "width",
+#'              width_type = "partcor")
+#'
+#' # Convert networks
+#' dfsFromNetwork(nets)
 dfsFromNetwork <- function(networks) {
 
     # Make sure input is a list, we will iterate later

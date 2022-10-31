@@ -23,3 +23,13 @@ This function takes objects of class "igraph" or "graphNEL" (or a list
 of these objects), and converts them into a networks represented as lists
 of data frames.
 }
+\examples{
+# We create basic networks for this example
+nets <- adjToNetwork(sepsis[1:2],
+             node_attrs = "size",
+             edge_attrs = "width",
+             width_type = "partcor")
+
+# Convert networks
+dfsFromNetwork(nets)
+}

@@ -110,7 +110,7 @@ to 1). Widths will be the absolute value of the correlation, scaled with a
 sigmoid. \code{"partcor"}, which is intended to be use for partial correlation
 values (range -1 to 1). For this method, edge widths will be the cube root
 of absolute weight values, scaled with a sigmoid. The option \code{"MI"} is meant
-to be used with weights derived from mutual information (range 0 to +∞).
+to be used with weights derived from mutual information (range 0 to +Inf).
 Widths will be the weights divided by to maximum weight, then scaled with
 a sigmoid. \code{"default_scaling"} applies the same transformation as \code{"MI"},
 as a result scaling the any weights to range 0 to 1.
@@ -121,6 +121,28 @@ be assigned the largest width, but they are the smallest group, vice versa
 for the lowest percentiles. This argument can be abbreviated.
 }
 
+\examples{
+# Create grouping vector for the nodes of sepsis data
+proteins <- colnames(sepsis[[1]])
+groups <- dplyr::case_when(
+    stringr::str_starts(proteins, "IL") ~ "group A",
+    stringr::str_starts(proteins, "CCL") ~ "group B",
+    stringr::str_starts(proteins, "CXCL") ~ "group C",
+    TRUE ~ "group D")
+
+# Create a network without additional attributes. Users that are adding
+#   attributes an to existing network can skip this step
+netw <- adjToNetwork(sepsis[[1]],
+             node_attrs = "none",
+             edge_attrs = "none")
+
+# Add attributes to our network
+addVisAttrs(netw,
+            node_attrs = "all",
+            edge_attrs = "all",
+            width_type = "partcor",
+            group_vec = groups)
+}
 \seealso{
 \link{adjToNetwork} for creating a network from an adjacency matrix and
 adding node and edge attributes in a single step.

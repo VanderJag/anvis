@@ -155,6 +155,26 @@ networks in a grid, for easier comparison.
 Note: When using this function to create visualizations with Cytoscape, the
 cytoscape software needs to be running in the background already.
 }
+\examples{
+# Create grouping vector for the nodes of sepsis data
+proteins <- colnames(sepsis[[1]])
+groups <- dplyr::case_when(
+    stringr::str_starts(proteins, "IL") ~ "group A",
+    stringr::str_starts(proteins, "CCL") ~ "group B",
+    stringr::str_starts(proteins, "CXCL") ~ "group C",
+    TRUE ~ "group D")
+
+# Create a network with node groups, color, and size, and edge width, and color
+#   attributes added. We'll use the first network from our sepsis example data
+sepsis_nets <- adjToNetwork(sepsis[1:2],
+             node_attrs = "all",
+             edge_attrs = "all",
+             width_type = "partcor",
+             group_vec = groups)
+
+# Visualize with igraph
+anvis(sepsis_nets)
+}
 \seealso{
 Generate more interesting visualizations by using \link{addVisAttrs}
 for adding attributes to an existing network objects, and

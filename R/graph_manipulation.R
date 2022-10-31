@@ -305,7 +305,7 @@ sort_avg_connectivity <- function(nodes_list) {
 #'   sigmoid. `"partcor"`, which is intended to be use for partial correlation
 #'   values (range -1 to 1). For this method, edge widths will be the cube root
 #'   of absolute weight values, scaled with a sigmoid. The option `"MI"` is meant
-#'   to be used with weights derived from mutual information (range 0 to +∞).
+#'   to be used with weights derived from mutual information (range 0 to +Inf).
 #'   Widths will be the weights divided by to maximum weight, then scaled with
 #'   a sigmoid. `"default_scaling"` applies the same transformation as `"MI"`,
 #'   as a result scaling the any weights to range 0 to 1.
@@ -346,7 +346,7 @@ edge_weight_to_widths <- function(edge_table,
   if (width_type == "MI" &
       (min(edge_table$weight) < 0)) {
     warning("'MI' width ",
-            "type expect edge weight range 0 to +∞, while your data has range: ",
+            "type expect edge weight range 0 to +Inf, while your data has range: ",
             range(edge_table$weight) %>% paste(collapse = " to "), ". ",
             "Unexpected results may be returned for edge widths.")
   }
