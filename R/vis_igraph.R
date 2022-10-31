@@ -57,6 +57,8 @@
 #' @return Returns `NULL` invisibly. This functions creates visualizations and
 #'     will show them directly in your R session or save them to the selected
 #'     graphical device.
+#'
+#' @noRd
 visIgraph <- function(network,
                       directed = if (is(network, "graphNEL")) {
                           graph::edgemode(network) == "directed"

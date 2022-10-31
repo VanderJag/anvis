@@ -8,6 +8,8 @@
 #'   network.
 #' @param group_vec A vector contains group labels for each row in `node_table`.
 #' @return Returns `node_table` with 'group' column added, sorted by group.
+#'
+#' @noRd
 group_nodes <- function(node_table, group_vec) {
 
   group_vec <- as.character(group_vec)
@@ -50,6 +52,8 @@ group_nodes <- function(node_table, group_vec) {
 #'   nodesize. It increases the spacing between nodes.
 #'
 #' @return Returns `node_table` with 'x' and 'y' column added or overwritten.
+#'
+#' @noRd
 add_node_pos <- function(node_table, nodesize, layout = c("circle"), space_fct = 1.2) {
 
   layout <- match.arg(layout)
@@ -90,6 +94,8 @@ add_node_pos <- function(node_table, nodesize, layout = c("circle"), space_fct =
 #'
 #' @return Returns `node_table` with 'color' column, that contains a different
 #'   color for each node group.
+#'
+#' @noRd
 add_colors <- function(node_table, group_colors = NULL) {
   # Group information is required to add group coloring
   if (!"group" %in% colnames(node_table)) {
@@ -138,6 +144,8 @@ add_colors <- function(node_table, group_colors = NULL) {
 #'   This argument determines a factor for linear scaling of node size. Factors
 #'   are 15, 25, and 1, respectively.
 #' @return Returns `node_table` with an added column 'size'.
+#'
+#' @noRd
 node_size_connectivity <- function(node_table,
                                    edge_table,
                                    size_type = c("igraph", "cytoscape", "scaled_only")) {
@@ -188,6 +196,8 @@ node_size_connectivity <- function(node_table,
 #'   node names. A least some of the tables should have a 'size' column, containing
 #'   the connectivity information.
 #' @return Returns the same `nodes_list` as was used as input, with rows reordered.
+#'
+#' @noRd
 sort_avg_connectivity <- function(nodes_list) {
   # Allow sorting of a single node_table that is not a list
   if (!inherits(nodes_list, "list")) {
@@ -316,6 +326,8 @@ sort_avg_connectivity <- function(nodes_list) {
 #'   for the lowest percentiles. This argument can be abbreviated.
 #' @return Return the input data frame with an added column "width", which can
 #'   be used to scale edges in a network visualization.
+#'
+#' @noRd
 edge_weight_to_widths <- function(edge_table,
                                   width_type = c("default_scaling", "MI", "cor",
                                                  "partcor", "ranked", "percentile")) {
@@ -399,6 +411,8 @@ edge_weight_to_widths <- function(edge_table,
 #'   returned
 #' @return A vector of edge widths which matches `n_edges` with its length. Widths
 #'   vary between 1 and 0.025.
+#'
+#' @noRd
 percentile_widths <- function(n_edges) {
   # The widths will be assigned based on the percentile a connection is in.
   # Specify percentiles that will get distinct widths
@@ -445,6 +459,8 @@ percentile_widths <- function(n_edges) {
 #'
 #' @return Returns the input `edge_table` with a column called 'color' added
 #' (or overwritten if it was already present).
+#'
+#' @noRd
 weights_to_color <- function(edge_table, edge_color_func = NULL) {
     # A column named 'weight' is required to determine edge colors
     if (!"weight" %in% colnames(edge_table)) {

@@ -12,6 +12,8 @@
 #'     of nodes with themselves (diagonal of the adjacency matrix) be retained?
 #' @return Returns data frame representing a network as weighted edge list.
 #'     Columns are source, target, and weight.
+#'
+#' @noRd
 adj_matrix_to_edgelist <- function(adj_matrix, directed = FALSE, self_loops = FALSE) {
 
     # If the number and column of the adjacency matrix is not equal there may be
@@ -93,6 +95,8 @@ adj_matrix_to_edgelist <- function(adj_matrix, directed = FALSE, self_loops = FA
 #'   names.
 #' @return Returns a data frame with a single column: 'node', which holds the
 #'   names of the network's nodes.
+#'
+#' @noRd
 adj_matrix_to_nodetable <- function(adj_matrix) {
 
   data.frame("node" = colnames(adj_matrix))
@@ -145,7 +149,11 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #' @param adj_mats A square adjacency matrix or data frame or a list of these.
 #'     The data in the matrix is used as edge weights for the network. Row names
 #'     and column names specify interacting nodes, and are required.
-#' @inheritParams adj_matrix_to_edgelist
+#' @param directed Logical (default `FALSE`), whether edges are directed in the
+#'     network. If `FALSE`, the information in the lower triangle of the
+#'     adjacency matrix will be discarded.
+#' @param self_loops Logical (default `FALSE`). Should the values for interaction
+#'     of nodes with themselves (diagonal of the adjacency matrix) be retained?
 #' @param node_attrs Character strings, one or multiple of 'none', 'all' (default), 'group',
 #'     'color_group', and 'size'. This argument can be used to choose which
 #'     additional attributes should be added to the node table. Selecting 'group'
@@ -167,9 +175,17 @@ adj_matrix_to_nodetable <- function(adj_matrix) {
 #'     Alternatively, provide a list of group vectors with one vector for each
 #'     adj. matrix in the list. For this information to be added, `node_attrs`
 #'     must be 'group' or 'all'.
-#' @inheritParams add_colors
-#' @inheritParams node_size_connectivity
-#' @inheritParams weights_to_color
+#' @param group_colors Optional (default: `NULL`), vector of character strings
+#'   representing colors, with a color for each node group. Colors may be
+#'   provided either as color names, e.g. 'green', or as hex, e.g. "#00FF00".
+#' @param size_type One of "igraph" (default), "cytoscape", or "scaled_only".
+#'   This argument determines a factor for linear scaling of node size. Factors
+#'   are 15, 25, and 1, respectively.
+#' @param edge_color_func A function that takes as first argument a number, and
+#'     returns a vector of colors, the length of which equals the input number.
+#'     The first colors in this vector will be used for low values, the last
+#'     colors will be assigned to high values. This argument is optional
+#'     (default `NULL`).
 #' @param colorblind Logical (default `FALSE`), determining if the default colors
 #'     should be exchanged for colorblind accessible colors.
 #' @param width_type Argument used to convert edge weights into widths for

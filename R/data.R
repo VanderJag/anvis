@@ -74,15 +74,3 @@
 #' @source For more information on the raw data or a download thereof:
 #' \url{doi:10.1016/j.margeo.2005.02.009}
 "paleo"
-
-
-
-
-
-
-
-
-
-
-
-

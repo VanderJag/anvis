@@ -45,6 +45,8 @@
 #'     Cytoscape version 3.8.x is detected? `FALSE` to skip this test.
 #'     Cytoscape version 3.8.x has problems interacting with `RCy3`, first
 #'     visualization may not show.
+#'
+#' @noRd
 visCytoscape <- function(network,
                          directed = if (is(network, "graphNEL")) {
                              graph::edgemode(network) == "directed"
